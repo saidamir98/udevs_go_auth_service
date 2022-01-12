@@ -1,0 +1,41 @@
+syntax="proto3";
+
+package settings_service;
+option go_package="genproto/settings_service";
+
+import "settings.proto";
+import "google/protobuf/empty.proto";
+
+service SphereService {
+    rpc Create(CreateSphereRequest) returns (Sphere) {}
+    rpc GetByID(SpherePrimaryKey) returns (Sphere) {}
+    rpc GetList(GetSphereListRequest) returns (GetSphereListResponse) {}
+    rpc Update(UpdateSphereRequest) returns (Sphere) {}
+    rpc Delete(SpherePrimaryKey) returns (google.protobuf.Empty) {}
+}
+
+message CreateSphereRequest {
+    string title = 2;
+    string description = 3;
+}
+
+message SpherePrimaryKey {
+    string id = 1;
+}
+
+message GetSphereListRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    string search = 3;
+}
+
+message GetSphereListResponse {
+    int32 count = 1;
+    repeated Sphere spheres = 2;
+}
+
+message UpdateSphereRequest {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+}

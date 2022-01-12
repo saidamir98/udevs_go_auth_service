@@ -1,0 +1,68 @@
+syntax="proto3";
+
+package settings_service;
+option go_package="genproto/settings_service";
+
+import "settings.proto";
+import "google/protobuf/empty.proto";
+
+service PositionService {
+    rpc Create(CreatePositionRequest) returns (Position) {}
+    rpc GetByID(PositionPrimaryKey) returns (Position) {}
+    rpc GetList(GetPositionListRequest) returns (GetPositionListResponse) {}
+    rpc Update(UpdatePositionRequest) returns (Position) {}
+    rpc Delete(PositionPrimaryKey) returns (google.protobuf.Empty) {}
+    rpc AddLevelItem(AddLevelItemRequest) returns (Position) {}
+    rpc UpdateLevelItem(UpdateLevelItemRequest) returns (Position) {}
+    rpc RemoveLevelItem(RemoveLevelItemRequest) returns (Position) {}
+}
+
+message CreatePositionRequest {
+    string title = 2;
+    string description = 3;
+}
+
+message PositionSlim {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+}
+
+message PositionPrimaryKey {
+    string id = 1;
+}
+
+message GetPositionListRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    string search = 3;
+}
+
+message GetPositionListResponse {
+    int32 count = 1;
+    repeated PositionSlim positions = 2;
+}
+
+message UpdatePositionRequest {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+}
+
+message AddLevelItemRequest {
+    string title = 2;
+    string description = 3;
+    string position_id = 4;
+}
+
+message UpdateLevelItemRequest {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    string position_id = 4;
+}
+
+message RemoveLevelItemRequest {
+    string id = 1;
+    string position_id = 4;
+}

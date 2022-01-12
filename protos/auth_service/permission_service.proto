@@ -1,0 +1,100 @@
+syntax="proto3";
+
+package auth_service;
+option go_package="genproto/auth_service";
+
+import "auth.proto";
+import "google/protobuf/empty.proto";
+
+service PermissionService {
+    rpc AddRole(AddRoleRequest) returns (Role) {}
+    rpc UpdateRole(UpdateRoleRequest) returns (Role) {}
+    rpc RemoveRole(RolePrimaryKey) returns (Role) {}
+
+    rpc CreatePermission(CreatePermissionRequest) returns (Permission) {}
+    rpc GetPermissionByID(PermissionPrimaryKey) returns (Permission) {}
+    rpc GetPermissionList(GetPermissionListRequest) returns (GetPermissionListResponse) {}
+    rpc UpdatePermission(UpdatePermissionRequest) returns (Permission) {}
+    rpc DeletePermission(PermissionPrimaryKey) returns (google.protobuf.Empty) {}
+
+    rpc UpsertScope(UpsertScopeRequest) returns (Scope) {}
+
+    rpc AddPermissionScope(AddPermissionScopeRequest) returns (PermissionScope) {}
+    rpc RemovePermissionScope(PermissionScopePrimaryKey) returns (PermissionScope) {}
+
+    rpc AddRolePermission(AddRolePermissionRequest) returns (RolePermission) {}
+    rpc RemoveRolePermission(RolePermissionPrimaryKey) returns (RolePermission) {}
+}
+
+message UpsertScopeRequest {
+    string client_platform_id = 1;
+    string path = 2;
+    string method = 3;
+}
+
+message AddRoleRequest {
+    string client_type_id = 2;
+    string name = 3;
+}
+
+message UpdateRoleRequest {
+    string id = 1;
+    string client_type_id = 2;
+    string name = 3;
+}
+
+message RolePrimaryKey {
+    string id = 1;
+}
+
+message CreatePermissionRequest {
+    string client_platform_id = 2;
+    string parent_id = 3;
+    string name = 4;
+}
+
+message PermissionPrimaryKey {
+    string id = 1;
+}
+
+message GetPermissionListRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    string search = 3;
+}
+
+message GetPermissionListResponse {
+    int32 count = 1;
+    repeated Permission permissions = 2;
+}
+
+message UpdatePermissionRequest {
+    string id = 1;
+    string client_platform_id = 2;
+    string parent_id = 3;
+    string name = 4;
+}
+
+message AddPermissionScopeRequest {
+    string permission_id = 1;
+    string client_platform_id = 2;
+    string path = 3;
+    string method = 4;
+}
+
+message PermissionScopePrimaryKey {
+    string permission_id = 1;
+    string client_platform_id = 2;
+    string path = 3;
+    string method = 4;
+}
+
+message AddRolePermissionRequest {
+    string role_id = 1;
+    string permission_id = 2;
+}
+
+message RolePermissionPrimaryKey {
+    string role_id = 1;
+    string permission_id = 2;
+}

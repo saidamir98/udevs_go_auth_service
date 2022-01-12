@@ -1,0 +1,64 @@
+syntax="proto3";
+
+package auth_service;
+option go_package="genproto/auth_service";
+
+import "auth.proto";
+import "google/protobuf/empty.proto";
+
+service SessionService {
+    rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {}
+    rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
+    rpc HasAccess(HasAccessRequest) returns (HasAccessResponse) {}
+}
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    bool user_found = 1;
+    ClientPlatform client_platform = 2;
+    ClientType client_type = 3;
+    User user = 4;
+    Role role = 5;
+    Token token = 6;
+    repeated Permission permissions = 7;
+    repeated Session sessions = 8;   
+}
+
+message LogoutRequest {
+    string access_token = 1;
+}
+
+message RefreshTokenRequest {
+    string refresh_token = 2;
+}
+
+message RefreshTokenResponse {
+    Token token = 6;
+}
+
+message HasAccessRequest {
+    string access_token = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string path = 4;
+    string method = 5;
+}
+
+message HasAccessResponse {
+    string id = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string user_id = 5;
+    string role_id = 6;
+    string ip = 7;
+    string data = 8;
+    string expires_at = 9;
+    string created_at = 10;
+    string updated_at = 11;
+}

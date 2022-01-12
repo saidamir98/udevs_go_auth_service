@@ -1,0 +1,78 @@
+syntax="proto3";
+
+package auth_service;
+option go_package="genproto/auth_service";
+
+import "auth.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (User) {}
+    rpc GetUserByID(UserPrimaryKey) returns (User) {}
+    rpc GetUserList(GetUserListRequest) returns (GetUserListResponse) {}
+    rpc UpdateUser(UpdateUserRequest) returns (User) {}
+    rpc DeleteUser(UserPrimaryKey) returns (google.protobuf.Empty) {}
+
+    rpc AddUserRelation(AddUserRelationRequest) returns (UserRelation) {}
+    rpc RemoveUserRelation(UserRelationPrimaryKey) returns (UserRelation) {}
+
+    rpc UpsertUserInfo(UpsertUserInfoRequest) returns (UserInfo) {}
+}
+
+message UpsertUserInfoRequest {
+    string user_id = 1;
+    google.protobuf.Struct data = 2;
+}
+
+message CreateUserRequest {
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string role_id = 5;
+    string phone = 6;
+    string email = 7;
+    string login = 8;
+    string password = 9;
+    int32 active = 10;
+    string expires_at = 11;
+}
+
+message UserPrimaryKey {
+    string id = 1;
+}
+
+message GetUserListRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    string search = 3;
+}
+
+message GetUserListResponse {
+    int32 count = 1;
+    repeated User users = 2;
+}
+
+message UpdateUserRequest {
+    string id = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string role_id = 5;
+    string phone = 6;
+    string email = 7;
+    string login = 8;
+    string password = 9;
+    int32 active = 10;
+    string expires_at = 11;
+}
+
+message AddUserRelationRequest {
+    string role_id = 1;
+    string permission_id = 2;
+}
+
+message UserRelationPrimaryKey {
+    string role_id = 1;
+    string permission_id = 2;
+}

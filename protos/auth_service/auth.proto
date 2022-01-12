@@ -1,0 +1,155 @@
+syntax="proto3";
+
+package auth_service;
+option go_package="genproto/auth_service";
+
+import "google/protobuf/struct.proto";
+
+enum LoginStrategies {
+    STANDARD = 0;
+    OTP = 1;
+    PASSCODE = 2;
+    ONE2MANY = 3;
+}
+
+enum ConfirmStrategies {
+    PHONE = 0;
+    EMAIL = 1;
+}
+
+enum RelationTypes {
+    BRANCH = 0;
+    REGION = 1;
+}
+
+message ClientPlatform {
+    string id = 1;
+    string project_id = 2;
+    string name = 3;
+    string subdomain = 4;
+}
+
+message ClientType {
+    string id = 1;
+    string name = 2;
+    ConfirmStrategies confirm_by = 3;
+    bool self_register = 4;
+    bool self_recover = 5;
+}
+
+message Relation {
+    string id = 1;
+    string client_type_id = 2;
+    RelationTypes type = 3;
+    string name = 4;
+    string description = 5;
+}
+
+message UserInfoField {
+    string id = 1;
+    string client_type_id = 2;
+    string field_name = 3;
+    string field_type = 4;
+    string data_type = 5;
+}
+
+message Client {
+    string client_platform_id = 1;
+    string client_type_id = 2;
+    LoginStrategies login_strategy = 3;
+}
+
+message Role {
+    string id = 1;
+    string client_type_id = 2;
+    string name = 3;
+}
+
+message Scope {
+    string client_platform_id = 1;
+    string path = 2;
+    string method = 3;
+    int64 requests = 4; 
+}
+
+message Permission {
+    string id = 1;
+    string client_platform_id = 2;
+    string parent_id = 3;
+    string name = 4;
+}
+
+message PermissionScope {
+    string permission_id = 1;
+    string client_platform_id = 2;
+    string path = 3;
+    string method = 4;
+}
+
+message RolePermission {
+    string role_id = 1;
+    string permission_id = 2;
+}
+
+message User {
+    string id = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string role_id = 5;
+    string phone = 6;
+    string email = 7;
+    string login = 8;
+    string password = 9;
+    int32 active = 10;
+    string expires_at = 11;
+    string created_at = 12;
+    string updated_at = 13;
+}
+
+message UserRelation {
+    string user_id = 1;
+    string relation_id = 2;
+}
+
+message UserInfo {
+    string user_id = 1;
+    google.protobuf.Struct data = 2;
+}
+
+message Session {
+    string id = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string user_id = 5;
+    string role_id = 6;
+    string ip = 7;
+    string data = 8;
+    string expires_at = 9;
+    string created_at = 10;
+    string updated_at = 11;
+}
+
+message Passcode {
+    string id = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string user_id = 5;
+    ConfirmStrategies confirm_by = 6;
+    string hashed_code = 7;
+    int32 state = 8;
+    string expires_at = 9;
+    string created_at = 10;
+    string updated_at = 11;
+}
+
+message Token {
+    string access_token = 1;
+    string refresh_token = 2;
+    string created_at = 3;
+    string updated_at = 4;
+    string expires_at = 5;
+    int32 refresh_in_seconds = 6;
+}

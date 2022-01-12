@@ -1,0 +1,10 @@
+DELETE FROM session;
+DELETE FROM users;
+DELETE FROM role_permission;
+DELETE FROM permission_scope;
+DELETE FROM permission;
+DELETE FROM scope;
+DELETE FROM role;
+DELETE FROM client;
+DELETE FROM client_type;
+DELETE FROM client_platform;

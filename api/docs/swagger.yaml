@@ -1,0 +1,786 @@
+definitions:
+  config.Config:
+    properties:
+      defaultLimit:
+        type: string
+      defaultOffset:
+        type: string
+      employeeGRPCPort:
+        type: string
+      employeeServiceHost:
+        type: string
+      environment:
+        description: debug, test, release
+        type: string
+      httpport:
+        type: string
+      httpscheme:
+        type: string
+      scrumGRPCPort:
+        type: string
+      scrumServiceHost:
+        type: string
+      serviceHost:
+        type: string
+      serviceName:
+        type: string
+      settingsGRPCPort:
+        type: string
+      settingsServiceHost:
+        type: string
+      version:
+        type: string
+    type: object
+  http.Response:
+    properties:
+      data: {}
+      description:
+        type: string
+      status:
+        type: string
+    type: object
+  settings_service.AddLevelItemRequest:
+    properties:
+      description:
+        type: string
+      position_id:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.CreatePositionRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.CreateSphereRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.GetPositionListResponse:
+    properties:
+      count:
+        type: integer
+      positions:
+        items:
+          $ref: '#/definitions/settings_service.PositionSlim'
+        type: array
+    type: object
+  settings_service.GetSphereListResponse:
+    properties:
+      count:
+        type: integer
+      spheres:
+        items:
+          $ref: '#/definitions/settings_service.Sphere'
+        type: array
+    type: object
+  settings_service.Position:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      level_items:
+        items:
+          $ref: '#/definitions/settings_service.Position_LevelItem'
+        type: array
+      title:
+        type: string
+    type: object
+  settings_service.Position_LevelItem:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.PositionSlim:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.Sphere:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.UpdateLevelItemRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      position_id:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.UpdatePositionRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  settings_service.UpdateSphereRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a api gateway
+  termsOfService: https://udevs.io
+paths:
+  /config:
+    get:
+      consumes:
+      - application/json
+      description: show service config data when the service environment set to debug
+        mode
+      operationId: get_config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Response data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/config.Config'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.Response'
+      summary: get config data on the debug mode
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: this returns "pong" messsage to show service is working
+      operationId: ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Response data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.Response'
+      summary: returns "pong" message
+  /position:
+    get:
+      consumes:
+      - application/json
+      description: Get Position List
+      operationId: get_position_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetPositionListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.GetPositionListResponse'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Position List
+      tags:
+      - Position
+    post:
+      consumes:
+      - application/json
+      description: Create Position
+      operationId: create_position
+      parameters:
+      - description: position
+        in: body
+        name: position
+        required: true
+        schema:
+          $ref: '#/definitions/settings_service.CreatePositionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: PositionBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Position'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Position
+      tags:
+      - Position
+    put:
+      consumes:
+      - application/json
+      description: Update Position
+      operationId: update_position
+      parameters:
+      - description: position
+        in: body
+        name: position
+        required: true
+        schema:
+          $ref: '#/definitions/settings_service.UpdatePositionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PositionBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Position'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Position
+      tags:
+      - Position
+  /position/{position_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Position
+      operationId: delete_position
+      parameters:
+      - description: position_id
+        in: path
+        name: position_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Position
+      tags:
+      - Position
+    get:
+      consumes:
+      - application/json
+      description: Get Position By ID
+      operationId: get_position_by_id
+      parameters:
+      - description: position_id
+        in: path
+        name: position_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PositionBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Position'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Position By ID
+      tags:
+      - Position
+  /position/{position_id}/level/{level_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove Level Item
+      operationId: remove_level_item
+      parameters:
+      - description: position_id
+        in: path
+        name: position_id
+        required: true
+        type: string
+      - description: level_id
+        in: path
+        name: level_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Remove Level Item
+      tags:
+      - Position
+  /position/level:
+    post:
+      consumes:
+      - application/json
+      description: Add Level Item
+      operationId: add_level_item
+      parameters:
+      - description: AddLevelItemRequestBody
+        in: body
+        name: position
+        required: true
+        schema:
+          $ref: '#/definitions/settings_service.AddLevelItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: PositionBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Position'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Add Level Item
+      tags:
+      - Position
+    put:
+      consumes:
+      - application/json
+      description: Update Level Item
+      operationId: update_level_item
+      parameters:
+      - description: UpdateLevelItemRequestBody
+        in: body
+        name: position
+        required: true
+        schema:
+          $ref: '#/definitions/settings_service.UpdateLevelItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PositionBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Position'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Level Item
+      tags:
+      - Position
+  /sphere:
+    get:
+      consumes:
+      - application/json
+      description: Get Sphere List
+      operationId: get_sphere_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetSphereListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.GetSphereListResponse'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Sphere List
+      tags:
+      - Sphere
+    post:
+      consumes:
+      - application/json
+      description: Create Sphere
+      operationId: create_sphere
+      parameters:
+      - description: CreateSphereRequestBody
+        in: body
+        name: sphere
+        required: true
+        schema:
+          $ref: '#/definitions/settings_service.CreateSphereRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Sphere data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Sphere'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Sphere
+      tags:
+      - Sphere
+    put:
+      consumes:
+      - application/json
+      description: Update Sphere
+      operationId: update_sphere
+      parameters:
+      - description: UpdateSphereRequestBody
+        in: body
+        name: sphere
+        required: true
+        schema:
+          $ref: '#/definitions/settings_service.UpdateSphereRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sphere data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Sphere'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Sphere
+      tags:
+      - Sphere
+  /sphere/{sphere_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Sphere
+      operationId: delete_sphere
+      parameters:
+      - description: sphere_id
+        in: path
+        name: sphere_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Sphere
+      tags:
+      - Sphere
+    get:
+      consumes:
+      - application/json
+      description: Get Sphere By ID
+      operationId: get_sphere_by_id
+      parameters:
+      - description: sphere_id
+        in: path
+        name: sphere_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: SphereBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/settings_service.Sphere'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Sphere By ID
+      tags:
+      - Sphere
+swagger: "2.0"

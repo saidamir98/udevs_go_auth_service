@@ -1,0 +1,3 @@
+[submodule "udevs_protos"]
+	path = udevs_protos
+	url = git@github.com:saidamir98/udevs_protos.git

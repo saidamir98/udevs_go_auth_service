@@ -1,0 +1,7 @@
+syntax="proto3";
+
+package settings_service;
+option go_package="genproto/settings_service";
+
+import "position_service.proto";
+import "sphere_service.proto";

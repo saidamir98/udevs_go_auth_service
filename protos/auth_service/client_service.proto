@@ -1,0 +1,146 @@
+syntax="proto3";
+
+package auth_service;
+option go_package="genproto/auth_service";
+
+import "auth.proto";
+import "google/protobuf/empty.proto";
+
+service ClientService {
+    rpc CreateClientPlatform(CreateClientPlatformRequest) returns (ClientPlatform) {}
+    rpc GetClientPlatformByID(ClientPlatformPrimaryKey) returns (ClientPlatform) {}
+    rpc GetClientPlatformList(GetClientPlatformListRequest) returns (GetClientPlatformListResponse) {}
+    rpc UpdateClientPlatform(UpdateClientPlatformRequest) returns (ClientPlatform) {}
+    rpc DeleteClientPlatform(ClientPlatformPrimaryKey) returns (google.protobuf.Empty) {}
+    
+    rpc CreateClientType(CreateClientTypeRequest) returns (ClientType) {}
+    rpc GetClientTypeByID(ClientTypePrimaryKey) returns (ClientType) {}
+    rpc GetClientTypeList(GetClientTypeListRequest) returns (GetClientTypeListResponse) {}
+    rpc UpdateClientType(UpdateClientTypeRequest) returns (ClientType) {}
+    rpc DeleteClientType(ClientTypePrimaryKey) returns (google.protobuf.Empty) {}
+
+    rpc AddClient(AddClientRequest) returns (Client) {}
+    rpc UpdateClient(UpdateClientRequest) returns (Client) {}
+    rpc RemoveClient(ClientPrimaryKey) returns (Client) {}
+
+    rpc AddRelation(AddRelationRequest) returns (Relation) {}
+    rpc UpdateRelation(UpdateRelationRequest) returns (Relation) {}
+    rpc RemoveRelation(RelationPrimaryKey) returns (Relation) {}
+    
+    rpc AddUserInfoField(AddUserInfoFieldRequest) returns (UserInfoField) {}
+    rpc UpdateUserInfoField(UpdateUserInfoFieldRequest) returns (UserInfoField) {}
+    rpc RemoveUserInfoField(UserInfoFieldPrimaryKey) returns (UserInfoField) {}
+}
+
+message CreateClientPlatformRequest {
+    string project_id = 2;
+    string name = 3;
+    string subdomain = 4;
+}
+
+message ClientPlatformPrimaryKey {
+    string id = 1;
+}
+
+message GetClientPlatformListRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    string search = 3;
+}
+
+message GetClientPlatformListResponse {
+    int32 count = 1;
+    repeated ClientPlatform client_platforms = 2;
+}
+
+message UpdateClientPlatformRequest {
+    string id = 1;
+    string project_id = 2;
+    string name = 3;
+    string subdomain = 4;
+}
+
+message CreateClientTypeRequest {
+    string name = 2;
+    ConfirmStrategies confirm_by = 3;
+    bool self_register = 4;
+    bool self_recover = 5;
+}
+
+message ClientTypePrimaryKey {
+    string id = 1;
+}
+
+message GetClientTypeListRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    string search = 3;
+}
+
+message GetClientTypeListResponse {
+    int32 count = 1;
+    repeated ClientType client_types = 2;
+}
+
+message UpdateClientTypeRequest {
+    string id = 1;
+    string name = 2;
+    ConfirmStrategies confirm_by = 3;
+    bool self_register = 4;
+    bool self_recover = 5;
+}
+
+message AddClientRequest {
+    string client_platform_id = 1;
+    string client_type_id = 2;
+    LoginStrategies login_strategy = 3;
+}
+
+message UpdateClientRequest {
+    string client_platform_id = 1;
+    string client_type_id = 2;
+    LoginStrategies login_strategy = 3;
+}
+
+message ClientPrimaryKey {
+    string client_platform_id = 1;
+    string client_type_id = 2;
+}
+
+message AddRelationRequest {
+    string client_type_id = 2;
+    RelationTypes type = 3;
+    string name = 4;
+    string description = 5;
+}
+
+message UpdateRelationRequest {
+    string id = 1;
+    string client_type_id = 2;
+    RelationTypes type = 3;
+    string name = 4;
+    string description = 5;
+}
+
+message RelationPrimaryKey {
+    string id = 1;
+}
+
+message AddUserInfoFieldRequest {
+    string client_type_id = 2;
+    string field_name = 3;
+    string field_type = 4;
+    string data_type = 5;
+}
+
+message UpdateUserInfoFieldRequest {
+    string id = 1;
+    string client_type_id = 2;
+    string field_name = 3;
+    string field_type = 4;
+    string data_type = 5;
+}
+
+message UserInfoFieldPrimaryKey {
+    string id = 1;
+}

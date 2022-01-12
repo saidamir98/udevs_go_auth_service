@@ -1,0 +1,23 @@
+syntax="proto3";
+
+package settings_service;
+option go_package="genproto/settings_service";
+
+message Sphere {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+}
+
+message Position {
+    message LevelItem {
+        string id = 1;
+        string title = 3;
+        string description = 4;
+    }
+    
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    repeated LevelItem level_items = 4;
+}
