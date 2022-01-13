@@ -8,13 +8,17 @@ import (
 )
 
 type Store struct {
-	db *sqlx.DB
-
-	clientPlatform storage.ClientPlatformRepoI
-	clientType     storage.ClientTypeRepoI
-	client         storage.ClientRepoI
-	relation       storage.RelationRepoI
-	userInfoField  storage.UserInfoFieldRepoI
+	db              *sqlx.DB
+	clientPlatform  storage.ClientPlatformRepoI
+	clientType      storage.ClientTypeRepoI
+	client          storage.ClientRepoI
+	relation        storage.RelationRepoI
+	userInfoField   storage.UserInfoFieldRepoI
+	role            storage.RoleRepoI
+	permission      storage.PermissionRepoI
+	scope           storage.ScopeRepoI
+	permissionScope storage.PermissionScopeRepoI
+	rolePermission  storage.RolePermissionRepoI
 }
 
 func NewPostgres(psqlConnString string) (storage.StorageI, error) {
@@ -67,4 +71,44 @@ func (s *Store) UserInfoField() storage.UserInfoFieldRepoI {
 	}
 
 	return s.userInfoField
+}
+
+func (s *Store) Role() storage.RoleRepoI {
+	if s.role == nil {
+		s.role = NewRoleRepo(s.db)
+	}
+
+	return s.role
+}
+
+func (s *Store) Permission() storage.PermissionRepoI {
+	if s.permission == nil {
+		s.permission = NewPermissionRepo(s.db)
+	}
+
+	return s.permission
+}
+
+func (s *Store) Scope() storage.ScopeRepoI {
+	if s.scope == nil {
+		s.scope = NewScopeRepo(s.db)
+	}
+
+	return s.scope
+}
+
+func (s *Store) PermissionScope() storage.PermissionScopeRepoI {
+	if s.permissionScope == nil {
+		s.permissionScope = NewPermissionScopeRepo(s.db)
+	}
+
+	return s.permissionScope
+}
+
+func (s *Store) RolePermission() storage.RolePermissionRepoI {
+	if s.rolePermission == nil {
+		s.rolePermission = NewRolePermissionRepo(s.db)
+	}
+
+	return s.rolePermission
 }

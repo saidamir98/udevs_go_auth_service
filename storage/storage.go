@@ -6,6 +6,7 @@ import (
 )
 
 var ErrorNotFound = errors.New("record not found")
+var ErrorTheSameId = errors.New("cannot use the same uuid for 'id' and 'parent_id' fields")
 
 type StorageI interface {
 	ClientPlatform() ClientPlatformRepoI
@@ -13,6 +14,11 @@ type StorageI interface {
 	Client() ClientRepoI
 	Relation() RelationRepoI
 	UserInfoField() UserInfoFieldRepoI
+	Role() RoleRepoI
+	Permission() PermissionRepoI
+	Scope() ScopeRepoI
+	PermissionScope() PermissionScopeRepoI
+	RolePermission() RolePermissionRepoI
 }
 
 type ClientPlatformRepoI interface {
@@ -51,4 +57,36 @@ type UserInfoFieldRepoI interface {
 	GetByPK(entity *pb.UserInfoFieldPrimaryKey) (res *pb.UserInfoField, err error)
 	Update(entity *pb.UpdateUserInfoFieldRequest) (rowsAffected int64, err error)
 	Remove(entity *pb.UserInfoFieldPrimaryKey) (rowsAffected int64, err error)
+}
+
+type RoleRepoI interface {
+	Add(entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error)
+	GetByPK(entity *pb.RolePrimaryKey) (res *pb.Role, err error)
+	Update(entity *pb.UpdateRoleRequest) (rowsAffected int64, err error)
+	Remove(entity *pb.RolePrimaryKey) (rowsAffected int64, err error)
+}
+
+type PermissionRepoI interface {
+	Create(entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error)
+	GetList(queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error)
+	GetByPK(pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error)
+	Update(entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error)
+	Delete(pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error)
+}
+
+type ScopeRepoI interface {
+	Upsert(entity *pb.UpsertScopeRequest) (res *pb.ScopePrimaryKey, err error)
+	GetByPK(pKey *pb.ScopePrimaryKey) (res *pb.Scope, err error)
+}
+
+type PermissionScopeRepoI interface {
+	Add(entity *pb.AddPermissionScopeRequest) (res *pb.PermissionScopePrimaryKey, err error)
+	Remove(entity *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error)
+	GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error)
+}
+
+type RolePermissionRepoI interface {
+	Add(entity *pb.AddRolePermissionRequest) (res *pb.RolePermissionPrimaryKey, err error)
+	Remove(entity *pb.RolePermissionPrimaryKey) (rowsAffected int64, err error)
+	GetByPK(pKey *pb.RolePermissionPrimaryKey) (res *pb.RolePermission, err error)
 }

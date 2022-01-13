@@ -32,6 +32,12 @@ message UpsertScopeRequest {
     string method = 3;
 }
 
+message ScopePrimaryKey {
+    string client_platform_id = 1;
+    string path = 2;
+    string method = 3;
+}
+
 message AddRoleRequest {
     string client_type_id = 2;
     string name = 3;
