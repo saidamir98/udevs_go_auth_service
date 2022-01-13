@@ -216,3 +216,122 @@ func (r *clientTypeRepo) Delete(pKey *pb.ClientTypePrimaryKey) (rowsAffected int
 
 	return rowsAffected, err
 }
+
+func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.CompleteClientType, err error) {
+	res = &pb.CompleteClientType{
+		ClientType:     &pb.ClientType{},
+		Relations:      make([]*pb.Relation, 0),
+		UserInfoFields: make([]*pb.UserInfoField, 0),
+	}
+
+	query := `SELECT
+		id,
+		name,
+		confirm_by,
+		self_register,
+		self_recover
+	FROM
+		"client_type"
+	WHERE
+		id = $1`
+
+	row, err := r.db.Query(query, pKey.Id)
+	if err != nil {
+		return res, err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		var confirmBy string
+
+		err = row.Scan(
+			&res.ClientType.Id,
+			&res.ClientType.Name,
+			&confirmBy,
+			&res.ClientType.SelfRegister,
+			&res.ClientType.SelfRecover,
+		)
+
+		res.ClientType.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
+
+		if err != nil {
+			return res, err
+		}
+	} else {
+		return res, storage.ErrorNotFound
+	}
+
+	query1 := `SELECT
+		id,
+		client_type_id,
+		type,
+		name,
+		description
+	FROM
+		"relation"
+	WHERE
+		client_type_id = $1`
+
+	rows1, err := r.db.Query(query1, res.ClientType.Id)
+	if err != nil {
+		return res, err
+	}
+	defer rows1.Close()
+
+	for rows1.Next() {
+		obj := &pb.Relation{}
+		var relationType string
+
+		err = rows1.Scan(
+			&obj.Id,
+			&obj.ClientTypeId,
+			&relationType,
+			&obj.Name,
+			&obj.Description,
+		)
+
+		if err != nil {
+			return res, err
+		}
+		obj.Type = pb.RelationTypes(pb.RelationTypes_value[relationType])
+
+		res.Relations = append(res.Relations, obj)
+	}
+
+	query2 := `SELECT
+		id,
+		client_type_id,
+		field_name,
+		field_type,
+		data_type
+	FROM
+		"user_info_field"
+	WHERE
+		client_type_id = $1`
+
+	rows2, err := r.db.Query(query2, res.ClientType.Id)
+	if err != nil {
+		return res, err
+	}
+	defer rows2.Close()
+
+	for rows2.Next() {
+		obj := &pb.UserInfoField{}
+
+		err = rows2.Scan(
+			&obj.Id,
+			&obj.ClientTypeId,
+			&obj.FieldName,
+			&obj.FieldType,
+			&obj.DataType,
+		)
+
+		if err != nil {
+			return res, err
+		}
+
+		res.UserInfoFields = append(res.UserInfoFields, obj)
+	}
+
+	return res, nil
+}

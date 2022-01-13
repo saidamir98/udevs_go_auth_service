@@ -13,6 +13,8 @@ type Store struct {
 	clientPlatform storage.ClientPlatformRepoI
 	clientType     storage.ClientTypeRepoI
 	client         storage.ClientRepoI
+	relation       storage.RelationRepoI
+	userInfoField  storage.UserInfoFieldRepoI
 }
 
 func NewPostgres(psqlConnString string) (storage.StorageI, error) {
@@ -49,4 +51,20 @@ func (s *Store) Client() storage.ClientRepoI {
 	}
 
 	return s.client
+}
+
+func (s *Store) Relation() storage.RelationRepoI {
+	if s.relation == nil {
+		s.relation = NewRelationRepo(s.db)
+	}
+
+	return s.relation
+}
+
+func (s *Store) UserInfoField() storage.UserInfoFieldRepoI {
+	if s.userInfoField == nil {
+		s.userInfoField = NewUserInfoFieldRepo(s.db)
+	}
+
+	return s.userInfoField
 }

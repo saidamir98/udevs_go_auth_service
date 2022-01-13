@@ -29,7 +29,7 @@ type ClientServiceClient interface {
 	UpdateClientPlatform(ctx context.Context, in *UpdateClientPlatformRequest, opts ...grpc.CallOption) (*ClientPlatform, error)
 	DeleteClientPlatform(ctx context.Context, in *ClientPlatformPrimaryKey, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateClientType(ctx context.Context, in *CreateClientTypeRequest, opts ...grpc.CallOption) (*ClientType, error)
-	GetClientTypeByID(ctx context.Context, in *ClientTypePrimaryKey, opts ...grpc.CallOption) (*ClientType, error)
+	GetClientTypeByID(ctx context.Context, in *ClientTypePrimaryKey, opts ...grpc.CallOption) (*CompleteClientType, error)
 	GetClientTypeList(ctx context.Context, in *GetClientTypeListRequest, opts ...grpc.CallOption) (*GetClientTypeListResponse, error)
 	UpdateClientType(ctx context.Context, in *UpdateClientTypeRequest, opts ...grpc.CallOption) (*ClientType, error)
 	DeleteClientType(ctx context.Context, in *ClientTypePrimaryKey, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -106,8 +106,8 @@ func (c *clientServiceClient) CreateClientType(ctx context.Context, in *CreateCl
 	return out, nil
 }
 
-func (c *clientServiceClient) GetClientTypeByID(ctx context.Context, in *ClientTypePrimaryKey, opts ...grpc.CallOption) (*ClientType, error) {
-	out := new(ClientType)
+func (c *clientServiceClient) GetClientTypeByID(ctx context.Context, in *ClientTypePrimaryKey, opts ...grpc.CallOption) (*CompleteClientType, error) {
+	out := new(CompleteClientType)
 	err := c.cc.Invoke(ctx, "/auth_service.ClientService/GetClientTypeByID", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -233,7 +233,7 @@ type ClientServiceServer interface {
 	UpdateClientPlatform(context.Context, *UpdateClientPlatformRequest) (*ClientPlatform, error)
 	DeleteClientPlatform(context.Context, *ClientPlatformPrimaryKey) (*emptypb.Empty, error)
 	CreateClientType(context.Context, *CreateClientTypeRequest) (*ClientType, error)
-	GetClientTypeByID(context.Context, *ClientTypePrimaryKey) (*ClientType, error)
+	GetClientTypeByID(context.Context, *ClientTypePrimaryKey) (*CompleteClientType, error)
 	GetClientTypeList(context.Context, *GetClientTypeListRequest) (*GetClientTypeListResponse, error)
 	UpdateClientType(context.Context, *UpdateClientTypeRequest) (*ClientType, error)
 	DeleteClientType(context.Context, *ClientTypePrimaryKey) (*emptypb.Empty, error)
@@ -271,7 +271,7 @@ func (UnimplementedClientServiceServer) DeleteClientPlatform(context.Context, *C
 func (UnimplementedClientServiceServer) CreateClientType(context.Context, *CreateClientTypeRequest) (*ClientType, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateClientType not implemented")
 }
-func (UnimplementedClientServiceServer) GetClientTypeByID(context.Context, *ClientTypePrimaryKey) (*ClientType, error) {
+func (UnimplementedClientServiceServer) GetClientTypeByID(context.Context, *ClientTypePrimaryKey) (*CompleteClientType, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetClientTypeByID not implemented")
 }
 func (UnimplementedClientServiceServer) GetClientTypeList(context.Context, *GetClientTypeListRequest) (*GetClientTypeListResponse, error) {

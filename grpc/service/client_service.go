@@ -125,10 +125,10 @@ func (s *clientService) CreateClientType(ctx context.Context, req *pb.CreateClie
 	return s.strg.ClientType().GetByPK(pKey)
 }
 
-func (s *clientService) GetClientTypeByID(ctx context.Context, req *pb.ClientTypePrimaryKey) (*pb.ClientType, error) {
+func (s *clientService) GetClientTypeByID(ctx context.Context, req *pb.ClientTypePrimaryKey) (*pb.CompleteClientType, error) {
 	s.log.Info("---GetClientTypeByID--->", logger.Any("req", req))
 
-	res, err := s.strg.ClientType().GetByPK(req)
+	res, err := s.strg.ClientType().GetCompleteByPK(req)
 
 	if err != nil {
 		s.log.Error("!!!GetClientTypeByID--->", logger.Error(err))
@@ -259,32 +259,126 @@ func (s *clientService) RemoveClient(ctx context.Context, req *pb.ClientPrimaryK
 	return res, nil
 }
 
-// func (s *clientService) AddRelation(ctx context.Context, req *pb.AddRelationRequest) (*pb.Relation, error) {
-// 	// CODE HERE
-// 	return
-// }
+func (s *clientService) AddRelation(ctx context.Context, req *pb.AddRelationRequest) (*pb.Relation, error) {
+	s.log.Info("---AddRelation--->", logger.Any("req", req))
 
-// func (s *clientService) UpdateRelation(ctx context.Context, req *pb.UpdateRelationRequest) (*pb.Relation, error) {
-// 	// CODE HERE
-// 	return
-// }
+	pKey, err := s.strg.Relation().Add(req)
+	if err != nil {
+		s.log.Error("!!!AddRelation--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 
-// func (s *clientService) RemoveRelation(ctx context.Context, req *pb.RemoveRelationRequest) (*pb.Relation, error) {
-// 	// CODE HERE
-// 	return
-// }
+	return s.strg.Relation().GetByPK(pKey)
+}
 
-// func (s *clientService) AddUserInfoField(ctx context.Context, req *pb.AddUserInfoFieldRequest) (*pb.UserInfoField, error) {
-// 	// CODE HERE
-// 	return
-// }
+func (s *clientService) UpdateRelation(ctx context.Context, req *pb.UpdateRelationRequest) (*pb.Relation, error) {
+	s.log.Info("---UpdateRelation--->", logger.Any("req", req))
 
-// func (s *clientService) UpdateUserInfoField(ctx context.Context, req *pb.UpdateUserInfoFieldRequest) (*pb.UserInfoField, error) {
-// 	// CODE HERE
-// 	return
-// }
+	rowsAffected, err := s.strg.Relation().Update(req)
 
-// func (s *clientService) RemoveUserInfoField(ctx context.Context, req *pb.RemoveUserInfoFieldRequest) (*pb.UserInfoField, error) {
-// 	// CODE HERE
-// 	return
-// }
+	if err != nil {
+		s.log.Error("!!!UpdateRelation--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if rowsAffected <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
+	}
+
+	res, err := s.strg.Relation().GetByPK(&pb.RelationPrimaryKey{
+		Id: req.Id,
+	})
+
+	if err != nil {
+		s.log.Error("!!!UpdateRelation--->", logger.Error(err))
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	return res, err
+}
+
+func (s *clientService) RemoveRelation(ctx context.Context, req *pb.RelationPrimaryKey) (*pb.Relation, error) {
+	s.log.Info("---RemoveRelation--->", logger.Any("req", req))
+
+	res, err := s.strg.Relation().GetByPK(req)
+
+	if err != nil {
+		s.log.Error("!!!GetRelationPlatformByID--->", logger.Error(err))
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	rowsAffected, err := s.strg.Relation().Remove(req)
+
+	if err != nil {
+		s.log.Error("!!!RemoveRelation--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if rowsAffected <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
+	}
+
+	return res, nil
+}
+
+func (s *clientService) AddUserInfoField(ctx context.Context, req *pb.AddUserInfoFieldRequest) (*pb.UserInfoField, error) {
+	s.log.Info("---AddUserInfoField--->", logger.Any("req", req))
+
+	pKey, err := s.strg.UserInfoField().Add(req)
+	if err != nil {
+		s.log.Error("!!!AddUserInfoField--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return s.strg.UserInfoField().GetByPK(pKey)
+}
+
+func (s *clientService) UpdateUserInfoField(ctx context.Context, req *pb.UpdateUserInfoFieldRequest) (*pb.UserInfoField, error) {
+	s.log.Info("---UpdateUserInfoField--->", logger.Any("req", req))
+
+	rowsAffected, err := s.strg.UserInfoField().Update(req)
+
+	if err != nil {
+		s.log.Error("!!!UpdateUserInfoField--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if rowsAffected <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
+	}
+
+	res, err := s.strg.UserInfoField().GetByPK(&pb.UserInfoFieldPrimaryKey{
+		Id: req.Id,
+	})
+
+	if err != nil {
+		s.log.Error("!!!UpdateUserInfoField--->", logger.Error(err))
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	return res, err
+}
+
+func (s *clientService) RemoveUserInfoField(ctx context.Context, req *pb.UserInfoFieldPrimaryKey) (*pb.UserInfoField, error) {
+	s.log.Info("---RemoveUserInfoField--->", logger.Any("req", req))
+
+	res, err := s.strg.UserInfoField().GetByPK(req)
+
+	if err != nil {
+		s.log.Error("!!!GetUserInfoFieldPlatformByID--->", logger.Error(err))
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	rowsAffected, err := s.strg.UserInfoField().Remove(req)
+
+	if err != nil {
+		s.log.Error("!!!RemoveUserInfoField--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if rowsAffected <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
+	}
+
+	return res, nil
+}

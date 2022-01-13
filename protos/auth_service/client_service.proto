@@ -14,7 +14,7 @@ service ClientService {
     rpc DeleteClientPlatform(ClientPlatformPrimaryKey) returns (google.protobuf.Empty) {}
     
     rpc CreateClientType(CreateClientTypeRequest) returns (ClientType) {}
-    rpc GetClientTypeByID(ClientTypePrimaryKey) returns (ClientType) {}
+    rpc GetClientTypeByID(ClientTypePrimaryKey) returns (CompleteClientType) {}
     rpc GetClientTypeList(GetClientTypeListRequest) returns (GetClientTypeListResponse) {}
     rpc UpdateClientType(UpdateClientTypeRequest) returns (ClientType) {}
     rpc DeleteClientType(ClientTypePrimaryKey) returns (google.protobuf.Empty) {}
@@ -69,6 +69,12 @@ message CreateClientTypeRequest {
 
 message ClientTypePrimaryKey {
     string id = 1;
+}
+
+message CompleteClientType {
+    ClientType client_type = 1;
+    repeated Relation relations = 2;
+    repeated UserInfoField user_info_fields = 3;
 }
 
 message GetClientTypeListRequest {

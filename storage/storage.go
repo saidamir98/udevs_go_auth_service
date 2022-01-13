@@ -11,6 +11,8 @@ type StorageI interface {
 	ClientPlatform() ClientPlatformRepoI
 	ClientType() ClientTypeRepoI
 	Client() ClientRepoI
+	Relation() RelationRepoI
+	UserInfoField() UserInfoFieldRepoI
 }
 
 type ClientPlatformRepoI interface {
@@ -27,6 +29,7 @@ type ClientTypeRepoI interface {
 	GetByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.ClientType, err error)
 	Update(entity *pb.UpdateClientTypeRequest) (rowsAffected int64, err error)
 	Delete(pKey *pb.ClientTypePrimaryKey) (rowsAffected int64, err error)
+	GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.CompleteClientType, err error)
 }
 
 type ClientRepoI interface {
@@ -34,4 +37,18 @@ type ClientRepoI interface {
 	GetByPK(entity *pb.ClientPrimaryKey) (res *pb.Client, err error)
 	Update(entity *pb.UpdateClientRequest) (rowsAffected int64, err error)
 	Remove(entity *pb.ClientPrimaryKey) (rowsAffected int64, err error)
+}
+
+type RelationRepoI interface {
+	Add(entity *pb.AddRelationRequest) (pKey *pb.RelationPrimaryKey, err error)
+	GetByPK(entity *pb.RelationPrimaryKey) (res *pb.Relation, err error)
+	Update(entity *pb.UpdateRelationRequest) (rowsAffected int64, err error)
+	Remove(entity *pb.RelationPrimaryKey) (rowsAffected int64, err error)
+}
+
+type UserInfoFieldRepoI interface {
+	Add(entity *pb.AddUserInfoFieldRequest) (pKey *pb.UserInfoFieldPrimaryKey, err error)
+	GetByPK(entity *pb.UserInfoFieldPrimaryKey) (res *pb.UserInfoField, err error)
+	Update(entity *pb.UpdateUserInfoFieldRequest) (rowsAffected int64, err error)
+	Remove(entity *pb.UserInfoFieldPrimaryKey) (rowsAffected int64, err error)
 }
