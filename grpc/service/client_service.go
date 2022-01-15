@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"upm/udevs_go_auth_service/config"
-	"upm/udevs_go_auth_service/genproto/auth_service"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/grpc/client"
 	"upm/udevs_go_auth_service/pkg/logger"
@@ -19,7 +18,7 @@ type clientService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	auth_service.UnimplementedClientServiceServer
+	pb.UnimplementedClientServiceServer
 }
 
 func NewClientService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, svcs client.ServiceManagerI) *clientService {

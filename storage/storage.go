@@ -19,6 +19,9 @@ type StorageI interface {
 	Scope() ScopeRepoI
 	PermissionScope() PermissionScopeRepoI
 	RolePermission() RolePermissionRepoI
+	User() UserRepoI
+	UserRelation() UserRelationRepoI
+	UserInfo() UserInfoRepoI
 }
 
 type ClientPlatformRepoI interface {
@@ -89,4 +92,23 @@ type RolePermissionRepoI interface {
 	Add(entity *pb.AddRolePermissionRequest) (res *pb.RolePermissionPrimaryKey, err error)
 	Remove(entity *pb.RolePermissionPrimaryKey) (rowsAffected int64, err error)
 	GetByPK(pKey *pb.RolePermissionPrimaryKey) (res *pb.RolePermission, err error)
+}
+
+type UserRepoI interface {
+	Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error)
+	GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error)
+	GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error)
+	Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
+	Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
+}
+
+type UserRelationRepoI interface {
+	Add(entity *pb.AddUserRelationRequest) (res *pb.UserRelationPrimaryKey, err error)
+	Remove(entity *pb.UserRelationPrimaryKey) (rowsAffected int64, err error)
+	GetByPK(pKey *pb.UserRelationPrimaryKey) (res *pb.UserRelation, err error)
+}
+
+type UserInfoRepoI interface {
+	Upsert(entity *pb.UpsertUserInfoRequest) (res *pb.UserInfoPrimaryKey, err error)
+	GetByPK(pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, err error)
 }

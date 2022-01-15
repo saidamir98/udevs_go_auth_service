@@ -19,6 +19,9 @@ type Store struct {
 	scope           storage.ScopeRepoI
 	permissionScope storage.PermissionScopeRepoI
 	rolePermission  storage.RolePermissionRepoI
+	user            storage.UserRepoI
+	userRelation    storage.UserRelationRepoI
+	userInfo        storage.UserInfoRepoI
 }
 
 func NewPostgres(psqlConnString string) (storage.StorageI, error) {
@@ -111,4 +114,28 @@ func (s *Store) RolePermission() storage.RolePermissionRepoI {
 	}
 
 	return s.rolePermission
+}
+
+func (s *Store) User() storage.UserRepoI {
+	if s.user == nil {
+		s.user = NewUserRepo(s.db)
+	}
+
+	return s.user
+}
+
+func (s *Store) UserRelation() storage.UserRelationRepoI {
+	if s.userRelation == nil {
+		s.userRelation = NewUserRelationRepo(s.db)
+	}
+
+	return s.userRelation
+}
+
+func (s *Store) UserInfo() storage.UserInfoRepoI {
+	if s.userInfo == nil {
+		s.userInfo = NewUserInfoRepo(s.db)
+	}
+
+	return s.userInfo
 }

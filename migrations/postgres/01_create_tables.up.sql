@@ -122,7 +122,10 @@ CREATE TABLE IF NOT EXISTS "user" (
     "active" SMALLINT,
     "expires_at" TIMESTAMP NOT NULL,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    UNIQUE ("project_id", "client_platform_id", "phone"),
+    UNIQUE ("project_id", "client_platform_id", "email"),
+    UNIQUE ("project_id", "client_platform_id", "login")
 );
 
 CREATE TABLE IF NOT EXISTS "user_relation" (

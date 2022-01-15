@@ -103,8 +103,7 @@ func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest
 
 	if len(queryParam.Search) > 0 {
 		params["search"] = queryParam.Search
-		filter += " AND (name ILIKE '%' || :search || '%')"
-		filter += " AND (subdomain ILIKE '%' || :search || '%')"
+		filter += " AND ((name || subdomain) ILIKE ('%' || :search || '%'))"
 	}
 
 	if queryParam.Offset > 0 {

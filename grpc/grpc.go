@@ -19,6 +19,7 @@ func SetUpServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI, s
 	ping_service.RegisterPingServiceServer(grpcServer, service.NewPingService(cfg, log, strg, svcs))
 	auth_service.RegisterClientServiceServer(grpcServer, service.NewClientService(cfg, log, strg, svcs))
 	auth_service.RegisterPermissionServiceServer(grpcServer, service.NewPermissionService(cfg, log, strg, svcs))
+	auth_service.RegisterUserServiceServer(grpcServer, service.NewUserService(cfg, log, strg, svcs))
 
 	reflection.Register(grpcServer)
 	return

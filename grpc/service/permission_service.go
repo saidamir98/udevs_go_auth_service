@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"upm/udevs_go_auth_service/config"
-	"upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/grpc/client"
 	"upm/udevs_go_auth_service/pkg/logger"
 	"upm/udevs_go_auth_service/storage"
@@ -20,7 +19,7 @@ type permissionService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	auth_service.UnimplementedPermissionServiceServer
+	pb.UnimplementedPermissionServiceServer
 }
 
 func NewPermissionService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, svcs client.ServiceManagerI) *permissionService {

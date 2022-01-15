@@ -62,17 +62,20 @@ message UpdateUserRequest {
     string phone = 6;
     string email = 7;
     string login = 8;
-    string password = 9;
     int32 active = 10;
     string expires_at = 11;
 }
 
 message AddUserRelationRequest {
-    string role_id = 1;
-    string permission_id = 2;
+    string user_id = 1;
+    string relation_id = 2;
 }
 
 message UserRelationPrimaryKey {
-    string role_id = 1;
-    string permission_id = 2;
+    string user_id = 1;
+    string relation_id = 2;
+}
+
+message UserInfoPrimaryKey {
+    string user_id = 1;
 }
