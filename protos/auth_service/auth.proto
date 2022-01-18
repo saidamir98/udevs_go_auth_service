@@ -6,20 +6,23 @@ option go_package="genproto/auth_service";
 import "google/protobuf/struct.proto";
 
 enum LoginStrategies {
-    STANDARD = 0;
-    OTP = 1;
-    PASSCODE = 2;
-    ONE2MANY = 3;
+    UNKNOWN = 0;
+    STANDARD = 1;
+    OTP = 2;
+    PASSCODE = 3;
+    ONE2MANY = 4;
 }
 
 enum ConfirmStrategies {
-    PHONE = 0;
-    EMAIL = 1;
+    UNKNOWN = 0;
+    PHONE = 1;
+    EMAIL = 2;
 }
 
 enum RelationTypes {
-    BRANCH = 0;
-    REGION = 1;
+    UNKNOWN = 0;
+    BRANCH = 1;
+    REGION = 2;
 }
 
 message ClientPlatform {
