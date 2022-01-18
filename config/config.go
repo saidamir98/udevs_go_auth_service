@@ -38,6 +38,11 @@ type Config struct {
 
 	SettingsServiceHost string
 	SettingsGRPCPort    string
+
+	SecretKey string
+
+	PasscodePool   string
+	PasscodeLength int
 }
 
 // Load ...
@@ -68,6 +73,11 @@ func Load() Config {
 
 	config.SettingsServiceHost = cast.ToString(getOrReturnDefaultValue("SETTINGS_SERVICE_HOST", "0.0.0.0"))
 	config.SettingsGRPCPort = cast.ToString(getOrReturnDefaultValue("SETTINGS_GRPC_PORT", ":9101"))
+
+	config.SecretKey = cast.ToString(getOrReturnDefaultValue("SECRET_KEY", "cMhXjcrfFRDYrF6f"))
+
+	config.PasscodePool = cast.ToString(getOrReturnDefaultValue("PASSCODE_POOL", "0123456789"))
+	config.PasscodeLength = cast.ToInt(getOrReturnDefaultValue("PASSCODE_LENGTH", "6"))
 
 	return config
 }

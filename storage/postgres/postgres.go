@@ -22,6 +22,7 @@ type Store struct {
 	user            storage.UserRepoI
 	userRelation    storage.UserRelationRepoI
 	userInfo        storage.UserInfoRepoI
+	session         storage.SessionRepoI
 }
 
 func NewPostgres(psqlConnString string) (storage.StorageI, error) {
@@ -138,4 +139,12 @@ func (s *Store) UserInfo() storage.UserInfoRepoI {
 	}
 
 	return s.userInfo
+}
+
+func (s *Store) Session() storage.SessionRepoI {
+	if s.session == nil {
+		s.session = NewSessionRepo(s.db)
+	}
+
+	return s.session
 }

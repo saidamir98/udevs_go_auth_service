@@ -1,36 +1,34 @@
 package postgres
 
 import (
+	"time"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
-	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
-type userRepo struct {
+type sessionRepo struct {
 	db *sqlx.DB
 }
 
-func NewUserRepo(db *sqlx.DB) storage.UserRepoI {
-	return &userRepo{
+func NewSessionRepo(db *sqlx.DB) storage.SessionRepoI {
+	return &sessionRepo{
 		db: db,
 	}
 }
 
-func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error) {
-	query := `INSERT INTO "user" (
+func (r *sessionRepo) Create(entity *pb.CreateSessionRequest) (pKey *pb.SessionPrimaryKey, err error) {
+	query := `INSERT INTO "session" (
 		id,
 		project_id,
 		client_platform_id,
 		client_type_id,
+		user_id,
 		role_id,
-		phone,
-		email,
-		login,
-		password,
-		active,
+		ip,
+		data,
 		expires_at
 	) VALUES (
 		$1,
@@ -41,9 +39,7 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 		$6,
 		$7,
 		$8,
-		$9,
-		$10,
-		$11
+		$9
 	)`
 
 	uuid, err := uuid.NewRandom()
@@ -56,40 +52,36 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 		entity.ProjectId,
 		entity.ClientPlatformId,
 		entity.ClientTypeId,
+		entity.UserId,
 		entity.RoleId,
-		entity.Phone,
-		entity.Email,
-		entity.Login,
-		entity.Password,
-		entity.Active,
+		entity.Ip,
+		entity.Data,
 		entity.ExpiresAt,
 	)
 
-	pKey = &pb.UserPrimaryKey{
+	pKey = &pb.SessionPrimaryKey{
 		Id: uuid.String(),
 	}
 
 	return pKey, err
 }
 
-func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
-	res = &pb.User{}
+func (r *sessionRepo) GetByPK(pKey *pb.SessionPrimaryKey) (res *pb.Session, err error) {
+	res = &pb.Session{}
 	query := `SELECT
 		id,
 		project_id,
 		client_platform_id,
 		client_type_id,
+		user_id,
 		role_id,
-		phone,
-		email,
-		login,
-		password,
-		active,
+		ip,
+		data,
 		expires_at,
 		created_at,
 		updated_at
 	FROM
-		"user"
+		"session"
 	WHERE
 		id = $1`
 
@@ -105,12 +97,10 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 			&res.ProjectId,
 			&res.ClientPlatformId,
 			&res.ClientTypeId,
+			&res.UserId,
 			&res.RoleId,
-			&res.Phone,
-			&res.Email,
-			&res.Login,
-			&res.Password,
-			&res.Active,
+			&res.Ip,
+			&res.Data,
 			&res.ExpiresAt,
 			&res.CreatedAt,
 			&res.UpdatedAt,
@@ -126,25 +116,23 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 	return res, nil
 }
 
-func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
-	res = &pb.GetUserListResponse{}
+func (r *sessionRepo) GetList(queryParam *pb.GetSessionListRequest) (res *pb.GetSessionListResponse, err error) {
+	res = &pb.GetSessionListResponse{}
 	params := make(map[string]interface{})
 	query := `SELECT
 		id,
 		project_id,
 		client_platform_id,
 		client_type_id,
+		user_id,
 		role_id,
-		phone,
-		email,
-		login,
-		password,
-		active,
+		ip,
+		data,
 		expires_at,
 		created_at,
 		updated_at
 	FROM
-		"user"`
+		"session"`
 	filter := " WHERE 1=1"
 	order := " ORDER BY created_at"
 	arrangement := " DESC"
@@ -153,7 +141,7 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 
 	if len(queryParam.Search) > 0 {
 		params["search"] = queryParam.Search
-		filter += " AND ((phone || email || login) ILIKE ('%' || :search || '%'))"
+		filter += " AND ((ip) ILIKE ('%' || :search || '%'))"
 	}
 
 	if queryParam.Offset > 0 {
@@ -166,7 +154,7 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 		limit = " LIMIT :limit"
 	}
 
-	cQ := `SELECT count(1) FROM "user"` + filter
+	cQ := `SELECT count(1) FROM "session"` + filter
 	row, err := r.db.NamedQuery(cQ, params)
 	if err != nil {
 		return res, err
@@ -190,18 +178,16 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 	defer rows.Close()
 
 	for rows.Next() {
-		obj := &pb.User{}
+		obj := &pb.Session{}
 		err = rows.Scan(
 			&obj.Id,
 			&obj.ProjectId,
 			&obj.ClientPlatformId,
 			&obj.ClientTypeId,
+			&obj.UserId,
 			&obj.RoleId,
-			&obj.Phone,
-			&obj.Email,
-			&obj.Login,
-			&obj.Password,
-			&obj.Active,
+			&obj.Ip,
+			&obj.Data,
 			&obj.ExpiresAt,
 			&obj.CreatedAt,
 			&obj.UpdatedAt,
@@ -211,22 +197,21 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 			return res, err
 		}
 
-		res.Users = append(res.Users, obj)
+		res.Sessions = append(res.Sessions, obj)
 	}
 
 	return res, nil
 }
 
-func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err error) {
-	query := `UPDATE "user" SET
+func (r *sessionRepo) Update(entity *pb.UpdateSessionRequest) (rowsAffected int64, err error) {
+	query := `UPDATE "session" SET
 		project_id = :project_id,
 		client_platform_id = :client_platform_id,
 		client_type_id = :client_type_id,
+		user_id = :user_id,
 		role_id = :role_id,
-		phone = :phone,
-		email = :email,
-		login = :login,
-		active = :active,
+		ip = :ip,
+		data = :data,
 		expires_at = :expires_at,
 		updated_at = now()
 	WHERE
@@ -237,11 +222,10 @@ func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err
 		"project_id":         entity.ProjectId,
 		"client_platform_id": entity.ClientPlatformId,
 		"client_type_id":     entity.ClientTypeId,
+		"user_id":            entity.UserId,
 		"role_id":            entity.RoleId,
-		"phone":              entity.Phone,
-		"email":              entity.Email,
-		"login":              entity.Login,
-		"active":             entity.Active,
+		"ip":                 entity.Ip,
+		"data":               entity.Data,
 		"expires_at":         entity.ExpiresAt,
 	}
 
@@ -258,8 +242,8 @@ func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err
 	return rowsAffected, err
 }
 
-func (r *userRepo) Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err error) {
-	query := `DELETE FROM "user" WHERE id = $1`
+func (r *sessionRepo) Delete(pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error) {
+	query := `DELETE FROM "session" WHERE id = $1`
 
 	result, err := r.db.Exec(query, pKey.Id)
 	if err != nil {
@@ -274,63 +258,68 @@ func (r *userRepo) Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err erro
 	return rowsAffected, err
 }
 
-func (r *userRepo) GetByUsername(username string) (res *pb.User, err error) {
-	res = &pb.User{}
+func (r *sessionRepo) DeleteExpiredUserSessions(userID string) (rowsAffected int64, err error) {
+	query := `DELETE FROM "session" WHERE user_id = $1 AND expires_at < $2`
+
+	result, err := r.db.Exec(query, userID, time.Now().Format("2006-01-02 15:04:05"))
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err = result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return rowsAffected, err
+}
+
+func (r *sessionRepo) GetSessionListByUserID(userID string) (res *pb.GetSessionListResponse, err error) {
+	res = &pb.GetSessionListResponse{}
 
 	query := `SELECT
 		id,
 		project_id,
 		client_platform_id,
 		client_type_id,
+		user_id,
 		role_id,
-		phone,
-		email,
-		login,
-		password,
-		active,
+		ip,
+		data,
 		expires_at,
 		created_at,
 		updated_at
 	FROM
-		"user"
-	WHERE`
+		"session"
+	WHERE user_id = $1`
 
-	if util.IsValidEmail(username) {
-		query = query + ` email = $1`
-	} else if util.IsValidPhone(username) {
-		query = query + ` phone = $1`
-	} else {
-		query = query + ` login = $1`
-	}
-
-	row, err := r.db.Query(query, username)
+	rows, err := r.db.Query(query, userID)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
+	defer rows.Close()
 
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&res.RoleId,
-			&res.Phone,
-			&res.Email,
-			&res.Login,
-			&res.Password,
-			&res.Active,
-			&res.ExpiresAt,
-			&res.CreatedAt,
-			&res.UpdatedAt,
+	for rows.Next() {
+		obj := &pb.Session{}
+		err = rows.Scan(
+			&obj.Id,
+			&obj.ProjectId,
+			&obj.ClientPlatformId,
+			&obj.ClientTypeId,
+			&obj.UserId,
+			&obj.RoleId,
+			&obj.Ip,
+			&obj.Data,
+			&obj.ExpiresAt,
+			&obj.CreatedAt,
+			&obj.UpdatedAt,
 		)
 
 		if err != nil {
 			return res, err
 		}
-	} else {
-		return res, storage.ErrorNotFound
+
+		res.Sessions = append(res.Sessions, obj)
 	}
 
 	return res, nil

@@ -19,6 +19,12 @@ copy-proto-module:
 gen-proto-module:
 	./scripts/gen_proto.sh ${CURRENT_DIR}
 
+migration-up:
+	migrate -path ./migrations/postgres -database 'postgres://postgres:test1234@0.0.0.0:5432/udevs_go_auth_service?sslmode=disable' up
+
+migration-down:
+	migrate -path ./migrations/postgres -database 'postgres://postgres:test1234@0.0.0.0:5432/udevs_go_auth_service?sslmode=disable' down
+
 build:
 	CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -o ${CURRENT_DIR}/bin/${APP} ${APP_CMD_DIR}/main.go
 

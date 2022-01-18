@@ -22,6 +22,7 @@ type StorageI interface {
 	User() UserRepoI
 	UserRelation() UserRelationRepoI
 	UserInfo() UserInfoRepoI
+	Session() SessionRepoI
 }
 
 type ClientPlatformRepoI interface {
@@ -100,6 +101,7 @@ type UserRepoI interface {
 	GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error)
 	Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
 	Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
+	GetByUsername(username string) (res *pb.User, err error)
 }
 
 type UserRelationRepoI interface {
@@ -111,4 +113,14 @@ type UserRelationRepoI interface {
 type UserInfoRepoI interface {
 	Upsert(entity *pb.UpsertUserInfoRequest) (res *pb.UserInfoPrimaryKey, err error)
 	GetByPK(pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, err error)
+}
+
+type SessionRepoI interface {
+	Create(entity *pb.CreateSessionRequest) (pKey *pb.SessionPrimaryKey, err error)
+	GetList(queryParam *pb.GetSessionListRequest) (res *pb.GetSessionListResponse, err error)
+	GetByPK(pKey *pb.SessionPrimaryKey) (res *pb.Session, err error)
+	Update(entity *pb.UpdateSessionRequest) (rowsAffected int64, err error)
+	Delete(pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error)
+	DeleteExpiredUserSessions(userID string) (rowsAffected int64, err error)
+	GetSessionListByUserID(userID string) (res *pb.GetSessionListResponse, err error)
 }

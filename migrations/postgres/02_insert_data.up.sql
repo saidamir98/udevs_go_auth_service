@@ -4,7 +4,7 @@ INSERT INTO "client_platform"("id", "project_id", "name", "subdomain") VALUES ('
 INSERT INTO "client_platform"("id", "project_id", "name", "subdomain") VALUES ('7d4a4c38-dd84-4902-b744-0488b80a4c02', 'e04766bc-3228-4cd9-bd22-09e3fa27a6be', 'UPM DEVELOPER PANEL', 'dev.upm.udevs.io');
 INSERT INTO "client_platform"("id", "project_id", "name", "subdomain") VALUES ('7d4a4c38-dd84-4902-b744-0488b80a4c03', 'e04766bc-3228-4cd9-bd22-09e3fa27a6be', 'UPM GUEST PANEL', 'guest.upm.udevs.io');
 
-INSERT INTO "client_type"("id", "name", "confirm_by", "self_register", "self_recover") VALUES ('5a3818a9-90f0-44e9-a053-3be0ba1e2c01', 'ADMIN', NULL, FALSE, FALSE);
+INSERT INTO "client_type"("id", "name", "confirm_by", "self_register", "self_recover") VALUES ('5a3818a9-90f0-44e9-a053-3be0ba1e2c01', 'ADMIN', 'UNKNOWN', FALSE, FALSE);
 INSERT INTO "client_type"("id", "name", "confirm_by", "self_register", "self_recover") VALUES ('5a3818a9-90f0-44e9-a053-3be0ba1e2c02', 'HR', 'PHONE', FALSE, TRUE);
 INSERT INTO "client_type"("id", "name", "confirm_by", "self_register", "self_recover") VALUES ('5a3818a9-90f0-44e9-a053-3be0ba1e2c03', 'CEO', 'PHONE', FALSE, TRUE);
 INSERT INTO "client_type"("id", "name", "confirm_by", "self_register", "self_recover") VALUES ('5a3818a9-90f0-44e9-a053-3be0ba1e2c04', 'DEV', 'EMAIL', FALSE, TRUE);

@@ -15,19 +15,19 @@ CREATE TABLE IF NOT EXISTS "client_platform" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TYPE "confirm_strategies" AS ENUM ('PHONE', 'EMAIL');
+CREATE TYPE "confirm_strategies" AS ENUM ('UNKNOWN', 'PHONE', 'EMAIL');
 
 CREATE TABLE IF NOT EXISTS "client_type" (
     "id" UUID PRIMARY KEY,
     "name" VARCHAR,
-    "confirm_by" confirm_strategies,
+    "confirm_by" confirm_strategies NOT NULL,
     "self_register" BOOLEAN,
     "self_recover" BOOLEAN,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TYPE "relation_types" AS ENUM ('BRANCH', 'REGION');
+CREATE TYPE "relation_types" AS ENUM ('UNKNOWN', 'BRANCH', 'REGION');
 
 CREATE TABLE IF NOT EXISTS "relation" (
     "id" UUID PRIMARY KEY,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "user_info_field" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TYPE "login_strategies" AS ENUM ('STANDARD', 'OTP', 'PASSCODE', 'ONE2MANY');
+CREATE TYPE "login_strategies" AS ENUM ('UNKNOWN', 'STANDARD', 'OTP', 'PASSCODE', 'ONE2MANY');
 
 CREATE TABLE IF NOT EXISTS "client" (
     "client_platform_id" UUID REFERENCES "client_platform"("id"),
@@ -152,9 +152,9 @@ CREATE TABLE IF NOT EXISTS "session" (
     "role_id" UUID REFERENCES "role"("id"),
     "ip" INET,
     "data" TEXT,
+    "expires_at" TIMESTAMP NOT NULL,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "expires_at" TIMESTAMP NOT NULL
+    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 CREATE INDEX "idx_session_user_id" ON "session"("user_id");
 
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS "passcode" (
     "client_platform_id" UUID REFERENCES "client_platform"("id"),
     "client_type_id" UUID REFERENCES "client_type"("id"),
     "user_id" UUID REFERENCES "user"("id"),
-    "confirm_by" confirm_strategies,
+    "confirm_by" confirm_strategies NOT NULL,
     "hashed_code" VARCHAR(1000),
     "state" SMALLINT,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
