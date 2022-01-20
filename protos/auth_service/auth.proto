@@ -14,13 +14,13 @@ enum LoginStrategies {
 }
 
 enum ConfirmStrategies {
-    UNKNOWN = 0;
+    UNDECIDED = 0;
     PHONE = 1;
     EMAIL = 2;
 }
 
 enum RelationTypes {
-    UNKNOWN = 0;
+    UNREVEALED = 0;
     BRANCH = 1;
     REGION = 2;
 }

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "client_platform" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TYPE "confirm_strategies" AS ENUM ('UNKNOWN', 'PHONE', 'EMAIL');
+CREATE TYPE "confirm_strategies" AS ENUM ('UNDECIDED', 'PHONE', 'EMAIL');
 
 CREATE TABLE IF NOT EXISTS "client_type" (
     "id" UUID PRIMARY KEY,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "client_type" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TYPE "relation_types" AS ENUM ('UNKNOWN', 'BRANCH', 'REGION');
+CREATE TYPE "relation_types" AS ENUM ('UNREVEALED', 'BRANCH', 'REGION');
 
 CREATE TABLE IF NOT EXISTS "relation" (
     "id" UUID PRIMARY KEY,
