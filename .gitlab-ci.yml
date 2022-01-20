@@ -3,6 +3,7 @@ before_script:
 
 stages:
   - build
+  - migrate
   - deploy
 
 build_image_test:
@@ -22,6 +23,28 @@ build_image_prod:
     - make push-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$CI_REGISTRY
   only:
     - master
+
+migrate-prod:
+  stage: migrate
+  image: gitlab.udevs.io:5050/docker/docker:dind
+  before_script:
+    - apk add wget && wget https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz
+    - tar -xvf migrate.linux-amd64.tar.gz && mv migrate.linux-amd64 migrate && chmod +x migrate
+  script:
+    - ./migrate -path=$PWD/migrations -database="${UPM_GO_AUTH_SERVICE_PRODDB}?sslmode=disable&x-migrations-table=migrations_$CI_PROJECT_NAME" up
+  only:
+    - master
+
+migrate-test:
+  stage: migrate
+  image: gitlab.udevs.io:5050/docker/docker:dind
+  before_script:
+    - apk add wget && wget https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz
+    - tar -xvf migrate.linux-amd64.tar.gz && mv migrate.linux-amd64 migrate && chmod +x migrate
+  script:
+    - ./migrate -path=$PWD/migrations -database="${UPM_GO_AUTH_SERVICE_TESTDB}?sslmode=disable&x-migrations-table=migrations_$CI_PROJECT_NAME" up
+  only:
+    - staging
 
 deploy_image_test:
   image: gitlab.udevs.io:5050/docker/docker:dind
