@@ -55,7 +55,7 @@ deploy_image_test:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
   script:
-    - ssh -p $UPM_TEST_SSH_PORT -o StrictHostKeyChecking=no $UPM_TEST_USER@$UPM_TEST_HOST 'docker service update --with-registry-auth --image '$CI_REGISTRY'/'$CI_PROJECT_NAMESPACE'/'$CI_PROJECT_NAME':'$CI_PIPELINE_IID' '$CI_PROJECT_NAME''
+    - ssh -p $UPM_TEST_SSH_PORT -o StrictHostKeyChecking=no $UPM_TEST_USER@$UPM_TEST_HOST 'docker service update --with-registry-auth --image '$CI_REGISTRY'/'$CI_PROJECT_NAMESPACE'/'$CI_PROJECT_NAME':'$CI_PIPELINE_IID' 'upm_$CI_PROJECT_NAME''
   only:
     - staging
 
@@ -68,7 +68,7 @@ deploy_image_prod:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
   script: 
-    - ssh -p $UPM_PROD_SSH_PORT -o StrictHostKeyChecking=no $UPM_PROD_USER@$UPM_PROD_HOST 'docker service update --with-registry-auth --image '$CI_REGISTRY'/'$CI_PROJECT_NAMESPACE'/'$CI_PROJECT_NAME':'$CI_PIPELINE_IID' '$CI_PROJECT_NAME''
+    - ssh -p $UPM_PROD_SSH_PORT -o StrictHostKeyChecking=no $UPM_PROD_USER@$UPM_PROD_HOST 'docker service update --with-registry-auth --image '$CI_REGISTRY'/'$CI_PROJECT_NAMESPACE'/'$CI_PROJECT_NAME':'$CI_PIPELINE_IID' 'upm_$CI_PROJECT_NAME''
   only:
     - master
 
