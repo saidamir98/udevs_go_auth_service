@@ -42,7 +42,7 @@ migrate-test:
     - apk add wget && wget https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz
     - tar -xvf migrate.linux-amd64.tar.gz && mv migrate.linux-amd64 migrate && chmod +x migrate
   script:
-    - ./migrate -path=$PWD/migrations -database="${UPM_GO_AUTH_SERVICE_TESTDB}?sslmode=disable&x-migrations-table=migrations_$CI_PROJECT_NAME" up
+    - ./migrate -path=$PWD/migrations/postgres -database="${UPM_GO_AUTH_SERVICE_TESTDB}?sslmode=disable&x-migrations-table=migrations_$CI_PROJECT_NAME" up
   only:
     - staging
 
