@@ -1,0 +1,51 @@
+before_script:
+  - docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password $CI_REGISTRY_PASSWORD
+
+stages:
+  - build
+  - deploy
+
+build_image_test:
+  image: gitlab.udevs.io:5050/docker/docker:dind
+  stage: build
+  script:
+    - make build-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$CI_REGISTRY ENV_TAG=test
+    - make push-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$CI_REGISTRY ENV_TAG=test
+  only:
+    - staging
+
+build_image_prod:
+  image: gitlab.udevs.io:5050/docker/docker:dind
+  stage: build
+  script:
+    - make build-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$CI_REGISTRY
+    - make push-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$CI_REGISTRY
+  only:
+    - master
+
+deploy_image_test:
+  image: gitlab.udevs.io:5050/docker/docker:dind
+  stage: deploy
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$GITLAB_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - ssh -p $UPM_TEST_SSH_PORT -o StrictHostKeyChecking=no $UPM_TEST_USER@$UPM_TEST_HOST 'docker service update --with-registry-auth --image '$CI_REGISTRY'/'$CI_PROJECT_NAMESPACE'/'$CI_PROJECT_NAME':'$CI_PIPELINE_IID' '$CI_PROJECT_NAME''
+  only:
+    - staging
+
+deploy_image_prod:
+  image: gitlab.udevs.io:5050/docker/docker:dind
+  stage: deploy
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$GITLAB_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script: 
+    - ssh -p $UPM_PROD_SSH_PORT -o StrictHostKeyChecking=no $UPM_PROD_USER@$UPM_PROD_HOST 'docker service update --with-registry-auth --image '$CI_REGISTRY'/'$CI_PROJECT_NAMESPACE'/'$CI_PROJECT_NAME':'$CI_PIPELINE_IID' '$CI_PROJECT_NAME''
+  only:
+    - master
+
