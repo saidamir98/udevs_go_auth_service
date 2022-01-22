@@ -6,6 +6,7 @@ import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/grpc/client"
 	"upm/udevs_go_auth_service/pkg/logger"
+	"upm/udevs_go_auth_service/pkg/security"
 	"upm/udevs_go_auth_service/storage"
 
 	"google.golang.org/grpc/codes"
@@ -32,6 +33,13 @@ func NewUserService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 
 func (s *userService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
 	s.log.Info("---CreateUser--->", logger.Any("req", req))
+
+	hashedPassword, err := security.HashPassword(req.Password)
+	if err != nil {
+		s.log.Error("!!!CreateUser--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	req.Password = hashedPassword
 
 	pKey, err := s.strg.User().Create(req)
 
