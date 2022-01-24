@@ -6,8 +6,8 @@ APP_CMD_DIR=${CURRENT_DIR}/cmd
 TAG=latest
 ENV_TAG=latest
 
-# pull-proto-module:
-# 	git submodule update --init --recursive
+pull-proto-module:
+	git submodule update --init --recursive
 
 update-proto-module:
 	git submodule update --remote --merge
