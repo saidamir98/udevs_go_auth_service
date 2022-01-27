@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fmt"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
@@ -100,4 +101,42 @@ func (r *permissionScopeRepo) Remove(pKey *pb.PermissionScopePrimaryKey) (rowsAf
 	}
 
 	return rowsAffected, err
+}
+
+func (r *permissionScopeRepo) HasAccess(roleID, clientPlatformID, path, method string) (hasAccess bool, err error) {
+	query := `SELECT COUNT(*) FROM
+	(SELECT * FROM "role_permission" 
+	WHERE role_id = $1
+	) AS rp
+	INNER JOIN
+	(SELECT * FROM "permission_scope"
+	WHERE client_platform_id = $2 AND path = $3 AND method = $4) AS ps
+	ON rp.permission_id = ps.permission_id`
+
+	row, err := r.db.Query(query, roleID, clientPlatformID, path, method)
+	if err != nil {
+		return hasAccess, err
+	}
+	defer row.Close()
+
+	var count int32
+	if row.Next() {
+		err = row.Scan(
+			&count,
+		)
+
+		if err != nil {
+			return hasAccess, err
+		}
+	} else {
+		return hasAccess, storage.ErrorNotFound
+	}
+
+	fmt.Println(count)
+
+	if count > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
