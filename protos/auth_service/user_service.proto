@@ -36,6 +36,8 @@ message CreateUserRequest {
     string password = 9;
     int32 active = 10;
     string expires_at = 11;
+    string name = 14;
+    string photo_url = 15;
 }
 
 message UserPrimaryKey {
@@ -64,6 +66,8 @@ message UpdateUserRequest {
     string login = 8;
     int32 active = 10;
     string expires_at = 11;
+    string name = 14;
+    string photo_url = 15;
 }
 
 message AddUserRelationRequest {

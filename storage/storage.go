@@ -87,6 +87,7 @@ type PermissionScopeRepoI interface {
 	Add(entity *pb.AddPermissionScopeRequest) (res *pb.PermissionScopePrimaryKey, err error)
 	Remove(entity *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error)
 	GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error)
+	HasAccess(roleID, clientPlatformID, path, method string) (hasAccess bool, err error)
 }
 
 type RolePermissionRepoI interface {

@@ -26,6 +26,8 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 		client_platform_id,
 		client_type_id,
 		role_id,
+		name,
+		photo_url,
 		phone,
 		email,
 		login,
@@ -43,7 +45,9 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 		$8,
 		$9,
 		$10,
-		$11
+		$11,
+		$12,
+		$13
 	)`
 
 	uuid, err := uuid.NewRandom()
@@ -57,6 +61,8 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 		entity.ClientPlatformId,
 		entity.ClientTypeId,
 		entity.RoleId,
+		entity.Name,
+		entity.PhotoUrl,
 		entity.Phone,
 		entity.Email,
 		entity.Login,
@@ -80,6 +86,8 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 		client_platform_id,
 		client_type_id,
 		role_id,
+		name,
+		photo_url,
 		phone,
 		email,
 		login,
@@ -106,6 +114,8 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 			&res.ClientPlatformId,
 			&res.ClientTypeId,
 			&res.RoleId,
+			&res.Name,
+			&res.PhotoUrl,
 			&res.Phone,
 			&res.Email,
 			&res.Login,
@@ -135,6 +145,8 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 		client_platform_id,
 		client_type_id,
 		role_id,
+		name,
+		photo_url,
 		phone,
 		email,
 		login,
@@ -153,7 +165,7 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 
 	if len(queryParam.Search) > 0 {
 		params["search"] = queryParam.Search
-		filter += " AND ((phone || email || login) ILIKE ('%' || :search || '%'))"
+		filter += " AND ((name || phone || email || login) ILIKE ('%' || :search || '%'))"
 	}
 
 	if queryParam.Offset > 0 {
@@ -197,6 +209,8 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 			&obj.ClientPlatformId,
 			&obj.ClientTypeId,
 			&obj.RoleId,
+			&obj.Name,
+			&obj.PhotoUrl,
 			&obj.Phone,
 			&obj.Email,
 			&obj.Login,
@@ -223,6 +237,8 @@ func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err
 		client_platform_id = :client_platform_id,
 		client_type_id = :client_type_id,
 		role_id = :role_id,
+		name = :name,
+		photo_url = :photo_url,
 		phone = :phone,
 		email = :email,
 		login = :login,
@@ -238,6 +254,8 @@ func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err
 		"client_platform_id": entity.ClientPlatformId,
 		"client_type_id":     entity.ClientTypeId,
 		"role_id":            entity.RoleId,
+		"name":               entity.Name,
+		"photo_url":          entity.PhotoUrl,
 		"phone":              entity.Phone,
 		"email":              entity.Email,
 		"login":              entity.Login,
@@ -283,6 +301,8 @@ func (r *userRepo) GetByUsername(username string) (res *pb.User, err error) {
 		client_platform_id,
 		client_type_id,
 		role_id,
+		name,
+		photo_url,
 		phone,
 		email,
 		login,
@@ -316,6 +336,8 @@ func (r *userRepo) GetByUsername(username string) (res *pb.User, err error) {
 			&res.ClientPlatformId,
 			&res.ClientTypeId,
 			&res.RoleId,
+			&res.Name,
+			&res.PhotoUrl,
 			&res.Phone,
 			&res.Email,
 			&res.Login,

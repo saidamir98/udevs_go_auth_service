@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 	"upm/udevs_go_auth_service/config"
 	"upm/udevs_go_auth_service/grpc/client"
@@ -79,8 +78,6 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	fmt.Println(user.ExpiresAt)
 
 	expiresAt, err := time.Parse(config.DatabaseTimeLayout, user.ExpiresAt)
 	if err != nil {
@@ -213,38 +210,182 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 }
 
 func (s *sessionService) Logout(ctx context.Context, req *pb.LogoutRequest) (*emptypb.Empty, error) {
-	claims, err := security.ExtractClaims(req.AccessToken, s.cfg.SecretKey)
+	tokenInfo, err := security.ParseClaims(req.AccessToken, s.cfg.SecretKey)
 	if err != nil {
 		s.log.Error("!!!Logout--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	// TODO - wrap in a function
-	id := claims["id"].(string)
-	// projectID := claims["project_id"].(string)
-	// clientPlatformID := claims["client_platform_id"].(string)
-	// clientTypeID := claims["client_type_id"].(string)
-	// userID := claims["user_id"].(string)
-	// roleID := claims["role_id"].(string)
-	// ip := claims["ip"].(string)
-	// data := claims["data"].(string)
-
-	rowsAffected, err := s.strg.Session().Delete(&pb.SessionPrimaryKey{Id: id})
+	rowsAffected, err := s.strg.Session().Delete(&pb.SessionPrimaryKey{Id: tokenInfo.ID})
 	if err != nil {
 		s.log.Error("!!!Logout--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	s.log.Info("---Logout--->", logger.Any("claims", claims))
+	s.log.Info("---Logout--->", logger.Any("tokenInfo", tokenInfo))
 	s.log.Info("---Logout--->", logger.Any("rowsAffected", rowsAffected))
 
 	return &emptypb.Empty{}, nil
 }
 
-// func (s *sessionService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenResponse, error) {
-// 	return
-// }
+func (s *sessionService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenResponse, error) {
+	res := &pb.RefreshTokenResponse{}
 
-// func (s *sessionService) HasAccess(ctx context.Context, req *pb.HasAccessRequest) (*pb.HasAccessResponse, error) {
-// 	return
-// }
+	tokenInfo, err := security.ParseClaims(req.RefreshToken, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!RefreshToken--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	session, err := s.strg.Session().GetByPK(&pb.SessionPrimaryKey{Id: tokenInfo.ID})
+	if err != nil {
+		s.log.Error("!!!RefreshToken--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	user, err := s.strg.User().GetByPK(&pb.UserPrimaryKey{Id: session.UserId})
+	if err != nil {
+		s.log.Error("!!!RefreshToken--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if user.Active < 0 {
+		err := errors.New("user is not active")
+		s.log.Error("!!!RefreshToken--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if user.Active == 0 {
+		err := errors.New("user hasn't been activated yet")
+		s.log.Error("!!!RefreshToken--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	expiresAt, err := time.Parse(config.DatabaseTimeLayout, user.ExpiresAt)
+	if err != nil {
+		s.log.Error("!!!RefreshToken--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if expiresAt.Unix() < time.Now().Unix() {
+		err := errors.New("user has been expired")
+		s.log.Error("!!!RefreshToken--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	// TODO - wrap in a function
+	m := map[string]interface{}{
+		"id":                 session.Id,
+		"project_id":         session.ProjectId,
+		"client_platform_id": session.ClientPlatformId,
+		"client_type_id":     session.ClientTypeId,
+		"user_id":            session.UserId,
+		"role_id":            session.RoleId,
+		"ip":                 session.Data,
+		"data":               session.Data,
+	}
+
+	accessToken, err := security.GenerateJWT(m, config.AccessTokenExpiresInTime, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	refreshToken, err := security.GenerateJWT(m, config.RefreshTokenExpiresInTime, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	res.Token = &pb.Token{
+		AccessToken:      accessToken,
+		RefreshToken:     refreshToken,
+		CreatedAt:        session.CreatedAt,
+		UpdatedAt:        session.UpdatedAt,
+		ExpiresAt:        session.ExpiresAt,
+		RefreshInSeconds: int32(config.AccessTokenExpiresInTime.Seconds()),
+	}
+
+	return res, nil
+}
+
+func (s *sessionService) HasAccess(ctx context.Context, req *pb.HasAccessRequest) (*pb.HasAccessResponse, error) {
+
+	tokenInfo, err := security.ParseClaims(req.AccessToken, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	session, err := s.strg.Session().GetByPK(&pb.SessionPrimaryKey{Id: tokenInfo.ID})
+	if err != nil {
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	user, err := s.strg.User().GetByPK(&pb.UserPrimaryKey{Id: session.UserId})
+	if err != nil {
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if user.Active < 0 {
+		err := errors.New("user is not active")
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if user.Active == 0 {
+		err := errors.New("user hasn't been activated yet")
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	expiresAt, err := time.Parse(config.DatabaseTimeLayout, user.ExpiresAt)
+	if err != nil {
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if expiresAt.Unix() < time.Now().Unix() {
+		err := errors.New("user has been expired")
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	_, err = s.strg.Scope().Upsert(&pb.UpsertScopeRequest{
+		ClientPlatformId: req.ClientPlatformId,
+		Path:             req.Path,
+		Method:           req.Method,
+	})
+	if err != nil {
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	hasAccess, err := s.strg.PermissionScope().HasAccess(user.RoleId, req.ClientPlatformId, req.Path, req.Method)
+	if err != nil {
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if !hasAccess {
+		err = errors.New("access denied")
+		s.log.Error("!!!HasAccess--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &pb.HasAccessResponse{
+		Id:               session.Id,
+		ProjectId:        session.ProjectId,
+		ClientPlatformId: session.ClientPlatformId,
+		ClientTypeId:     session.ClientTypeId,
+		UserId:           session.UserId,
+		RoleId:           session.RoleId,
+		Ip:               session.Ip,
+		Data:             session.Data,
+		ExpiresAt:        session.ExpiresAt,
+		CreatedAt:        session.CreatedAt,
+		UpdatedAt:        session.UpdatedAt,
+	}, nil
+}
