@@ -108,6 +108,8 @@ message User {
     string expires_at = 11;
     string created_at = 12;
     string updated_at = 13;
+    string name = 14;
+    string photo_url = 15;
 }
 
 message UserRelation {

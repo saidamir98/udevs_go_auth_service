@@ -1,0 +1,3 @@
+ALTER TABLE "user"
+DROP COLUMN IF EXISTS "photo_url",
+DROP COLUMN IF EXISTS "name";
