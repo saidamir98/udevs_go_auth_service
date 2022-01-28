@@ -17,18 +17,21 @@ func NewClientRepo(db *sqlx.DB) storage.ClientRepoI {
 	}
 }
 
-func (r *clientRepo) Add(entity *pb.AddClientRequest) (err error) {
+func (r *clientRepo) Add(projectID string, entity *pb.AddClientRequest) (err error) {
 	query := `INSERT INTO "client" (
+		project_id,
 		client_platform_id,
 		client_type_id,
 		login_strategy
 	) VALUES (
 		$1,
 		$2,
-		$3
+		$3,
+		$4
 	)`
 
 	_, err = r.db.Exec(query,
+		projectID,
 		entity.ClientPlatformId,
 		entity.ClientTypeId,
 		entity.LoginStrategy.String(),
@@ -40,6 +43,7 @@ func (r *clientRepo) Add(entity *pb.AddClientRequest) (err error) {
 func (r *clientRepo) GetByPK(pKey *pb.ClientPrimaryKey) (res *pb.Client, err error) {
 	res = &pb.Client{}
 	query := `SELECT
+		project_id,
 		client_platform_id,
 		client_type_id,
 		login_strategy
@@ -58,6 +62,7 @@ func (r *clientRepo) GetByPK(pKey *pb.ClientPrimaryKey) (res *pb.Client, err err
 		var loginStrategy string
 
 		err = row.Scan(
+			&res.ProjectId,
 			&res.ClientPlatformId,
 			&res.ClientTypeId,
 			&loginStrategy,

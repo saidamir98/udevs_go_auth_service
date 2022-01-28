@@ -158,7 +158,6 @@ func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest
 
 func (r *clientPlatformRepo) Update(entity *pb.UpdateClientPlatformRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "client_platform" SET
-		project_id = :project_id,
 		name = :name,
 		subdomain = :subdomain,
 		updated_at = now()
@@ -166,10 +165,9 @@ func (r *clientPlatformRepo) Update(entity *pb.UpdateClientPlatformRequest) (row
 		id = :id`
 
 	params := map[string]interface{}{
-		"id":         entity.Id,
-		"project_id": entity.ProjectId,
-		"name":       entity.Name,
-		"subdomain":  entity.Subdomain,
+		"id":        entity.Id,
+		"name":      entity.Name,
+		"subdomain": entity.Subdomain,
 	}
 
 	result, err := r.db.NamedExec(query, params)

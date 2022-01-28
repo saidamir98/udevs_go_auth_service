@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/grpc/client"
@@ -195,7 +196,25 @@ func (s *clientService) DeleteClientType(ctx context.Context, req *pb.ClientType
 func (s *clientService) AddClient(ctx context.Context, req *pb.AddClientRequest) (*pb.Client, error) {
 	s.log.Info("---AddClient--->", logger.Any("req", req))
 
-	err := s.strg.Client().Add(req)
+	clientPlatform, err := s.strg.ClientPlatform().GetByPK(&pb.ClientPlatformPrimaryKey{Id: req.ClientPlatformId})
+	if err != nil {
+		s.log.Error("!!!AddClient--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	clientType, err := s.strg.ClientType().GetByPK(&pb.ClientTypePrimaryKey{Id: req.ClientTypeId})
+	if err != nil {
+		s.log.Error("!!!AddClient--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if clientPlatform.ProjectId != clientType.ProjectId {
+		err = errors.New("mismatch between client platform&client project_id")
+		s.log.Error("!!!AddClient--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	err = s.strg.Client().Add(clientPlatform.ProjectId, req)
 	if err != nil {
 		s.log.Error("!!!AddClient--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())

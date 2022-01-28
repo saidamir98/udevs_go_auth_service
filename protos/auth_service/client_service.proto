@@ -55,7 +55,6 @@ message GetClientPlatformListResponse {
 
 message UpdateClientPlatformRequest {
     string id = 1;
-    string project_id = 2;
     string name = 3;
     string subdomain = 4;
 }
@@ -65,6 +64,7 @@ message CreateClientTypeRequest {
     ConfirmStrategies confirm_by = 3;
     bool self_register = 4;
     bool self_recover = 5;
+    string project_id = 6;
 }
 
 message ClientTypePrimaryKey {

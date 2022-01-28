@@ -43,7 +43,7 @@ type ClientTypeRepoI interface {
 }
 
 type ClientRepoI interface {
-	Add(entity *pb.AddClientRequest) (err error)
+	Add(projectID string, entity *pb.AddClientRequest) (err error)
 	GetByPK(entity *pb.ClientPrimaryKey) (res *pb.Client, err error)
 	Update(entity *pb.UpdateClientRequest) (rowsAffected int64, err error)
 	Remove(entity *pb.ClientPrimaryKey) (rowsAffected int64, err error)

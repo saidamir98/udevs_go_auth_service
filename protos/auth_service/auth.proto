@@ -38,6 +38,7 @@ message ClientType {
     ConfirmStrategies confirm_by = 3;
     bool self_register = 4;
     bool self_recover = 5;
+    string project_id = 6;
 }
 
 message Relation {
@@ -60,6 +61,7 @@ message Client {
     string client_platform_id = 1;
     string client_type_id = 2;
     LoginStrategies login_strategy = 3;
+    string project_id = 4;
 }
 
 message Role {
