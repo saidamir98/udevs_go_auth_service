@@ -2,6 +2,7 @@ package postgres
 
 import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
@@ -117,6 +118,11 @@ func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *
 	arrangement := " DESC"
 	offset := " OFFSET 0"
 	limit := " LIMIT 10"
+
+	if util.IsValidUUID(queryParam.ProjectId) {
+		params["project_id"] = queryParam.ProjectId
+		filter += " AND (project_id = :project_id)"
+	}
 
 	if len(queryParam.Search) > 0 {
 		params["search"] = queryParam.Search

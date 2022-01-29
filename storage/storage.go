@@ -7,6 +7,7 @@ import (
 
 var ErrorNotFound = errors.New("record not found")
 var ErrorTheSameId = errors.New("cannot use the same uuid for 'id' and 'parent_id' fields")
+var ErrorProjectId = errors.New("not valid 'project_id'")
 
 type StorageI interface {
 	ClientPlatform() ClientPlatformRepoI
@@ -47,6 +48,8 @@ type ClientRepoI interface {
 	GetByPK(entity *pb.ClientPrimaryKey) (res *pb.Client, err error)
 	Update(entity *pb.UpdateClientRequest) (rowsAffected int64, err error)
 	Remove(entity *pb.ClientPrimaryKey) (rowsAffected int64, err error)
+	GetList(queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error)
+	GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClientMatrixResponse, err error)
 }
 
 type RelationRepoI interface {

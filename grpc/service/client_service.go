@@ -226,6 +226,32 @@ func (s *clientService) AddClient(ctx context.Context, req *pb.AddClientRequest)
 	})
 }
 
+func (s *clientService) GetClientList(ctx context.Context, req *pb.GetClientListRequest) (*pb.GetClientListResponse, error) {
+	s.log.Info("---GetClientList--->", logger.Any("req", req))
+
+	res, err := s.strg.Client().GetList(req)
+
+	if err != nil {
+		s.log.Error("!!!GetClientList--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return res, err
+}
+
+func (s *clientService) GetClientMatrix(ctx context.Context, req *pb.GetClientMatrixRequest) (*pb.GetClientMatrixResponse, error) {
+	s.log.Info("---GetClientMatrix--->", logger.Any("req", req))
+
+	res, err := s.strg.Client().GetMatrix(req)
+
+	if err != nil {
+		s.log.Error("!!!GetClientMatrix--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return res, err
+}
+
 func (s *clientService) UpdateClient(ctx context.Context, req *pb.UpdateClientRequest) (*pb.Client, error) {
 	s.log.Info("---UpdateClient--->", logger.Any("req", req))
 
