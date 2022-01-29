@@ -1,13 +1,479 @@
 definitions:
+  auth_service.AddClientRequest:
+    properties:
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      login_strategy:
+        type: integer
+    type: object
+  auth_service.AddPermissionScopeRequest:
+    properties:
+      client_platform_id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+      permission_id:
+        type: string
+    type: object
+  auth_service.AddRelationRequest:
+    properties:
+      client_type_id:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      type:
+        type: integer
+    type: object
+  auth_service.AddRolePermissionRequest:
+    properties:
+      permission_id:
+        type: string
+      role_id:
+        type: string
+    type: object
+  auth_service.AddRoleRequest:
+    properties:
+      client_type_id:
+        type: string
+      name:
+        type: string
+    type: object
+  auth_service.AddUserInfoFieldRequest:
+    properties:
+      client_type_id:
+        type: string
+      data_type:
+        type: string
+      field_name:
+        type: string
+      field_type:
+        type: string
+    type: object
+  auth_service.AddUserRelationRequest:
+    properties:
+      relation_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  auth_service.Client:
+    properties:
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      login_strategy:
+        type: integer
+      project_id:
+        type: string
+    type: object
+  auth_service.ClientPlatform:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      project_id:
+        type: string
+      subdomain:
+        type: string
+    type: object
+  auth_service.ClientType:
+    properties:
+      confirm_by:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      project_id:
+        type: string
+      self_recover:
+        type: boolean
+      self_register:
+        type: boolean
+    type: object
+  auth_service.CreateClientPlatformRequest:
+    properties:
+      name:
+        type: string
+      project_id:
+        type: string
+      subdomain:
+        type: string
+    type: object
+  auth_service.CreateClientTypeRequest:
+    properties:
+      confirm_by:
+        type: integer
+      name:
+        type: string
+      project_id:
+        type: string
+      self_recover:
+        type: boolean
+      self_register:
+        type: boolean
+    type: object
+  auth_service.CreatePermissionRequest:
+    properties:
+      client_platform_id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+    type: object
+  auth_service.CreateUserRequest:
+    properties:
+      active:
+        type: integer
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      email:
+        type: string
+      expires_at:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      photo_url:
+        type: string
+      project_id:
+        type: string
+      role_id:
+        type: string
+    type: object
+  auth_service.GetClientPlatformListResponse:
+    properties:
+      client_platforms:
+        items:
+          $ref: '#/definitions/auth_service.ClientPlatform'
+        type: array
+      count:
+        type: integer
+    type: object
+  auth_service.GetClientTypeListResponse:
+    properties:
+      client_types:
+        items:
+          $ref: '#/definitions/auth_service.ClientType'
+        type: array
+      count:
+        type: integer
+    type: object
+  auth_service.GetPermissionListResponse:
+    properties:
+      count:
+        type: integer
+      permissions:
+        items:
+          $ref: '#/definitions/auth_service.Permission'
+        type: array
+    type: object
+  auth_service.GetUserListResponse:
+    properties:
+      count:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/auth_service.User'
+        type: array
+    type: object
+  auth_service.HasAccessRequest:
+    properties:
+      access_token:
+        type: string
+      client_platform_id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+      project_id:
+        type: string
+    type: object
+  auth_service.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  auth_service.LogoutRequest:
+    properties:
+      access_token:
+        type: string
+    type: object
+  auth_service.Permission:
+    properties:
+      client_platform_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+    type: object
+  auth_service.PermissionScope:
+    properties:
+      client_platform_id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+      permission_id:
+        type: string
+    type: object
+  auth_service.PermissionScopePrimaryKey:
+    properties:
+      client_platform_id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+      permission_id:
+        type: string
+    type: object
+  auth_service.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  auth_service.Relation:
+    properties:
+      client_type_id:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: integer
+    type: object
+  auth_service.Role:
+    properties:
+      client_type_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  auth_service.RolePermission:
+    properties:
+      permission_id:
+        type: string
+      role_id:
+        type: string
+    type: object
+  auth_service.RolePermissionPrimaryKey:
+    properties:
+      permission_id:
+        type: string
+      role_id:
+        type: string
+    type: object
+  auth_service.UpdateClientPlatformRequest:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      subdomain:
+        type: string
+    type: object
+  auth_service.UpdateClientRequest:
+    properties:
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      login_strategy:
+        type: integer
+    type: object
+  auth_service.UpdateClientTypeRequest:
+    properties:
+      confirm_by:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      self_recover:
+        type: boolean
+      self_register:
+        type: boolean
+    type: object
+  auth_service.UpdatePermissionRequest:
+    properties:
+      client_platform_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+    type: object
+  auth_service.UpdateRelationRequest:
+    properties:
+      client_type_id:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: integer
+    type: object
+  auth_service.UpdateRoleRequest:
+    properties:
+      client_type_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  auth_service.UpdateUserInfoFieldRequest:
+    properties:
+      client_type_id:
+        type: string
+      data_type:
+        type: string
+      field_name:
+        type: string
+      field_type:
+        type: string
+      id:
+        type: string
+    type: object
+  auth_service.UpdateUserRequest:
+    properties:
+      active:
+        type: integer
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      email:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      photo_url:
+        type: string
+      project_id:
+        type: string
+      role_id:
+        type: string
+    type: object
+  auth_service.UpsertScopeRequest:
+    properties:
+      client_platform_id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+    type: object
+  auth_service.User:
+    properties:
+      active:
+        type: integer
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      photo_url:
+        type: string
+      project_id:
+        type: string
+      role_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  auth_service.UserInfoField:
+    properties:
+      client_type_id:
+        type: string
+      data_type:
+        type: string
+      field_name:
+        type: string
+      field_type:
+        type: string
+      id:
+        type: string
+    type: object
+  auth_service.UserRelation:
+    properties:
+      relation_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  auth_service.UserRelationPrimaryKey:
+    properties:
+      relation_id:
+        type: string
+      user_id:
+        type: string
+    type: object
   config.Config:
     properties:
+      authGRPCPort:
+        type: string
+      authServiceHost:
+        type: string
       defaultLimit:
         type: string
       defaultOffset:
-        type: string
-      employeeGRPCPort:
-        type: string
-      employeeServiceHost:
         type: string
       environment:
         description: debug, test, release
@@ -16,11 +482,21 @@ definitions:
         type: string
       httpscheme:
         type: string
-      scrumGRPCPort:
+      passcodeLength:
+        type: integer
+      passcodePool:
         type: string
-      scrumServiceHost:
+      postgresDatabase:
         type: string
-      serviceHost:
+      postgresHost:
+        type: string
+      postgresPassword:
+        type: string
+      postgresPort:
+        type: integer
+      postgresUser:
+        type: string
+      secretKey:
         type: string
       serviceName:
         type: string
@@ -33,7 +509,8 @@ definitions:
     type: object
   http.Response:
     properties:
-      data: {}
+      data:
+        type: object
       description:
         type: string
       status:
@@ -152,8 +629,474 @@ definitions:
 info:
   contact: {}
   description: This is a api gateway
+  license: {}
   termsOfService: https://udevs.io
 paths:
+  /client:
+    post:
+      consumes:
+      - application/json
+      description: Create Client
+      operationId: create_client
+      parameters:
+      - description: AddClientRequestBody
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddClientRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Client data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Client'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Client
+      tags:
+      - Client
+    put:
+      consumes:
+      - application/json
+      description: Update Client
+      operationId: update_client
+      parameters:
+      - description: UpdateClientRequestBody
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateClientRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Client data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Client'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Client
+      tags:
+      - Client
+  /client/{client_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Client
+      operationId: delete_client
+      parameters:
+      - description: client_platform_id
+        in: path
+        name: client_platform_id
+        required: true
+        type: string
+      - description: client_type_id
+        in: path
+        name: client_type_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Client
+      tags:
+      - Client
+  /client_platform:
+    get:
+      consumes:
+      - application/json
+      description: Get ClientPlatform List
+      operationId: get_client_platform_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetClientPlatformListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetClientPlatformListResponse'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get ClientPlatform List
+      tags:
+      - ClientPlatform
+    post:
+      consumes:
+      - application/json
+      description: Create ClientPlatform
+      operationId: create_client_platform
+      parameters:
+      - description: CreateClientPlatformRequestBody
+        in: body
+        name: client_platform
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.CreateClientPlatformRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ClientPlatform data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.ClientPlatform'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create ClientPlatform
+      tags:
+      - ClientPlatform
+    put:
+      consumes:
+      - application/json
+      description: Update ClientPlatform
+      operationId: update_client_platform
+      parameters:
+      - description: UpdateClientPlatformRequestBody
+        in: body
+        name: client_platform
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateClientPlatformRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ClientPlatform data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.ClientPlatform'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update ClientPlatform
+      tags:
+      - ClientPlatform
+  /client_platform/{client_platform_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get ClientPlatform
+      operationId: delete_client_platform
+      parameters:
+      - description: client_platform_id
+        in: path
+        name: client_platform_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete ClientPlatform
+      tags:
+      - ClientPlatform
+    get:
+      consumes:
+      - application/json
+      description: Get ClientPlatform By ID
+      operationId: get_client_platform_by_id
+      parameters:
+      - description: client_platform_id
+        in: path
+        name: client_platform_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ClientPlatformBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.ClientPlatform'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get ClientPlatform By ID
+      tags:
+      - ClientPlatform
+  /client_type:
+    get:
+      consumes:
+      - application/json
+      description: Get ClientType List
+      operationId: get_client_type_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetClientTypeListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetClientTypeListResponse'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get ClientType List
+      tags:
+      - ClientType
+    post:
+      consumes:
+      - application/json
+      description: Create ClientType
+      operationId: create_client_type
+      parameters:
+      - description: CreateClientTypeRequestBody
+        in: body
+        name: client_type
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.CreateClientTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ClientType data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.ClientType'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create ClientType
+      tags:
+      - ClientType
+    put:
+      consumes:
+      - application/json
+      description: Update ClientType
+      operationId: update_client_type
+      parameters:
+      - description: UpdateClientTypeRequestBody
+        in: body
+        name: client_type
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateClientTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ClientType data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.ClientType'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update ClientType
+      tags:
+      - ClientType
+  /client_type/{client_type_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get ClientType
+      operationId: delete_client_type
+      parameters:
+      - description: client_type_id
+        in: path
+        name: client_type_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete ClientType
+      tags:
+      - ClientType
+    get:
+      consumes:
+      - application/json
+      description: Get ClientType By ID
+      operationId: get_client_type_by_id
+      parameters:
+      - description: client_type_id
+        in: path
+        name: client_type_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ClientTypeBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.ClientType'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get ClientType By ID
+      tags:
+      - ClientType
   /config:
     get:
       consumes:
@@ -178,6 +1121,355 @@ paths:
           schema:
             $ref: '#/definitions/http.Response'
       summary: get config data on the debug mode
+  /has-access:
+    post:
+      consumes:
+      - application/json
+      description: Has Access
+      operationId: has_access
+      parameters:
+      - description: HasAccessRequestBody
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.HasAccessRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.User'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Has Access
+      tags:
+      - Session
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      operationId: login
+      parameters:
+      - description: LoginRequestBody
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.User'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Login
+      tags:
+      - Session
+  /logout:
+    delete:
+      consumes:
+      - application/json
+      description: Logout User
+      operationId: logout
+      parameters:
+      - description: LogoutRequest
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Logout User
+      tags:
+      - Session
+  /permission:
+    get:
+      consumes:
+      - application/json
+      description: Get Permission List
+      operationId: get_permission_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetPermissionListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetPermissionListResponse'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Permission List
+      tags:
+      - Permission
+    post:
+      consumes:
+      - application/json
+      description: Create Permission
+      operationId: create_permission
+      parameters:
+      - description: CreatePermissionRequestBody
+        in: body
+        name: permission
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.CreatePermissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Permission data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Permission'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Permission
+      tags:
+      - Permission
+    put:
+      consumes:
+      - application/json
+      description: Update Permission
+      operationId: update_permission
+      parameters:
+      - description: UpdatePermissionRequestBody
+        in: body
+        name: permission
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdatePermissionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permission data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Permission'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Permission
+      tags:
+      - Permission
+  /permission-scope:
+    delete:
+      consumes:
+      - application/json
+      description: Get PermissionScope
+      operationId: delete_permission_scope
+      parameters:
+      - description: PermissionScopePrimaryKeyBody
+        in: body
+        name: permission_scope
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.PermissionScopePrimaryKey'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete PermissionScope
+      tags:
+      - PermissionScope
+    post:
+      consumes:
+      - application/json
+      description: Create PermissionScope
+      operationId: add_permission_scope
+      parameters:
+      - description: AddPermissionScopeRequestBody
+        in: body
+        name: permission_scope
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddPermissionScopeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: PermissionScope data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.PermissionScope'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create PermissionScope
+      tags:
+      - PermissionScope
+  /permission/{permission-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Permission
+      operationId: delete_permission
+      parameters:
+      - description: permission-id
+        in: path
+        name: permission-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Permission
+      tags:
+      - Permission
+    get:
+      consumes:
+      - application/json
+      description: Get Permission By ID
+      operationId: get_permission_by_id
+      parameters:
+      - description: permission-id
+        in: path
+        name: permission-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PermissionBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Permission'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Permission By ID
+      tags:
+      - Permission
   /ping:
     get:
       consumes:
@@ -232,15 +1524,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.GetPositionListResponse'
               type: object
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -276,15 +1559,6 @@ paths:
             - properties:
                 data:
                   $ref: '#/definitions/settings_service.Position'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
               type: object
         "500":
           description: Server Error
@@ -322,15 +1596,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.Position'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -360,15 +1625,6 @@ paths:
       responses:
         "204":
           description: ""
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -404,15 +1660,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.Position'
               type: object
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -447,15 +1694,6 @@ paths:
       responses:
         "204":
           description: ""
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -493,15 +1731,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.Position'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -538,15 +1767,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.Position'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -559,6 +1779,313 @@ paths:
       summary: Update Level Item
       tags:
       - Position
+  /refresh:
+    put:
+      consumes:
+      - application/json
+      description: Refresh Token
+      operationId: refresh
+      parameters:
+      - description: RefreshTokenRequestBody
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.User'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Refresh Token
+      tags:
+      - Session
+  /relation:
+    post:
+      consumes:
+      - application/json
+      description: Create Relation
+      operationId: create_relation
+      parameters:
+      - description: AddRelationRequestBody
+        in: body
+        name: relation
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddRelationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Relation data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Relation'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Relation
+      tags:
+      - Relation
+    put:
+      consumes:
+      - application/json
+      description: Update Relation
+      operationId: update_relation
+      parameters:
+      - description: UpdateRelationRequestBody
+        in: body
+        name: relation
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateRelationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Relation data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Relation'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Relation
+      tags:
+      - Relation
+  /relation/{relation_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Relation
+      operationId: delete_relation
+      parameters:
+      - description: relation_id
+        in: path
+        name: relation_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Relation
+      tags:
+      - Relation
+  /role:
+    post:
+      consumes:
+      - application/json
+      description: Create Role
+      operationId: create_role
+      parameters:
+      - description: AddRoleRequestBody
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Role data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Role'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Role
+      tags:
+      - Role
+    put:
+      consumes:
+      - application/json
+      description: Update Role
+      operationId: update_role
+      parameters:
+      - description: UpdateRoleRequestBody
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Role'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Role
+      tags:
+      - Role
+  /role-permission:
+    delete:
+      consumes:
+      - application/json
+      description: Get RolePermission
+      operationId: delete_role_permission
+      parameters:
+      - description: RolePermissionPrimaryKeyBody
+        in: body
+        name: role_permission
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.RolePermissionPrimaryKey'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete RolePermission
+      tags:
+      - RolePermission
+    post:
+      consumes:
+      - application/json
+      description: Create RolePermission
+      operationId: add_role_permission
+      parameters:
+      - description: AddRolePermissionRequestBody
+        in: body
+        name: role_permission
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddRolePermissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: RolePermission data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.RolePermission'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create RolePermission
+      tags:
+      - RolePermission
+  /role/{role_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Role
+      operationId: delete_role
+      parameters:
+      - description: role-id
+        in: path
+        name: role-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Role
+      tags:
+      - Role
   /sphere:
     get:
       consumes:
@@ -589,15 +2116,6 @@ paths:
             - properties:
                 data:
                   $ref: '#/definitions/settings_service.GetSphereListResponse'
-              type: object
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
               type: object
         "500":
           description: Server Error
@@ -635,15 +2153,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.Sphere'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -680,15 +2189,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.Sphere'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -718,15 +2218,6 @@ paths:
       responses:
         "204":
           description: ""
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -762,15 +2253,6 @@ paths:
                 data:
                   $ref: '#/definitions/settings_service.Sphere'
               type: object
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
         "500":
           description: Server Error
           schema:
@@ -783,4 +2265,388 @@ paths:
       summary: Get Sphere By ID
       tags:
       - Sphere
+  /upsert-scope:
+    post:
+      consumes:
+      - application/json
+      description: Upsert Scope
+      operationId: upsert_scope
+      parameters:
+      - description: UpsertScopeRequestBody
+        in: body
+        name: upsert_scope
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpsertScopeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Role data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Role'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Upsert Scope
+      tags:
+      - UpsertScope
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Get User List
+      operationId: get_user_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetUserListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetUserListResponse'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get User List
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Create User
+      operationId: create_user
+      parameters:
+      - description: CreateUserRequestBody
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.User'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create User
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update User
+      operationId: update_user
+      parameters:
+      - description: UpdateUserRequestBody
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.User'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update User
+      tags:
+      - User
+  /user-relation:
+    delete:
+      consumes:
+      - application/json
+      description: Get UserRelation
+      operationId: delete_user_relation
+      parameters:
+      - description: UserRelationPrimaryKeyBody
+        in: body
+        name: user_relation
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UserRelationPrimaryKey'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete UserRelation
+      tags:
+      - UserRelation
+    post:
+      consumes:
+      - application/json
+      description: Create UserRelation
+      operationId: add_user_relation
+      parameters:
+      - description: AddUserRelationRequestBody
+        in: body
+        name: user_relation
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddUserRelationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: UserRelation data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.UserRelation'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create UserRelation
+      tags:
+      - UserRelation
+  /user/{user-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get User
+      operationId: delete_user
+      parameters:
+      - description: user-id
+        in: path
+        name: user-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete User
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Get User By ID
+      operationId: get_user_by_id
+      parameters:
+      - description: user-id
+        in: path
+        name: user-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: UserBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.User'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get User By ID
+      tags:
+      - User
+  /user_info_field:
+    post:
+      consumes:
+      - application/json
+      description: Create UserInfoField
+      operationId: create_user_info_field
+      parameters:
+      - description: AddUserInfoFieldRequestBody
+        in: body
+        name: user_info_field
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddUserInfoFieldRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: UserInfoField data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.UserInfoField'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create UserInfoField
+      tags:
+      - UserInfoField
+    put:
+      consumes:
+      - application/json
+      description: Update UserInfoField
+      operationId: update_user_info_field
+      parameters:
+      - description: UpdateUserInfoFieldRequestBody
+        in: body
+        name: user_info_field
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateUserInfoFieldRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: UserInfoField data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.UserInfoField'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update UserInfoField
+      tags:
+      - UserInfoField
+  /user_info_field/{user_info_field_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get UserInfoField
+      operationId: delete_user_info_field
+      parameters:
+      - description: user_info_field_id
+        in: path
+        name: user_info_field_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete UserInfoField
+      tags:
+      - UserInfoField
 swagger: "2.0"

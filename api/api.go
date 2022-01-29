@@ -43,6 +43,66 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.PUT("/position/level", h.UpdateLevelItem)
 	r.DELETE("/position/:position_id/level/:level_id", h.RemoveLevelItem)
 
+	// CLIENT SERVICE
+	r.POST("/client_platform", h.CreateClientPlatform)
+	r.GET("/client_platform", h.GetClientPlatformList)
+	r.GET("/client_platform/:client_platform_id", h.GetClientPlatformByID)
+	r.PUT("/client_platform", h.UpdateClientPlatform)
+	r.DELETE("/client_platform/:client_platform_id", h.DeleteClientPlatform)
+
+	r.POST("/client_type", h.CreateClientType)
+	r.GET("/client_type", h.GetClientTypeList)
+	r.GET("/client_type/:client_type_id", h.GetClientTypeByID)
+	r.PUT("/client_type", h.UpdateClientType)
+	r.DELETE("/client_type/:client_type_id", h.DeleteClientType)
+
+	r.POST("/client", h.AddClient)
+	r.PUT("/client", h.UpdateClient)
+	r.DELETE("/client/:client_platform_id/:client_type_id", h.RemoveClient)
+
+	r.POST("/relation", h.AddRelation)
+	r.PUT("/relation", h.UpdateRelation)
+	r.DELETE("/relation/:relation_id", h.RemoveRelation)
+
+	r.POST("/user_info_field", h.AddUserInfoField)
+	r.PUT("/user_info_field", h.UpdateUserInfoField)
+	r.DELETE("/user_info_field/:user_info_field_id", h.RemoveUserInfoField)
+
+	// PERMISSION SERVICE
+	r.POST("/role", h.AddRole)
+	r.PUT("/role", h.UpdateRole)
+	r.DELETE("/role/:role-id", h.RemoveRole)
+
+	r.POST("/permission", h.CreatePermission)
+	r.GET("/permission", h.GetPermissionList)
+	r.GET("/permission/:permission-id", h.GetPermissionByID)
+	r.PUT("/permission", h.UpdatePermission)
+	r.DELETE("/permission/:permission-id", h.DeletePermission)
+
+	r.POST("/upsert-scope", h.UpsertScope)
+
+	r.POST("/permission-scope", h.AddPermissionScope)
+	r.DELETE("/permission-scope", h.RemovePermissionScope)
+
+	r.POST("/role-permission", h.AddRolePermission)
+	r.DELETE("/role-permission", h.RemoveRolePermission)
+
+	r.POST("/user", h.CreateUser)
+	r.GET("/user", h.GetUserList)
+	r.GET("/user/:user-id", h.GetUserByID)
+	r.PUT("/user", h.UpdateUser)
+	r.DELETE("/user/:user-id", h.DeleteUser)
+
+	r.POST("/user-relation", h.AddUserRelation)
+	r.DELETE("/user-relation", h.RemoveUserRelation)
+
+	r.POST("/upsert-user-info", h.UpsertUserInfo)
+
+	r.POST("/login", h.Login)
+	r.DELETE("/logout", h.Logout)
+	r.PUT("/refresh", h.RefreshToken)
+	r.POST("/has-acess", h.HasAccess)
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return
 }
