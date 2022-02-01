@@ -409,6 +409,36 @@ func (h *Handler) AddClient(c *gin.Context) {
 	h.handleResponse(c, http.Created, resp)
 }
 
+// GetClientMatrix godoc
+// @ID create_client
+// @Router /client/{project-id} [GET]
+// @Summary Create Client
+// @Description Create Client
+// @Tags Client
+// @Accept json
+// @Produce json
+// @Param project-id path string true "project-id"
+// @Success 201 {object} http.Response{data=auth_service.GetClientMatrixResponse} "GetClientMatrixBody"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetClientMatrix(c *gin.Context) {
+	project_id := c.Param("project-id")
+
+	resp, err := h.services.ClientService().GetClientMatrix(
+		context.Background(),
+		&auth_service.GetClientMatrixRequest{
+			ProjectId: project_id,
+		},
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.Created, resp)
+}
+
 // UpdateClient godoc
 // @ID update_client
 // @Router /client [PUT]

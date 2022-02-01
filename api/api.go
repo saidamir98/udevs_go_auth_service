@@ -57,6 +57,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.DELETE("/client-type/:client-type-id", h.DeleteClientType)
 
 	r.POST("/client", h.AddClient)
+	r.GET("/client/:project-id", h.GetClientMatrix)
 	r.PUT("/client", h.UpdateClient)
 	r.DELETE("/client", h.RemoveClient)
 
