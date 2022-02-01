@@ -81,7 +81,7 @@ func (h *Handler) UpdateRole(c *gin.Context) {
 
 // RemoveRole godoc
 // @ID delete_role
-// @Router /role/{role_id} [DELETE]
+// @Router /role/{role-id} [DELETE]
 // @Summary Delete Role
 // @Description Get Role
 // @Tags Role
@@ -304,7 +304,7 @@ func (h *Handler) DeletePermission(c *gin.Context) {
 // @Tags UpsertScope
 // @Accept json
 // @Produce json
-// @Param upsert_scope body auth_service.UpsertScopeRequest true "UpsertScopeRequestBody"
+// @Param upsert-scope body auth_service.UpsertScopeRequest true "UpsertScopeRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.Role} "Role data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -338,7 +338,7 @@ func (h *Handler) UpsertScope(c *gin.Context) {
 // @Tags PermissionScope
 // @Accept json
 // @Produce json
-// @Param permission_scope body auth_service.AddPermissionScopeRequest true "AddPermissionScopeRequestBody"
+// @Param permission-scope body auth_service.AddPermissionScopeRequest true "AddPermissionScopeRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.PermissionScope} "PermissionScope data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -372,7 +372,7 @@ func (h *Handler) AddPermissionScope(c *gin.Context) {
 // @Tags PermissionScope
 // @Accept json
 // @Produce json
-// @Param permission_scope body auth_service.PermissionScopePrimaryKey true "PermissionScopePrimaryKeyBody"
+// @Param permission-scope body auth_service.PermissionScopePrimaryKey true "PermissionScopePrimaryKeyBody"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -406,7 +406,7 @@ func (h *Handler) RemovePermissionScope(c *gin.Context) {
 // @Tags RolePermission
 // @Accept json
 // @Produce json
-// @Param role_permission body auth_service.AddRolePermissionRequest true "AddRolePermissionRequestBody"
+// @Param role-permission body auth_service.AddRolePermissionRequest true "AddRolePermissionRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.RolePermission} "RolePermission data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -440,7 +440,7 @@ func (h *Handler) AddRolePermission(c *gin.Context) {
 // @Tags RolePermission
 // @Accept json
 // @Produce json
-// @Param role_permission body auth_service.RolePermissionPrimaryKey true "RolePermissionPrimaryKeyBody"
+// @Param role-permission body auth_service.RolePermissionPrimaryKey true "RolePermissionPrimaryKeyBody"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"

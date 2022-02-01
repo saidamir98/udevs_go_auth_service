@@ -203,7 +203,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 // @Tags UserRelation
 // @Accept json
 // @Produce json
-// @Param user_relation body auth_service.AddUserRelationRequest true "AddUserRelationRequestBody"
+// @Param user-relation body auth_service.AddUserRelationRequest true "AddUserRelationRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.UserRelation} "UserRelation data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -237,7 +237,7 @@ func (h *Handler) AddUserRelation(c *gin.Context) {
 // @Tags UserRelation
 // @Accept json
 // @Produce json
-// @Param user_relation body auth_service.UserRelationPrimaryKey true "UserRelationPrimaryKeyBody"
+// @Param user-relation body auth_service.UserRelationPrimaryKey true "UserRelationPrimaryKeyBody"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -265,20 +265,20 @@ func (h *Handler) RemoveUserRelation(c *gin.Context) {
 
 // // UpsertUserInfo godoc
 // // @ID upsert_user_info
-// // @Router /upsert-user-info [POST]
+// // @Router /upsert-user-info/{user-id} [POST]
 // // @Summary Upsert UserInfo
 // // @Description Upsert UserInfo
 // // @Tags UpsertUserInfo
 // // @Accept json
 // // @Produce json
 // // @Param data body structpb.Struct true "UpsertUserInfoRequestBody"
-// // @Param user_id path string true "user_id"
+// // @Param user-id path string true "user-id"
 // // @Success 201 {object} http.Response{data=auth_service.Role} "Role data"
 // // @Response 400 {object} http.Response{data=string} "Bad Request"
 // // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) UpsertUserInfo(c *gin.Context) {
 	var data structpb.Struct
-	userID := c.Param("user_id")
+	userID := c.Param("user-id")
 
 	if !util.IsValidUUID(userID) {
 		h.handleResponse(c, http.InvalidArgument, "user id is an invalid uuid")

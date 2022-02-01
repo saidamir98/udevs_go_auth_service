@@ -119,7 +119,7 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 // @Tags Session
 // @Accept json
 // @Produce json
-// @Param login body auth_service.HasAccessRequest true "HasAccessRequestBody"
+// @Param has-access body auth_service.HasAccessRequest true "HasAccessRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.User} "User data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"

@@ -30,43 +30,43 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 
 	r.POST("/sphere", h.CreateSphere)
 	r.GET("/sphere", h.GetSphereList)
-	r.GET("/sphere/:sphere_id", h.GetSphereByID)
+	r.GET("/sphere/:sphere-id", h.GetSphereByID)
 	r.PUT("/sphere", h.UpdateSphere)
-	r.DELETE("/sphere/:sphere_id", h.DeleteSphere)
+	r.DELETE("/sphere/:sphere-id", h.DeleteSphere)
 
 	r.POST("/position", h.CreatePosition)
 	r.GET("/position", h.GetPositionList)
-	r.GET("/position/:position_id", h.GetPositionByID)
+	r.GET("/position/:position-id", h.GetPositionByID)
 	r.PUT("/position", h.UpdatePosition)
-	r.DELETE("/position/:position_id", h.DeletePosition)
+	r.DELETE("/position/:position-id", h.DeletePosition)
 	r.POST("/position/level", h.AddLevelItem)
 	r.PUT("/position/level", h.UpdateLevelItem)
-	r.DELETE("/position/:position_id/level/:level_id", h.RemoveLevelItem)
+	r.DELETE("/position/:position-id/level/:level-id", h.RemoveLevelItem)
 
 	// CLIENT SERVICE
-	r.POST("/client_platform", h.CreateClientPlatform)
-	r.GET("/client_platform", h.GetClientPlatformList)
-	r.GET("/client_platform/:client_platform_id", h.GetClientPlatformByID)
-	r.PUT("/client_platform", h.UpdateClientPlatform)
-	r.DELETE("/client_platform/:client_platform_id", h.DeleteClientPlatform)
+	r.POST("/client-platform", h.CreateClientPlatform)
+	r.GET("/client-platform", h.GetClientPlatformList)
+	r.GET("/client-platform/:client-platform-id", h.GetClientPlatformByID)
+	r.PUT("/client-platform", h.UpdateClientPlatform)
+	r.DELETE("/client-platform/:client-platform-id", h.DeleteClientPlatform)
 
-	r.POST("/client_type", h.CreateClientType)
-	r.GET("/client_type", h.GetClientTypeList)
-	r.GET("/client_type/:client_type_id", h.GetClientTypeByID)
-	r.PUT("/client_type", h.UpdateClientType)
-	r.DELETE("/client_type/:client_type_id", h.DeleteClientType)
+	r.POST("/client-type", h.CreateClientType)
+	r.GET("/client-type", h.GetClientTypeList)
+	r.GET("/client-type/:client-type-id", h.GetClientTypeByID)
+	r.PUT("/client-type", h.UpdateClientType)
+	r.DELETE("/client-type/:client-type-id", h.DeleteClientType)
 
 	r.POST("/client", h.AddClient)
 	r.PUT("/client", h.UpdateClient)
-	r.DELETE("/client/:client_platform_id/:client_type_id", h.RemoveClient)
+	r.DELETE("/client", h.RemoveClient)
 
 	r.POST("/relation", h.AddRelation)
 	r.PUT("/relation", h.UpdateRelation)
-	r.DELETE("/relation/:relation_id", h.RemoveRelation)
+	r.DELETE("/relation/:relation-id", h.RemoveRelation)
 
-	r.POST("/user_info_field", h.AddUserInfoField)
-	r.PUT("/user_info_field", h.UpdateUserInfoField)
-	r.DELETE("/user_info_field/:user_info_field_id", h.RemoveUserInfoField)
+	r.POST("/user-info-field", h.AddUserInfoField)
+	r.PUT("/user-info-field", h.UpdateUserInfoField)
+	r.DELETE("/user-info-field/:user-info-field-id", h.RemoveUserInfoField)
 
 	// PERMISSION SERVICE
 	r.POST("/role", h.AddRole)
@@ -96,7 +96,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.POST("/user-relation", h.AddUserRelation)
 	r.DELETE("/user-relation", h.RemoveUserRelation)
 
-	r.POST("/upsert-user-info", h.UpsertUserInfo)
+	r.POST("/upsert-user-info/:user-id", h.UpsertUserInfo)
 
 	r.POST("/login", h.Login)
 	r.DELETE("/logout", h.Logout)
