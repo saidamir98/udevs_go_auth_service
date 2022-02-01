@@ -205,6 +205,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 	if !util.IsValidUUID(req.ProjectId) {
 		return res, storage.ErrorProjectId
 	}
+	res = &pb.GetClientMatrixResponse{}
 
 	queryClientPlatform := `SELECT
 		id,
@@ -230,6 +231,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 			&obj.Name,
 			&obj.Subdomain,
 		)
+
 		if err != nil {
 			return res, err
 		}

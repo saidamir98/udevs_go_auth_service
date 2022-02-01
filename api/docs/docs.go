@@ -822,7 +822,7 @@ var doc = `{
         },
         "/client/{project-id}": {
             "get": {
-                "description": "Create Client",
+                "description": "Get Client Matrix",
                 "consumes": [
                     "application/json"
                 ],
@@ -832,8 +832,8 @@ var doc = `{
                 "tags": [
                     "Client"
                 ],
-                "summary": "Create Client",
-                "operationId": "create_client",
+                "summary": "Get Client Matrix",
+                "operationId": "get_client_matrix",
                 "parameters": [
                     {
                         "type": "string",
@@ -844,7 +844,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "GetClientMatrixBody",
                         "schema": {
                             "allOf": [
