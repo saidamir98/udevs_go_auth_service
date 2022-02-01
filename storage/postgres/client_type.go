@@ -2,6 +2,7 @@ package postgres
 
 import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
@@ -21,6 +22,7 @@ func NewClientTypeRepo(db *sqlx.DB) storage.ClientTypeRepoI {
 func (r *clientTypeRepo) Create(entity *pb.CreateClientTypeRequest) (pKey *pb.ClientTypePrimaryKey, err error) {
 	query := `INSERT INTO "client_type" (
 		id,
+		project_id,
 		name,
 		confirm_by,
 		self_register,
@@ -30,7 +32,8 @@ func (r *clientTypeRepo) Create(entity *pb.CreateClientTypeRequest) (pKey *pb.Cl
 		$2,
 		$3,
 		$4,
-		$5
+		$5,
+		$6
 	)`
 
 	uuid, err := uuid.NewRandom()
@@ -40,6 +43,7 @@ func (r *clientTypeRepo) Create(entity *pb.CreateClientTypeRequest) (pKey *pb.Cl
 
 	_, err = r.db.Exec(query,
 		uuid,
+		entity.ProjectId,
 		entity.Name,
 		entity.ConfirmBy.String(),
 		entity.SelfRegister,
@@ -57,6 +61,7 @@ func (r *clientTypeRepo) GetByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.ClientT
 	res = &pb.ClientType{}
 	query := `SELECT
 		id,
+		project_id,
 		name,
 		confirm_by,
 		self_register,
@@ -77,6 +82,7 @@ func (r *clientTypeRepo) GetByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.ClientT
 
 		err = row.Scan(
 			&res.Id,
+			&res.ProjectId,
 			&res.Name,
 			&confirmBy,
 			&res.SelfRegister,
@@ -100,6 +106,7 @@ func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *
 	params := make(map[string]interface{})
 	query := `SELECT
 		id,
+		project_id,
 		name,
 		confirm_by,
 		self_register,
@@ -111,6 +118,11 @@ func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *
 	arrangement := " DESC"
 	offset := " OFFSET 0"
 	limit := " LIMIT 10"
+
+	if util.IsValidUUID(queryParam.ProjectId) {
+		params["project_id"] = queryParam.ProjectId
+		filter += " AND (project_id = :project_id)"
+	}
 
 	if len(queryParam.Search) > 0 {
 		params["search"] = queryParam.Search
@@ -155,6 +167,7 @@ func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *
 		var confirmBy string
 		err = rows.Scan(
 			&obj.Id,
+			&obj.ProjectId,
 			&obj.Name,
 			&confirmBy,
 			&obj.SelfRegister,
@@ -226,6 +239,7 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 
 	query := `SELECT
 		id,
+		project_id,
 		name,
 		confirm_by,
 		self_register,
@@ -246,6 +260,7 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 
 		err = row.Scan(
 			&res.ClientType.Id,
+			&res.ClientType.ProjectId,
 			&res.ClientType.Name,
 			&confirmBy,
 			&res.ClientType.SelfRegister,

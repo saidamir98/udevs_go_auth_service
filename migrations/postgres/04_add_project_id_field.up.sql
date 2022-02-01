@@ -1,0 +1,5 @@
+ALTER TABLE "client_type"
+ADD COLUMN "project_id" UUID DEFAULT 'e04766bc-3228-4cd9-bd22-09e3fa27a6be' NOT NULL;
+
+ALTER TABLE "client"
+ADD COLUMN "project_id" UUID DEFAULT 'e04766bc-3228-4cd9-bd22-09e3fa27a6be' NOT NULL;

@@ -22,10 +22,8 @@ type Config struct {
 	Environment string // debug, test, release
 	Version     string
 
-	ServiceHost string
-	GRPCPort    string
-	HTTPPort    string
-	HTTPScheme  string
+	HTTPPort   string
+	HTTPScheme string
 
 	PostgresHost     string
 	PostgresPort     int
@@ -36,13 +34,16 @@ type Config struct {
 	DefaultOffset string
 	DefaultLimit  string
 
-	SettingsServiceHost string
-	SettingsGRPCPort    string
-
 	SecretKey string
 
 	PasscodePool   string
 	PasscodeLength int
+
+	SettingsServiceHost string
+	SettingsGRPCPort    string
+
+	AuthServiceHost string
+	AuthGRPCPort    string
 }
 
 // Load ...
@@ -57,8 +58,6 @@ func Load() Config {
 	config.Environment = cast.ToString(getOrReturnDefaultValue("ENVIRONMENT", DebugMode))
 	config.Version = cast.ToString(getOrReturnDefaultValue("VERSION", "1.0"))
 
-	config.ServiceHost = cast.ToString(getOrReturnDefaultValue("SERVICE_HOST", "0.0.0.0"))
-	config.GRPCPort = cast.ToString(getOrReturnDefaultValue("GRPC_PORT", ":9102"))
 	config.HTTPPort = cast.ToString(getOrReturnDefaultValue("HTTP_PORT", ":8080"))
 	config.HTTPScheme = cast.ToString(getOrReturnDefaultValue("HTTP_SCHEME", "http"))
 
@@ -71,13 +70,16 @@ func Load() Config {
 	config.DefaultOffset = cast.ToString(getOrReturnDefaultValue("DEFAULT_OFFSET", "0"))
 	config.DefaultLimit = cast.ToString(getOrReturnDefaultValue("DEFAULT_LIMIT", "10"))
 
-	config.SettingsServiceHost = cast.ToString(getOrReturnDefaultValue("SETTINGS_SERVICE_HOST", "0.0.0.0"))
-	config.SettingsGRPCPort = cast.ToString(getOrReturnDefaultValue("SETTINGS_GRPC_PORT", ":9101"))
-
 	config.SecretKey = cast.ToString(getOrReturnDefaultValue("SECRET_KEY", "cMhXjcrfFRDYrF6f"))
 
 	config.PasscodePool = cast.ToString(getOrReturnDefaultValue("PASSCODE_POOL", "0123456789"))
 	config.PasscodeLength = cast.ToInt(getOrReturnDefaultValue("PASSCODE_LENGTH", "6"))
+
+	config.SettingsServiceHost = cast.ToString(getOrReturnDefaultValue("SETTINGS_SERVICE_HOST", "0.0.0.0"))
+	config.SettingsGRPCPort = cast.ToString(getOrReturnDefaultValue("SETTINGS_GRPC_PORT", ":9101"))
+
+	config.AuthServiceHost = cast.ToString(getOrReturnDefaultValue("AUTH_SERVICE_HOST", "0.0.0.0"))
+	config.AuthGRPCPort = cast.ToString(getOrReturnDefaultValue("AUTH_GRPC_PORT", ":9102"))
 
 	return config
 }

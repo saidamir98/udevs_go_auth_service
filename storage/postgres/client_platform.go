@@ -2,6 +2,7 @@ package postgres
 
 import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
@@ -101,6 +102,11 @@ func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest
 	offset := " OFFSET 0"
 	limit := " LIMIT 10"
 
+	if util.IsValidUUID(queryParam.ProjectId) {
+		params["project_id"] = queryParam.ProjectId
+		filter += " AND (project_id = :project_id)"
+	}
+
 	if len(queryParam.Search) > 0 {
 		params["search"] = queryParam.Search
 		filter += " AND ((name || subdomain) ILIKE ('%' || :search || '%'))"
@@ -158,7 +164,6 @@ func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest
 
 func (r *clientPlatformRepo) Update(entity *pb.UpdateClientPlatformRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "client_platform" SET
-		project_id = :project_id,
 		name = :name,
 		subdomain = :subdomain,
 		updated_at = now()
@@ -166,10 +171,9 @@ func (r *clientPlatformRepo) Update(entity *pb.UpdateClientPlatformRequest) (row
 		id = :id`
 
 	params := map[string]interface{}{
-		"id":         entity.Id,
-		"project_id": entity.ProjectId,
-		"name":       entity.Name,
-		"subdomain":  entity.Subdomain,
+		"id":        entity.Id,
+		"name":      entity.Name,
+		"subdomain": entity.Subdomain,
 	}
 
 	result, err := r.db.NamedExec(query, params)

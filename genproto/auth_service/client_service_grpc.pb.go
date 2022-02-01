@@ -36,6 +36,8 @@ type ClientServiceClient interface {
 	AddClient(ctx context.Context, in *AddClientRequest, opts ...grpc.CallOption) (*Client, error)
 	UpdateClient(ctx context.Context, in *UpdateClientRequest, opts ...grpc.CallOption) (*Client, error)
 	RemoveClient(ctx context.Context, in *ClientPrimaryKey, opts ...grpc.CallOption) (*Client, error)
+	GetClientList(ctx context.Context, in *GetClientListRequest, opts ...grpc.CallOption) (*GetClientListResponse, error)
+	GetClientMatrix(ctx context.Context, in *GetClientMatrixRequest, opts ...grpc.CallOption) (*GetClientMatrixResponse, error)
 	AddRelation(ctx context.Context, in *AddRelationRequest, opts ...grpc.CallOption) (*Relation, error)
 	UpdateRelation(ctx context.Context, in *UpdateRelationRequest, opts ...grpc.CallOption) (*Relation, error)
 	RemoveRelation(ctx context.Context, in *RelationPrimaryKey, opts ...grpc.CallOption) (*Relation, error)
@@ -169,6 +171,24 @@ func (c *clientServiceClient) RemoveClient(ctx context.Context, in *ClientPrimar
 	return out, nil
 }
 
+func (c *clientServiceClient) GetClientList(ctx context.Context, in *GetClientListRequest, opts ...grpc.CallOption) (*GetClientListResponse, error) {
+	out := new(GetClientListResponse)
+	err := c.cc.Invoke(ctx, "/auth_service.ClientService/GetClientList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clientServiceClient) GetClientMatrix(ctx context.Context, in *GetClientMatrixRequest, opts ...grpc.CallOption) (*GetClientMatrixResponse, error) {
+	out := new(GetClientMatrixResponse)
+	err := c.cc.Invoke(ctx, "/auth_service.ClientService/GetClientMatrix", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *clientServiceClient) AddRelation(ctx context.Context, in *AddRelationRequest, opts ...grpc.CallOption) (*Relation, error) {
 	out := new(Relation)
 	err := c.cc.Invoke(ctx, "/auth_service.ClientService/AddRelation", in, out, opts...)
@@ -240,6 +260,8 @@ type ClientServiceServer interface {
 	AddClient(context.Context, *AddClientRequest) (*Client, error)
 	UpdateClient(context.Context, *UpdateClientRequest) (*Client, error)
 	RemoveClient(context.Context, *ClientPrimaryKey) (*Client, error)
+	GetClientList(context.Context, *GetClientListRequest) (*GetClientListResponse, error)
+	GetClientMatrix(context.Context, *GetClientMatrixRequest) (*GetClientMatrixResponse, error)
 	AddRelation(context.Context, *AddRelationRequest) (*Relation, error)
 	UpdateRelation(context.Context, *UpdateRelationRequest) (*Relation, error)
 	RemoveRelation(context.Context, *RelationPrimaryKey) (*Relation, error)
@@ -291,6 +313,12 @@ func (UnimplementedClientServiceServer) UpdateClient(context.Context, *UpdateCli
 }
 func (UnimplementedClientServiceServer) RemoveClient(context.Context, *ClientPrimaryKey) (*Client, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveClient not implemented")
+}
+func (UnimplementedClientServiceServer) GetClientList(context.Context, *GetClientListRequest) (*GetClientListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetClientList not implemented")
+}
+func (UnimplementedClientServiceServer) GetClientMatrix(context.Context, *GetClientMatrixRequest) (*GetClientMatrixResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetClientMatrix not implemented")
 }
 func (UnimplementedClientServiceServer) AddRelation(context.Context, *AddRelationRequest) (*Relation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddRelation not implemented")
@@ -557,6 +585,42 @@ func _ClientService_RemoveClient_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientService_GetClientList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetClientListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).GetClientList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.ClientService/GetClientList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).GetClientList(ctx, req.(*GetClientListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClientService_GetClientMatrix_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetClientMatrixRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).GetClientMatrix(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.ClientService/GetClientMatrix",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).GetClientMatrix(ctx, req.(*GetClientMatrixRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ClientService_AddRelation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddRelationRequest)
 	if err := dec(in); err != nil {
@@ -723,6 +787,14 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveClient",
 			Handler:    _ClientService_RemoveClient_Handler,
+		},
+		{
+			MethodName: "GetClientList",
+			Handler:    _ClientService_GetClientList_Handler,
+		},
+		{
+			MethodName: "GetClientMatrix",
+			Handler:    _ClientService_GetClientMatrix_Handler,
 		},
 		{
 			MethodName: "AddRelation",

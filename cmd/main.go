@@ -53,12 +53,12 @@ func main() {
 
 	grpcServer := grpc.SetUpServer(cfg, log, pgStore, svcs)
 	go func() {
-		lis, err := net.Listen("tcp", cfg.GRPCPort)
+		lis, err := net.Listen("tcp", cfg.AuthGRPCPort)
 		if err != nil {
 			panic(err)
 		}
 
-		log.Info("GRPC: Server being started...", logger.String("port", cfg.GRPCPort))
+		log.Info("GRPC: Server being started...", logger.String("port", cfg.AuthGRPCPort))
 
 		if err := grpcServer.Serve(lis); err != nil {
 			panic(err)
