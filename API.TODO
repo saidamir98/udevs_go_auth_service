@@ -1,0 +1,44 @@
+GetClientMatri
+CreateClientPlatform
+UpdateClientPlatform
+DeleteClientPlatform
+CreateClientType
+UpdateClientType
+DeleteClientType
+AddClient
+UpdateClient
+RemoveClient
+
+GetClientTypeByID
+AddRelation
+UpdateRelation
+RemoveRelation
+AddUserInfoField
+UpdateUserInfoField
+RemoveUserInfoField
+AddRole
+UpdateRole
+RemoveRole
+
+GetClientPlatformByID // Include Nested Permission & Scope List
+CreatePermission
+UpdatePermission
+DeletePermission
+AddPermissionScope
+RemovePermissionScope
+
+*GetRoleByID
+AddRolePermission
+RemoveRolePermission
+
+CreateUser
+GetUserByID // Include user_info, user_relation, role, client_type, client_platform
+UpsertUserInfo
+AddUserRelation
+RemoveUserRelation
+GetUserList // Filter by project_id
+UpdateUser
+
+Login
+Logout
+RefreshToken
