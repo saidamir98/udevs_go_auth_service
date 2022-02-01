@@ -91,18 +91,18 @@ func (h *Handler) GetSphereList(c *gin.Context) {
 
 // GetSphereByID godoc
 // @ID get_sphere_by_id
-// @Router /sphere/{sphere_id} [GET]
+// @Router /sphere/{sphere-id} [GET]
 // @Summary Get Sphere By ID
 // @Description Get Sphere By ID
 // @Tags Sphere
 // @Accept json
 // @Produce json
-// @Param sphere_id path string true "sphere_id"
+// @Param sphere-id path string true "sphere-id"
 // @Success 200 {object} http.Response{data=settings_service.Sphere} "SphereBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetSphereByID(c *gin.Context) {
-	sphereID := c.Param("sphere_id")
+	sphereID := c.Param("sphere-id")
 
 	if !util.IsValidUUID(sphereID) {
 		h.handleResponse(c, http.InvalidArgument, "sphere id is an invalid uuid")
@@ -160,18 +160,18 @@ func (h *Handler) UpdateSphere(c *gin.Context) {
 
 // DeleteSphere godoc
 // @ID delete_sphere
-// @Router /sphere/{sphere_id} [DELETE]
+// @Router /sphere/{sphere-id} [DELETE]
 // @Summary Delete Sphere
 // @Description Get Sphere
 // @Tags Sphere
 // @Accept json
 // @Produce json
-// @Param sphere_id path string true "sphere_id"
+// @Param sphere-id path string true "sphere-id"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) DeleteSphere(c *gin.Context) {
-	sphereID := c.Param("sphere_id")
+	sphereID := c.Param("sphere-id")
 
 	if !util.IsValidUUID(sphereID) {
 		h.handleResponse(c, http.InvalidArgument, "sphere id is an invalid uuid")

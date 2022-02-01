@@ -13,13 +13,13 @@ import (
 
 // CreateClientPlatform godoc
 // @ID create_client_platform
-// @Router /client_platform [POST]
+// @Router /client-platform [POST]
 // @Summary Create ClientPlatform
 // @Description Create ClientPlatform
 // @Tags ClientPlatform
 // @Accept json
 // @Produce json
-// @Param client_platform body auth_service.CreateClientPlatformRequest true "CreateClientPlatformRequestBody"
+// @Param client-platform body auth_service.CreateClientPlatformRequest true "CreateClientPlatformRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.ClientPlatform} "ClientPlatform data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -47,7 +47,7 @@ func (h *Handler) CreateClientPlatform(c *gin.Context) {
 
 // GetClientPlatformList godoc
 // @ID get_client_platform_list
-// @Router /client_platform [GET]
+// @Router /client-platform [GET]
 // @Summary Get ClientPlatform List
 // @Description  Get ClientPlatform List
 // @Tags ClientPlatform
@@ -91,18 +91,18 @@ func (h *Handler) GetClientPlatformList(c *gin.Context) {
 
 // GetClientPlatformByID godoc
 // @ID get_client_platform_by_id
-// @Router /client_platform/{client_platform_id} [GET]
+// @Router /client-platform/{client-platform-id} [GET]
 // @Summary Get ClientPlatform By ID
 // @Description Get ClientPlatform By ID
 // @Tags ClientPlatform
 // @Accept json
 // @Produce json
-// @Param client_platform_id path string true "client_platform_id"
+// @Param client-platform-id path string true "client-platform-id"
 // @Success 200 {object} http.Response{data=auth_service.ClientPlatform} "ClientPlatformBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetClientPlatformByID(c *gin.Context) {
-	client_platformID := c.Param("client_platform_id")
+	client_platformID := c.Param("client-platform-id")
 
 	if !util.IsValidUUID(client_platformID) {
 		h.handleResponse(c, http.InvalidArgument, "client_platform id is an invalid uuid")
@@ -126,13 +126,13 @@ func (h *Handler) GetClientPlatformByID(c *gin.Context) {
 
 // UpdateClientPlatform godoc
 // @ID update_client_platform
-// @Router /client_platform [PUT]
+// @Router /client-platform [PUT]
 // @Summary Update ClientPlatform
 // @Description Update ClientPlatform
 // @Tags ClientPlatform
 // @Accept json
 // @Produce json
-// @Param client_platform body auth_service.UpdateClientPlatformRequest true "UpdateClientPlatformRequestBody"
+// @Param client-platform body auth_service.UpdateClientPlatformRequest true "UpdateClientPlatformRequestBody"
 // @Success 200 {object} http.Response{data=auth_service.ClientPlatform} "ClientPlatform data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -160,18 +160,18 @@ func (h *Handler) UpdateClientPlatform(c *gin.Context) {
 
 // DeleteClientPlatform godoc
 // @ID delete_client_platform
-// @Router /client_platform/{client_platform_id} [DELETE]
+// @Router /client-platform/{client-platform-id} [DELETE]
 // @Summary Delete ClientPlatform
 // @Description Get ClientPlatform
 // @Tags ClientPlatform
 // @Accept json
 // @Produce json
-// @Param client_platform_id path string true "client_platform_id"
+// @Param client-platform-id path string true "client-platform-id"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) DeleteClientPlatform(c *gin.Context) {
-	client_platformID := c.Param("client_platform_id")
+	client_platformID := c.Param("client-platform-id")
 
 	if !util.IsValidUUID(client_platformID) {
 		h.handleResponse(c, http.InvalidArgument, "client_platform id is an invalid uuid")
@@ -195,13 +195,13 @@ func (h *Handler) DeleteClientPlatform(c *gin.Context) {
 
 // CreateClientType godoc
 // @ID create_client_type
-// @Router /client_type [POST]
+// @Router /client-type [POST]
 // @Summary Create ClientType
 // @Description Create ClientType
 // @Tags ClientType
 // @Accept json
 // @Produce json
-// @Param client_type body auth_service.CreateClientTypeRequest true "CreateClientTypeRequestBody"
+// @Param client-type body auth_service.CreateClientTypeRequest true "CreateClientTypeRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.ClientType} "ClientType data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -229,7 +229,7 @@ func (h *Handler) CreateClientType(c *gin.Context) {
 
 // GetClientTypeList godoc
 // @ID get_client_type_list
-// @Router /client_type [GET]
+// @Router /client-type [GET]
 // @Summary Get ClientType List
 // @Description  Get ClientType List
 // @Tags ClientType
@@ -273,18 +273,18 @@ func (h *Handler) GetClientTypeList(c *gin.Context) {
 
 // GetClientTypeByID godoc
 // @ID get_client_type_by_id
-// @Router /client_type/{client_type_id} [GET]
+// @Router /client-type/{client-type-id} [GET]
 // @Summary Get ClientType By ID
 // @Description Get ClientType By ID
 // @Tags ClientType
 // @Accept json
 // @Produce json
-// @Param client_type_id path string true "client_type_id"
+// @Param client-type-id path string true "client-type-id"
 // @Success 200 {object} http.Response{data=auth_service.ClientType} "ClientTypeBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetClientTypeByID(c *gin.Context) {
-	client_typeID := c.Param("client_type_id")
+	client_typeID := c.Param("client-type-id")
 
 	if !util.IsValidUUID(client_typeID) {
 		h.handleResponse(c, http.InvalidArgument, "client_type id is an invalid uuid")
@@ -308,13 +308,13 @@ func (h *Handler) GetClientTypeByID(c *gin.Context) {
 
 // UpdateClientType godoc
 // @ID update_client_type
-// @Router /client_type [PUT]
+// @Router /client-type [PUT]
 // @Summary Update ClientType
 // @Description Update ClientType
 // @Tags ClientType
 // @Accept json
 // @Produce json
-// @Param client_type body auth_service.UpdateClientTypeRequest true "UpdateClientTypeRequestBody"
+// @Param client-type body auth_service.UpdateClientTypeRequest true "UpdateClientTypeRequestBody"
 // @Success 200 {object} http.Response{data=auth_service.ClientType} "ClientType data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -342,18 +342,18 @@ func (h *Handler) UpdateClientType(c *gin.Context) {
 
 // DeleteClientType godoc
 // @ID delete_client_type
-// @Router /client_type/{client_type_id} [DELETE]
+// @Router /client-type/{client-type-id} [DELETE]
 // @Summary Delete ClientType
 // @Description Get ClientType
 // @Tags ClientType
 // @Accept json
 // @Produce json
-// @Param client_type_id path string true "client_type_id"
+// @Param client-type-id path string true "client-type-id"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) DeleteClientType(c *gin.Context) {
-	client_typeID := c.Param("client_type_id")
+	client_typeID := c.Param("client-type-id")
 
 	if !util.IsValidUUID(client_typeID) {
 		h.handleResponse(c, http.InvalidArgument, "client_type id is an invalid uuid")
@@ -444,37 +444,39 @@ func (h *Handler) UpdateClient(c *gin.Context) {
 }
 
 // RemoveClient godoc
-// @ID delete_client
-// @Router /client/{client_id} [DELETE]
+// @ID remove_client
+// @Router /client [DELETE]
 // @Summary Delete Client
 // @Description Get Client
 // @Tags Client
 // @Accept json
 // @Produce json
-// @Param client_platform_id path string true "client_platform_id"
-// @Param client_type_id path string true "client_type_id"
+// @Param remove-client body auth_service.ClientPrimaryKey true "RemoveClientBody"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) RemoveClient(c *gin.Context) {
-	clientPlatformID := c.Param("client_platform_id")
-	clientTypeID := c.Param("client_type_id")
+	var removeClient auth_service.ClientPrimaryKey
 
-	if !util.IsValidUUID(clientPlatformID) {
+	err := c.ShouldBindJSON(&removeClient)
+	if err != nil {
+		h.handleResponse(c, http.BadRequest, err.Error())
+		return
+	}
+
+	if !util.IsValidUUID(removeClient.ClientPlatformId) {
 		h.handleResponse(c, http.InvalidArgument, "client platform id is an invalid uuid")
 		return
 	}
-	if !util.IsValidUUID(clientTypeID) {
+
+	if !util.IsValidUUID(removeClient.ClientTypeId) {
 		h.handleResponse(c, http.InvalidArgument, "client type id is an invalid uuid")
 		return
 	}
 
 	resp, err := h.services.ClientService().RemoveClient(
 		context.Background(),
-		&auth_service.ClientPrimaryKey{
-			ClientPlatformId: clientPlatformID,
-			ClientTypeId:     clientTypeID,
-		},
+		&removeClient,
 	)
 
 	if err != nil {
@@ -555,18 +557,18 @@ func (h *Handler) UpdateRelation(c *gin.Context) {
 
 // RemoveRelation godoc
 // @ID delete_relation
-// @Router /relation/{relation_id} [DELETE]
+// @Router /relation/{relation-id} [DELETE]
 // @Summary Delete Relation
 // @Description Get Relation
 // @Tags Relation
 // @Accept json
 // @Produce json
-// @Param relation_id path string true "relation_id"
+// @Param relation-id path string true "relation-id"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) RemoveRelation(c *gin.Context) {
-	relationID := c.Param("relation_id")
+	relationID := c.Param("relation-id")
 
 	if !util.IsValidUUID(relationID) {
 		h.handleResponse(c, http.InvalidArgument, "relation id is an invalid uuid")
@@ -590,13 +592,13 @@ func (h *Handler) RemoveRelation(c *gin.Context) {
 
 // AddUserInfoField godoc
 // @ID create_user_info_field
-// @Router /user_info_field [POST]
+// @Router /user-info-field [POST]
 // @Summary Create UserInfoField
 // @Description Create UserInfoField
 // @Tags UserInfoField
 // @Accept json
 // @Produce json
-// @Param user_info_field body auth_service.AddUserInfoFieldRequest true "AddUserInfoFieldRequestBody"
+// @Param user-info-field body auth_service.AddUserInfoFieldRequest true "AddUserInfoFieldRequestBody"
 // @Success 201 {object} http.Response{data=auth_service.UserInfoField} "UserInfoField data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -624,13 +626,13 @@ func (h *Handler) AddUserInfoField(c *gin.Context) {
 
 // UpdateUserInfoField godoc
 // @ID update_user_info_field
-// @Router /user_info_field [PUT]
+// @Router /user-info-field [PUT]
 // @Summary Update UserInfoField
 // @Description Update UserInfoField
 // @Tags UserInfoField
 // @Accept json
 // @Produce json
-// @Param user_info_field body auth_service.UpdateUserInfoFieldRequest true "UpdateUserInfoFieldRequestBody"
+// @Param user-info-field body auth_service.UpdateUserInfoFieldRequest true "UpdateUserInfoFieldRequestBody"
 // @Success 200 {object} http.Response{data=auth_service.UserInfoField} "UserInfoField data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -658,18 +660,18 @@ func (h *Handler) UpdateUserInfoField(c *gin.Context) {
 
 // RemoveUserInfoField godoc
 // @ID delete_user_info_field
-// @Router /user_info_field/{user_info_field_id} [DELETE]
+// @Router /user-info-field/{user-info-field-id} [DELETE]
 // @Summary Delete UserInfoField
 // @Description Get UserInfoField
 // @Tags UserInfoField
 // @Accept json
 // @Produce json
-// @Param user_info_field_id path string true "user_info_field_id"
+// @Param user-info-field-id path string true "user-info-field-id"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) RemoveUserInfoField(c *gin.Context) {
-	userInfoFieldID := c.Param("user_info_field_id")
+	userInfoFieldID := c.Param("user-info-field-id")
 
 	if !util.IsValidUUID(userInfoFieldID) {
 		h.handleResponse(c, http.InvalidArgument, "user info field id is an invalid uuid")

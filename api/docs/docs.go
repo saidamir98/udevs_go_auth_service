@@ -186,9 +186,7 @@ var doc = `{
                         }
                     }
                 }
-            }
-        },
-        "/client/{client_id}": {
+            },
             "delete": {
                 "description": "Get Client",
                 "consumes": [
@@ -201,21 +199,16 @@ var doc = `{
                     "Client"
                 ],
                 "summary": "Delete Client",
-                "operationId": "delete_client",
+                "operationId": "remove_client",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "client_platform_id",
-                        "name": "client_platform_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "client_type_id",
-                        "name": "client_type_id",
-                        "in": "path",
-                        "required": true
+                        "description": "RemoveClientBody",
+                        "name": "remove-client",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_service.ClientPrimaryKey"
+                        }
                     }
                 ],
                 "responses": {
@@ -261,7 +254,7 @@ var doc = `{
                 }
             }
         },
-        "/client_platform": {
+        "/client-platform": {
             "get": {
                 "description": "Get ClientPlatform List",
                 "consumes": [
@@ -368,7 +361,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "UpdateClientPlatformRequestBody",
-                        "name": "client_platform",
+                        "name": "client-platform",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -449,7 +442,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "CreateClientPlatformRequestBody",
-                        "name": "client_platform",
+                        "name": "client-platform",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -515,7 +508,7 @@ var doc = `{
                 }
             }
         },
-        "/client_platform/{client_platform_id}": {
+        "/client-platform/{client-platform-id}": {
             "get": {
                 "description": "Get ClientPlatform By ID",
                 "consumes": [
@@ -532,8 +525,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "client_platform_id",
-                        "name": "client_platform_id",
+                        "description": "client-platform-id",
+                        "name": "client-platform-id",
                         "in": "path",
                         "required": true
                     }
@@ -611,8 +604,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "client_platform_id",
-                        "name": "client_platform_id",
+                        "description": "client-platform-id",
+                        "name": "client-platform-id",
                         "in": "path",
                         "required": true
                     }
@@ -660,7 +653,7 @@ var doc = `{
                 }
             }
         },
-        "/client_type": {
+        "/client-type": {
             "get": {
                 "description": "Get ClientType List",
                 "consumes": [
@@ -767,7 +760,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "UpdateClientTypeRequestBody",
-                        "name": "client_type",
+                        "name": "client-type",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -848,7 +841,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "CreateClientTypeRequestBody",
-                        "name": "client_type",
+                        "name": "client-type",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -914,7 +907,7 @@ var doc = `{
                 }
             }
         },
-        "/client_type/{client_type_id}": {
+        "/client-type/{client-type-id}": {
             "get": {
                 "description": "Get ClientType By ID",
                 "consumes": [
@@ -931,8 +924,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "client_type_id",
-                        "name": "client_type_id",
+                        "description": "client-type-id",
+                        "name": "client-type-id",
                         "in": "path",
                         "required": true
                     }
@@ -1010,8 +1003,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "client_type_id",
-                        "name": "client_type_id",
+                        "description": "client-type-id",
+                        "name": "client-type-id",
                         "in": "path",
                         "required": true
                     }
@@ -1115,7 +1108,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "HasAccessRequestBody",
-                        "name": "login",
+                        "name": "has-access",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1603,7 +1596,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "AddPermissionScopeRequestBody",
-                        "name": "permission_scope",
+                        "name": "permission-scope",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1684,7 +1677,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "PermissionScopePrimaryKeyBody",
-                        "name": "permission_scope",
+                        "name": "permission-scope",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -2337,7 +2330,7 @@ var doc = `{
                 }
             }
         },
-        "/position/{position_id}": {
+        "/position/{position-id}": {
             "get": {
                 "description": "Get Position By ID",
                 "consumes": [
@@ -2354,8 +2347,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "position_id",
-                        "name": "position_id",
+                        "description": "position-id",
+                        "name": "position-id",
                         "in": "path",
                         "required": true
                     }
@@ -2433,8 +2426,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "position_id",
-                        "name": "position_id",
+                        "description": "position-id",
+                        "name": "position-id",
                         "in": "path",
                         "required": true
                     }
@@ -2482,7 +2475,7 @@ var doc = `{
                 }
             }
         },
-        "/position/{position_id}/level/{level_id}": {
+        "/position/{position-id}/level/{level-id}": {
             "delete": {
                 "description": "Remove Level Item",
                 "consumes": [
@@ -2499,15 +2492,15 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "position_id",
-                        "name": "position_id",
+                        "description": "position-id",
+                        "name": "position-id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "level_id",
-                        "name": "level_id",
+                        "description": "level-id",
+                        "name": "level-id",
                         "in": "path",
                         "required": true
                     }
@@ -2802,7 +2795,7 @@ var doc = `{
                 }
             }
         },
-        "/relation/{relation_id}": {
+        "/relation/{relation-id}": {
             "delete": {
                 "description": "Get Relation",
                 "consumes": [
@@ -2819,8 +2812,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "relation_id",
-                        "name": "relation_id",
+                        "description": "relation-id",
+                        "name": "relation-id",
                         "in": "path",
                         "required": true
                     }
@@ -3049,7 +3042,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "AddRolePermissionRequestBody",
-                        "name": "role_permission",
+                        "name": "role-permission",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -3130,7 +3123,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "RolePermissionPrimaryKeyBody",
-                        "name": "role_permission",
+                        "name": "role-permission",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -3181,7 +3174,7 @@ var doc = `{
                 }
             }
         },
-        "/role/{role_id}": {
+        "/role/{role-id}": {
             "delete": {
                 "description": "Get Role",
                 "consumes": [
@@ -3501,7 +3494,7 @@ var doc = `{
                 }
             }
         },
-        "/sphere/{sphere_id}": {
+        "/sphere/{sphere-id}": {
             "get": {
                 "description": "Get Sphere By ID",
                 "consumes": [
@@ -3518,8 +3511,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "sphere_id",
-                        "name": "sphere_id",
+                        "description": "sphere-id",
+                        "name": "sphere-id",
                         "in": "path",
                         "required": true
                     }
@@ -3597,8 +3590,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "sphere_id",
-                        "name": "sphere_id",
+                        "description": "sphere-id",
+                        "name": "sphere-id",
                         "in": "path",
                         "required": true
                     }
@@ -3663,7 +3656,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "UpsertScopeRequestBody",
-                        "name": "upsert_scope",
+                        "name": "upsert-scope",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -3983,6 +3976,236 @@ var doc = `{
                 }
             }
         },
+        "/user-info-field": {
+            "put": {
+                "description": "Update UserInfoField",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserInfoField"
+                ],
+                "summary": "Update UserInfoField",
+                "operationId": "update_user_info_field",
+                "parameters": [
+                    {
+                        "description": "UpdateUserInfoFieldRequestBody",
+                        "name": "user-info-field",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_service.UpdateUserInfoFieldRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "UserInfoField data",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.UserInfoField"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create UserInfoField",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserInfoField"
+                ],
+                "summary": "Create UserInfoField",
+                "operationId": "create_user_info_field",
+                "parameters": [
+                    {
+                        "description": "AddUserInfoFieldRequestBody",
+                        "name": "user-info-field",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_service.AddUserInfoFieldRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "UserInfoField data",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.UserInfoField"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user-info-field/{user-info-field-id}": {
+            "delete": {
+                "description": "Get UserInfoField",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserInfoField"
+                ],
+                "summary": "Delete UserInfoField",
+                "operationId": "delete_user_info_field",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user-info-field-id",
+                        "name": "user-info-field-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/user-relation": {
             "post": {
                 "description": "Create UserRelation",
@@ -4000,7 +4223,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "AddUserRelationRequestBody",
-                        "name": "user_relation",
+                        "name": "user-relation",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -4081,7 +4304,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "UserRelationPrimaryKeyBody",
-                        "name": "user_relation",
+                        "name": "user-relation",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -4276,236 +4499,6 @@ var doc = `{
                     }
                 }
             }
-        },
-        "/user_info_field": {
-            "put": {
-                "description": "Update UserInfoField",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "UserInfoField"
-                ],
-                "summary": "Update UserInfoField",
-                "operationId": "update_user_info_field",
-                "parameters": [
-                    {
-                        "description": "UpdateUserInfoFieldRequestBody",
-                        "name": "user_info_field",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth_service.UpdateUserInfoFieldRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "UserInfoField data",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/auth_service.UserInfoField"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create UserInfoField",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "UserInfoField"
-                ],
-                "summary": "Create UserInfoField",
-                "operationId": "create_user_info_field",
-                "parameters": [
-                    {
-                        "description": "AddUserInfoFieldRequestBody",
-                        "name": "user_info_field",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth_service.AddUserInfoFieldRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "UserInfoField data",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/auth_service.UserInfoField"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/user_info_field/{user_info_field_id}": {
-            "delete": {
-                "description": "Get UserInfoField",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "UserInfoField"
-                ],
-                "summary": "Delete UserInfoField",
-                "operationId": "delete_user_info_field",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "user_info_field_id",
-                        "name": "user_info_field_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Invalid Argument",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -4637,6 +4630,17 @@ var doc = `{
                     "type": "string"
                 },
                 "subdomain": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth_service.ClientPrimaryKey": {
+            "type": "object",
+            "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
+                "client_type_id": {
                     "type": "string"
                 }
             }

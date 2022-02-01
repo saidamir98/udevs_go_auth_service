@@ -84,6 +84,13 @@ definitions:
       subdomain:
         type: string
     type: object
+  auth_service.ClientPrimaryKey:
+    properties:
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+    type: object
   auth_service.ClientType:
     properties:
       confirm_by:
@@ -631,6 +638,44 @@ info:
   termsOfService: https://udevs.io
 paths:
   /client:
+    delete:
+      consumes:
+      - application/json
+      description: Get Client
+      operationId: remove_client
+      parameters:
+      - description: RemoveClientBody
+        in: body
+        name: remove-client
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.ClientPrimaryKey'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Client
+      tags:
+      - Client
     post:
       consumes:
       - application/json
@@ -721,50 +766,7 @@ paths:
       summary: Update Client
       tags:
       - Client
-  /client/{client_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Get Client
-      operationId: delete_client
-      parameters:
-      - description: client_platform_id
-        in: path
-        name: client_platform_id
-        required: true
-        type: string
-      - description: client_type_id
-        in: path
-        name: client_type_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ""
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Delete Client
-      tags:
-      - Client
-  /client_platform:
+  /client-platform:
     get:
       consumes:
       - application/json
@@ -824,7 +826,7 @@ paths:
       parameters:
       - description: CreateClientPlatformRequestBody
         in: body
-        name: client_platform
+        name: client-platform
         required: true
         schema:
           $ref: '#/definitions/auth_service.CreateClientPlatformRequest'
@@ -869,7 +871,7 @@ paths:
       parameters:
       - description: UpdateClientPlatformRequestBody
         in: body
-        name: client_platform
+        name: client-platform
         required: true
         schema:
           $ref: '#/definitions/auth_service.UpdateClientPlatformRequest'
@@ -906,16 +908,16 @@ paths:
       summary: Update ClientPlatform
       tags:
       - ClientPlatform
-  /client_platform/{client_platform_id}:
+  /client-platform/{client-platform-id}:
     delete:
       consumes:
       - application/json
       description: Get ClientPlatform
       operationId: delete_client_platform
       parameters:
-      - description: client_platform_id
+      - description: client-platform-id
         in: path
-        name: client_platform_id
+        name: client-platform-id
         required: true
         type: string
       produces:
@@ -950,9 +952,9 @@ paths:
       description: Get ClientPlatform By ID
       operationId: get_client_platform_by_id
       parameters:
-      - description: client_platform_id
+      - description: client-platform-id
         in: path
-        name: client_platform_id
+        name: client-platform-id
         required: true
         type: string
       produces:
@@ -988,7 +990,7 @@ paths:
       summary: Get ClientPlatform By ID
       tags:
       - ClientPlatform
-  /client_type:
+  /client-type:
     get:
       consumes:
       - application/json
@@ -1048,7 +1050,7 @@ paths:
       parameters:
       - description: CreateClientTypeRequestBody
         in: body
-        name: client_type
+        name: client-type
         required: true
         schema:
           $ref: '#/definitions/auth_service.CreateClientTypeRequest'
@@ -1093,7 +1095,7 @@ paths:
       parameters:
       - description: UpdateClientTypeRequestBody
         in: body
-        name: client_type
+        name: client-type
         required: true
         schema:
           $ref: '#/definitions/auth_service.UpdateClientTypeRequest'
@@ -1130,16 +1132,16 @@ paths:
       summary: Update ClientType
       tags:
       - ClientType
-  /client_type/{client_type_id}:
+  /client-type/{client-type-id}:
     delete:
       consumes:
       - application/json
       description: Get ClientType
       operationId: delete_client_type
       parameters:
-      - description: client_type_id
+      - description: client-type-id
         in: path
-        name: client_type_id
+        name: client-type-id
         required: true
         type: string
       produces:
@@ -1174,9 +1176,9 @@ paths:
       description: Get ClientType By ID
       operationId: get_client_type_by_id
       parameters:
-      - description: client_type_id
+      - description: client-type-id
         in: path
-        name: client_type_id
+        name: client-type-id
         required: true
         type: string
       produces:
@@ -1245,7 +1247,7 @@ paths:
       parameters:
       - description: HasAccessRequestBody
         in: body
-        name: login
+        name: has-access
         required: true
         schema:
           $ref: '#/definitions/auth_service.HasAccessRequest'
@@ -1518,7 +1520,7 @@ paths:
       parameters:
       - description: PermissionScopePrimaryKeyBody
         in: body
-        name: permission_scope
+        name: permission-scope
         required: true
         schema:
           $ref: '#/definitions/auth_service.PermissionScopePrimaryKey'
@@ -1556,7 +1558,7 @@ paths:
       parameters:
       - description: AddPermissionScopeRequestBody
         in: body
-        name: permission_scope
+        name: permission-scope
         required: true
         schema:
           $ref: '#/definitions/auth_service.AddPermissionScopeRequest'
@@ -1840,16 +1842,16 @@ paths:
       summary: Update Position
       tags:
       - Position
-  /position/{position_id}:
+  /position/{position-id}:
     delete:
       consumes:
       - application/json
       description: Get Position
       operationId: delete_position
       parameters:
-      - description: position_id
+      - description: position-id
         in: path
-        name: position_id
+        name: position-id
         required: true
         type: string
       produces:
@@ -1884,9 +1886,9 @@ paths:
       description: Get Position By ID
       operationId: get_position_by_id
       parameters:
-      - description: position_id
+      - description: position-id
         in: path
-        name: position_id
+        name: position-id
         required: true
         type: string
       produces:
@@ -1922,21 +1924,21 @@ paths:
       summary: Get Position By ID
       tags:
       - Position
-  /position/{position_id}/level/{level_id}:
+  /position/{position-id}/level/{level-id}:
     delete:
       consumes:
       - application/json
       description: Remove Level Item
       operationId: remove_level_item
       parameters:
-      - description: position_id
+      - description: position-id
         in: path
-        name: position_id
+        name: position-id
         required: true
         type: string
-      - description: level_id
+      - description: level-id
         in: path
-        name: level_id
+        name: level-id
         required: true
         type: string
       produces:
@@ -2193,16 +2195,16 @@ paths:
       summary: Update Relation
       tags:
       - Relation
-  /relation/{relation_id}:
+  /relation/{relation-id}:
     delete:
       consumes:
       - application/json
       description: Get Relation
       operationId: delete_relation
       parameters:
-      - description: relation_id
+      - description: relation-id
         in: path
-        name: relation_id
+        name: relation-id
         required: true
         type: string
       produces:
@@ -2331,7 +2333,7 @@ paths:
       parameters:
       - description: RolePermissionPrimaryKeyBody
         in: body
-        name: role_permission
+        name: role-permission
         required: true
         schema:
           $ref: '#/definitions/auth_service.RolePermissionPrimaryKey'
@@ -2369,7 +2371,7 @@ paths:
       parameters:
       - description: AddRolePermissionRequestBody
         in: body
-        name: role_permission
+        name: role-permission
         required: true
         schema:
           $ref: '#/definitions/auth_service.AddRolePermissionRequest'
@@ -2406,7 +2408,7 @@ paths:
       summary: Create RolePermission
       tags:
       - RolePermission
-  /role/{role_id}:
+  /role/{role-id}:
     delete:
       consumes:
       - application/json
@@ -2586,16 +2588,16 @@ paths:
       summary: Update Sphere
       tags:
       - Sphere
-  /sphere/{sphere_id}:
+  /sphere/{sphere-id}:
     delete:
       consumes:
       - application/json
       description: Get Sphere
       operationId: delete_sphere
       parameters:
-      - description: sphere_id
+      - description: sphere-id
         in: path
-        name: sphere_id
+        name: sphere-id
         required: true
         type: string
       produces:
@@ -2630,9 +2632,9 @@ paths:
       description: Get Sphere By ID
       operationId: get_sphere_by_id
       parameters:
-      - description: sphere_id
+      - description: sphere-id
         in: path
-        name: sphere_id
+        name: sphere-id
         required: true
         type: string
       produces:
@@ -2677,7 +2679,7 @@ paths:
       parameters:
       - description: UpsertScopeRequestBody
         in: body
-        name: upsert_scope
+        name: upsert-scope
         required: true
         schema:
           $ref: '#/definitions/auth_service.UpsertScopeRequest'
@@ -2856,6 +2858,135 @@ paths:
       summary: Update User
       tags:
       - User
+  /user-info-field:
+    post:
+      consumes:
+      - application/json
+      description: Create UserInfoField
+      operationId: create_user_info_field
+      parameters:
+      - description: AddUserInfoFieldRequestBody
+        in: body
+        name: user-info-field
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddUserInfoFieldRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: UserInfoField data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.UserInfoField'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create UserInfoField
+      tags:
+      - UserInfoField
+    put:
+      consumes:
+      - application/json
+      description: Update UserInfoField
+      operationId: update_user_info_field
+      parameters:
+      - description: UpdateUserInfoFieldRequestBody
+        in: body
+        name: user-info-field
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateUserInfoFieldRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: UserInfoField data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.UserInfoField'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update UserInfoField
+      tags:
+      - UserInfoField
+  /user-info-field/{user-info-field-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get UserInfoField
+      operationId: delete_user_info_field
+      parameters:
+      - description: user-info-field-id
+        in: path
+        name: user-info-field-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete UserInfoField
+      tags:
+      - UserInfoField
   /user-relation:
     delete:
       consumes:
@@ -2865,7 +2996,7 @@ paths:
       parameters:
       - description: UserRelationPrimaryKeyBody
         in: body
-        name: user_relation
+        name: user-relation
         required: true
         schema:
           $ref: '#/definitions/auth_service.UserRelationPrimaryKey'
@@ -2903,7 +3034,7 @@ paths:
       parameters:
       - description: AddUserRelationRequestBody
         in: body
-        name: user_relation
+        name: user-relation
         required: true
         schema:
           $ref: '#/definitions/auth_service.AddUserRelationRequest'
@@ -3022,133 +3153,4 @@ paths:
       summary: Get User By ID
       tags:
       - User
-  /user_info_field:
-    post:
-      consumes:
-      - application/json
-      description: Create UserInfoField
-      operationId: create_user_info_field
-      parameters:
-      - description: AddUserInfoFieldRequestBody
-        in: body
-        name: user_info_field
-        required: true
-        schema:
-          $ref: '#/definitions/auth_service.AddUserInfoFieldRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: UserInfoField data
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/auth_service.UserInfoField'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Create UserInfoField
-      tags:
-      - UserInfoField
-    put:
-      consumes:
-      - application/json
-      description: Update UserInfoField
-      operationId: update_user_info_field
-      parameters:
-      - description: UpdateUserInfoFieldRequestBody
-        in: body
-        name: user_info_field
-        required: true
-        schema:
-          $ref: '#/definitions/auth_service.UpdateUserInfoFieldRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: UserInfoField data
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/auth_service.UserInfoField'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Update UserInfoField
-      tags:
-      - UserInfoField
-  /user_info_field/{user_info_field_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Get UserInfoField
-      operationId: delete_user_info_field
-      parameters:
-      - description: user_info_field_id
-        in: path
-        name: user_info_field_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ""
-        "400":
-          description: Invalid Argument
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Delete UserInfoField
-      tags:
-      - UserInfoField
 swagger: "2.0"
