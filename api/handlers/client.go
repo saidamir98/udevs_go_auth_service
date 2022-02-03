@@ -436,7 +436,7 @@ func (h *Handler) GetClientMatrix(c *gin.Context) {
 		return
 	}
 
-	h.handleResponse(c, http.Created, resp)
+	h.handleResponse(c, http.OK, resp)
 }
 
 // UpdateClient godoc
