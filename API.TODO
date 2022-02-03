@@ -27,7 +27,7 @@ DeletePermission
 AddPermissionScope
 RemovePermissionScope
 
-*GetRoleByID
+*GetRoleByID // Include user_type & permissions
 AddRolePermission
 RemoveRolePermission
 
