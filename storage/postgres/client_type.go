@@ -235,6 +235,7 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 		ClientType:     &pb.ClientType{},
 		Relations:      make([]*pb.Relation, 0),
 		UserInfoFields: make([]*pb.UserInfoField, 0),
+		Roles:          make([]*pb.Role, 0),
 	}
 
 	query := `SELECT
@@ -346,6 +347,34 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 		}
 
 		res.UserInfoFields = append(res.UserInfoFields, obj)
+	}
+
+	query3 := `SELECT
+		id,
+		client_type_id,
+		name
+		FROM
+			"role"
+		WHERE
+			client_type_id = $1`
+
+	rows3, err := r.db.Query(query3, res.ClientType.Id)
+	if err != nil {
+		return res, err
+	}
+	defer rows3.Close()
+
+	for rows3.Next() {
+		obj := &pb.Role{}
+		err = rows3.Scan(
+			&obj.Id,
+			&obj.ClientTypeId,
+			&obj.Name,
+		)
+		if err != nil {
+			return res, err
+		}
+		res.Roles = append(res.Roles, obj)
 	}
 
 	return res, nil
