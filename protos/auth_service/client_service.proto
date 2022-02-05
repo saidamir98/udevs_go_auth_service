@@ -89,6 +89,7 @@ message CompleteClientType {
     ClientType client_type = 1;
     repeated Relation relations = 2;
     repeated UserInfoField user_info_fields = 3;
+    repeated Role roles = 4;
 }
 
 message GetClientTypeListRequest {

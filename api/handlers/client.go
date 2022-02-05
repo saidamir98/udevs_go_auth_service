@@ -280,7 +280,7 @@ func (h *Handler) GetClientTypeList(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param client-type-id path string true "client-type-id"
-// @Success 200 {object} http.Response{data=auth_service.ClientType} "ClientTypeBody"
+// @Success 200 {object} http.Response{data=auth_service.CompleteClientType} "ClientTypeBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetClientTypeByID(c *gin.Context) {
