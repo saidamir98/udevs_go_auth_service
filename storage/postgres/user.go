@@ -168,6 +168,16 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 		filter += " AND ((name || phone || email || login) ILIKE ('%' || :search || '%'))"
 	}
 
+	if len(queryParam.ClientPlatformId) > 0 {
+		params["client_platform_id"] = queryParam.ClientPlatformId
+		filter += " AND client_platform_id = :client_platform_id"
+	}
+
+	if len(queryParam.ClientTypeId) > 0 {
+		params["client_type_id"] = queryParam.ClientTypeId
+		filter += " AND client_type_id = :client_type_id"
+	}
+
 	if queryParam.Offset > 0 {
 		params["offset"] = queryParam.Offset
 		offset = " OFFSET :offset"
