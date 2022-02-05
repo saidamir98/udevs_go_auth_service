@@ -942,7 +942,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/auth_service.ClientType"
+                                            "$ref": "#/definitions/auth_service.CompleteClientType"
                                         }
                                     }
                                 }
@@ -4746,6 +4746,32 @@ var doc = `{
                 },
                 "self_register": {
                     "type": "boolean"
+                }
+            }
+        },
+        "auth_service.CompleteClientType": {
+            "type": "object",
+            "properties": {
+                "client_type": {
+                    "$ref": "#/definitions/auth_service.ClientType"
+                },
+                "relations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Relation"
+                    }
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Role"
+                    }
+                },
+                "user_info_fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.UserInfoField"
+                    }
                 }
             }
         },

@@ -106,6 +106,23 @@ definitions:
       self_register:
         type: boolean
     type: object
+  auth_service.CompleteClientType:
+    properties:
+      client_type:
+        $ref: '#/definitions/auth_service.ClientType'
+      relations:
+        items:
+          $ref: '#/definitions/auth_service.Relation'
+        type: array
+      roles:
+        items:
+          $ref: '#/definitions/auth_service.Role'
+        type: array
+      user_info_fields:
+        items:
+          $ref: '#/definitions/auth_service.UserInfoField'
+        type: array
+    type: object
   auth_service.CreateClientPlatformRequest:
     properties:
       name:
@@ -1206,7 +1223,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/auth_service.ClientType'
+                  $ref: '#/definitions/auth_service.CompleteClientType'
               type: object
         "400":
           description: Invalid Argument
