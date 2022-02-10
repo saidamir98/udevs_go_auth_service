@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type userRepo struct {
@@ -159,7 +160,7 @@ func (r *userRepo) GetListByPKs(pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserLi
 	WHERE
 		id = ANY($1)`
 
-	rows, err := r.db.Query(query, pKeys.Ids)
+	rows, err := r.db.Query(query, pq.Array(pKeys.Ids))
 	if err != nil {
 		return res, err
 	}
