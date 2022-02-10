@@ -103,6 +103,7 @@ type UserRepoI interface {
 	Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error)
 	GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error)
 	GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error)
+	GetListByPKs(pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error)
 	Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
 	Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
 	GetByUsername(username string) (res *pb.User, err error)

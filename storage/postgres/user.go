@@ -136,6 +136,65 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 	return res, nil
 }
 
+func (r *userRepo) GetListByPKs(pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error) {
+	res = &pb.GetUserListResponse{}
+	query := `SELECT
+		id,
+		project_id,
+		client_platform_id,
+		client_type_id,
+		role_id,
+		name,
+		photo_url,
+		phone,
+		email,
+		login,
+		password,
+		active,
+		expires_at,
+		created_at,
+		updated_at
+	FROM
+		"user"
+	WHERE
+		id = ANY($1)`
+
+	rows, err := r.db.Query(query, pKeys.Ids)
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		user := &pb.User{}
+		err = rows.Scan(
+			&user.Id,
+			&user.ProjectId,
+			&user.ClientPlatformId,
+			&user.ClientTypeId,
+			&user.RoleId,
+			&user.Name,
+			&user.PhotoUrl,
+			&user.Phone,
+			&user.Email,
+			&user.Login,
+			&user.Password,
+			&user.Active,
+			&user.ExpiresAt,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Users = append(res.Users, user)
+	}
+
+	return res, nil
+}
+
 func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
 	res = &pb.GetUserListResponse{}
 	params := make(map[string]interface{})
