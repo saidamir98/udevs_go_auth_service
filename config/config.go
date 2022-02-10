@@ -44,6 +44,8 @@ type Config struct {
 
 	AuthServiceHost string
 	AuthGRPCPort    string
+
+	PostgresMaxConnections int
 }
 
 // Load ...
@@ -80,6 +82,8 @@ func Load() Config {
 
 	config.AuthServiceHost = cast.ToString(getOrReturnDefaultValue("AUTH_SERVICE_HOST", "0.0.0.0"))
 	config.AuthGRPCPort = cast.ToString(getOrReturnDefaultValue("AUTH_GRPC_PORT", ":9102"))
+
+	config.PostgresMaxConnections = cast.ToInt(getOrReturnDefaultValue("POSTGRES_MAX_CONNECTIONS", 5))
 
 	return config
 }

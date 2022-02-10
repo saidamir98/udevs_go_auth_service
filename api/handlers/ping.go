@@ -18,7 +18,6 @@ import (
 // @Failure 500 {object} http.Response{}
 func (h *Handler) Ping(c *gin.Context) {
 	h.handleResponse(c, http.OK, "pong")
-	return
 }
 
 // GetConfig godoc
@@ -44,5 +43,4 @@ func (h *Handler) GetConfig(c *gin.Context) {
 	}
 
 	h.handleResponse(c, http.BadEnvironment, "wrong environment value passed")
-	return
 }

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
@@ -19,7 +20,7 @@ func NewUserRepo(db *sqlx.DB) storage.UserRepoI {
 	}
 }
 
-func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error) {
+func (r *userRepo) Create(ctx context.Context, entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error) {
 	query := `INSERT INTO "user" (
 		id,
 		project_id,
@@ -55,7 +56,7 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 		return pKey, err
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.ClientPlatformId,
@@ -78,7 +79,7 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 	return pKey, err
 }
 
-func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
+func (r *userRepo) GetByPK(ctx context.Context, pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 	res = &pb.User{}
 	query := `SELECT
 		id,
@@ -101,7 +102,7 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	row, err := r.db.QueryContext(ctx, query, pKey.Id)
 	if err != nil {
 		return res, err
 	}
@@ -136,7 +137,7 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 	return res, nil
 }
 
-func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
+func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
 	res = &pb.GetUserListResponse{}
 	params := make(map[string]interface{})
 	query := `SELECT
@@ -179,7 +180,7 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 	}
 
 	cQ := `SELECT count(1) FROM "user"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	row, err := r.db.NamedQueryContext(ctx, cQ, params)
 	if err != nil {
 		return res, err
 	}
@@ -195,7 +196,7 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+	rows, err := r.db.NamedQueryContext(ctx, q, params)
 	if err != nil {
 		return res, err
 	}
@@ -231,7 +232,7 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 	return res, nil
 }
 
-func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err error) {
+func (r *userRepo) Update(ctx context.Context, entity *pb.UpdateUserRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "user" SET
 		project_id = :project_id,
 		client_platform_id = :client_platform_id,
@@ -263,7 +264,7 @@ func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err
 		"expires_at":         entity.ExpiresAt,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	result, err := r.db.NamedExecContext(ctx, query, params)
 	if err != nil {
 		return 0, err
 	}
@@ -276,10 +277,10 @@ func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err
 	return rowsAffected, err
 }
 
-func (r *userRepo) Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err error) {
+func (r *userRepo) Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "user" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.ExecContext(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
@@ -292,7 +293,7 @@ func (r *userRepo) Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err erro
 	return rowsAffected, err
 }
 
-func (r *userRepo) GetByUsername(username string) (res *pb.User, err error) {
+func (r *userRepo) GetByUsername(ctx context.Context, username string) (res *pb.User, err error) {
 	res = &pb.User{}
 
 	query := `SELECT
@@ -323,7 +324,7 @@ func (r *userRepo) GetByUsername(username string) (res *pb.User, err error) {
 		query = query + ` login = $1`
 	}
 
-	row, err := r.db.Query(query, username)
+	row, err := r.db.QueryContext(ctx, query, username)
 	if err != nil {
 		return res, err
 	}

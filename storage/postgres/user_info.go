@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"encoding/json"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
@@ -18,7 +19,7 @@ func NewUserInfoRepo(db *sqlx.DB) storage.UserInfoRepoI {
 	}
 }
 
-func (r *userInfoRepo) Upsert(entity *pb.UpsertUserInfoRequest) (pKey *pb.UserInfoPrimaryKey, err error) {
+func (r *userInfoRepo) Upsert(ctx context.Context, entity *pb.UpsertUserInfoRequest) (pKey *pb.UserInfoPrimaryKey, err error) {
 	data, err := json.Marshal(entity.Data)
 	if err != nil {
 		return pKey, err
@@ -34,7 +35,7 @@ func (r *userInfoRepo) Upsert(entity *pb.UpsertUserInfoRequest) (pKey *pb.UserIn
 		user_id
 	) DO UPDATE SET data = $2, updated_at = NOW()`
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		entity.UserId,
 		data,
 	)
@@ -46,7 +47,7 @@ func (r *userInfoRepo) Upsert(entity *pb.UpsertUserInfoRequest) (pKey *pb.UserIn
 	return pKey, err
 }
 
-func (r *userInfoRepo) GetByPK(pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, err error) {
+func (r *userInfoRepo) GetByPK(ctx context.Context, pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, err error) {
 	res = &pb.UserInfo{}
 	query := `SELECT
 		user_id,
@@ -56,7 +57,7 @@ func (r *userInfoRepo) GetByPK(pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, e
 	WHERE
 		user_id = $1`
 
-	row, err := r.db.Query(query, pKey.UserId)
+	row, err := r.db.QueryContext(ctx, query, pKey.UserId)
 	if err != nil {
 		return res, err
 	}

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
@@ -19,7 +20,7 @@ func NewClientTypeRepo(db *sqlx.DB) storage.ClientTypeRepoI {
 	}
 }
 
-func (r *clientTypeRepo) Create(entity *pb.CreateClientTypeRequest) (pKey *pb.ClientTypePrimaryKey, err error) {
+func (r *clientTypeRepo) Create(ctx context.Context, entity *pb.CreateClientTypeRequest) (pKey *pb.ClientTypePrimaryKey, err error) {
 	query := `INSERT INTO "client_type" (
 		id,
 		project_id,
@@ -41,7 +42,7 @@ func (r *clientTypeRepo) Create(entity *pb.CreateClientTypeRequest) (pKey *pb.Cl
 		return pKey, err
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.Name,
@@ -57,7 +58,7 @@ func (r *clientTypeRepo) Create(entity *pb.CreateClientTypeRequest) (pKey *pb.Cl
 	return pKey, err
 }
 
-func (r *clientTypeRepo) GetByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.ClientType, err error) {
+func (r *clientTypeRepo) GetByPK(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (res *pb.ClientType, err error) {
 	res = &pb.ClientType{}
 	query := `SELECT
 		id,
@@ -71,7 +72,7 @@ func (r *clientTypeRepo) GetByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.ClientT
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	row, err := r.db.QueryContext(ctx, query, pKey.Id)
 	if err != nil {
 		return res, err
 	}
@@ -101,7 +102,7 @@ func (r *clientTypeRepo) GetByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.ClientT
 	return res, nil
 }
 
-func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *pb.GetClientTypeListResponse, err error) {
+func (r *clientTypeRepo) GetList(ctx context.Context, queryParam *pb.GetClientTypeListRequest) (res *pb.GetClientTypeListResponse, err error) {
 	res = &pb.GetClientTypeListResponse{}
 	params := make(map[string]interface{})
 	query := `SELECT
@@ -140,7 +141,7 @@ func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *
 	}
 
 	cQ := `SELECT count(1) FROM "client_type"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	row, err := r.db.NamedQueryContext(ctx, cQ, params)
 	if err != nil {
 		return res, err
 	}
@@ -156,7 +157,7 @@ func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *
 	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+	rows, err := r.db.NamedQueryContext(ctx, q, params)
 	if err != nil {
 		return res, err
 	}
@@ -183,7 +184,7 @@ func (r *clientTypeRepo) GetList(queryParam *pb.GetClientTypeListRequest) (res *
 	return res, nil
 }
 
-func (r *clientTypeRepo) Update(entity *pb.UpdateClientTypeRequest) (rowsAffected int64, err error) {
+func (r *clientTypeRepo) Update(ctx context.Context, entity *pb.UpdateClientTypeRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "client_type" SET
 		name = :name,
 		confirm_by = :confirm_by,
@@ -201,7 +202,7 @@ func (r *clientTypeRepo) Update(entity *pb.UpdateClientTypeRequest) (rowsAffecte
 		"self_recover":  entity.SelfRecover,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	result, err := r.db.NamedExecContext(ctx, query, params)
 	if err != nil {
 		return 0, err
 	}
@@ -214,10 +215,10 @@ func (r *clientTypeRepo) Update(entity *pb.UpdateClientTypeRequest) (rowsAffecte
 	return rowsAffected, err
 }
 
-func (r *clientTypeRepo) Delete(pKey *pb.ClientTypePrimaryKey) (rowsAffected int64, err error) {
+func (r *clientTypeRepo) Delete(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "client_type" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.ExecContext(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
@@ -230,7 +231,7 @@ func (r *clientTypeRepo) Delete(pKey *pb.ClientTypePrimaryKey) (rowsAffected int
 	return rowsAffected, err
 }
 
-func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.CompleteClientType, err error) {
+func (r *clientTypeRepo) GetCompleteByPK(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (res *pb.CompleteClientType, err error) {
 	res = &pb.CompleteClientType{
 		ClientType:     &pb.ClientType{},
 		Relations:      make([]*pb.Relation, 0),
@@ -250,7 +251,7 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	row, err := r.db.QueryContext(ctx, query, pKey.Id)
 	if err != nil {
 		return res, err
 	}
@@ -288,7 +289,7 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 	WHERE
 		client_type_id = $1`
 
-	rows1, err := r.db.Query(query1, res.ClientType.Id)
+	rows1, err := r.db.QueryContext(ctx, query1, res.ClientType.Id)
 	if err != nil {
 		return res, err
 	}
@@ -325,7 +326,7 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 	WHERE
 		client_type_id = $1`
 
-	rows2, err := r.db.Query(query2, res.ClientType.Id)
+	rows2, err := r.db.QueryContext(ctx, query2, res.ClientType.Id)
 	if err != nil {
 		return res, err
 	}
@@ -358,7 +359,7 @@ func (r *clientTypeRepo) GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb
 		WHERE
 			client_type_id = $1`
 
-	rows3, err := r.db.Query(query3, res.ClientType.Id)
+	rows3, err := r.db.QueryContext(ctx, query3, res.ClientType.Id)
 	if err != nil {
 		return res, err
 	}

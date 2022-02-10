@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
@@ -18,7 +19,7 @@ func NewRelationRepo(db *sqlx.DB) storage.RelationRepoI {
 	}
 }
 
-func (r *relationRepo) Add(entity *pb.AddRelationRequest) (pKey *pb.RelationPrimaryKey, err error) {
+func (r *relationRepo) Add(ctx context.Context, entity *pb.AddRelationRequest) (pKey *pb.RelationPrimaryKey, err error) {
 	query := `INSERT INTO "relation" (
 		id,
 		client_type_id,
@@ -38,7 +39,7 @@ func (r *relationRepo) Add(entity *pb.AddRelationRequest) (pKey *pb.RelationPrim
 		return pKey, err
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		uuid,
 		entity.ClientTypeId,
 		entity.Type.String(),
@@ -53,7 +54,7 @@ func (r *relationRepo) Add(entity *pb.AddRelationRequest) (pKey *pb.RelationPrim
 	return pKey, err
 }
 
-func (r *relationRepo) GetByPK(pKey *pb.RelationPrimaryKey) (res *pb.Relation, err error) {
+func (r *relationRepo) GetByPK(ctx context.Context, pKey *pb.RelationPrimaryKey) (res *pb.Relation, err error) {
 	res = &pb.Relation{}
 	query := `SELECT
 		id,
@@ -66,7 +67,7 @@ func (r *relationRepo) GetByPK(pKey *pb.RelationPrimaryKey) (res *pb.Relation, e
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	row, err := r.db.QueryContext(ctx, query, pKey.Id)
 	if err != nil {
 		return res, err
 	}
@@ -95,7 +96,7 @@ func (r *relationRepo) GetByPK(pKey *pb.RelationPrimaryKey) (res *pb.Relation, e
 	return res, nil
 }
 
-func (r *relationRepo) Update(entity *pb.UpdateRelationRequest) (rowsAffected int64, err error) {
+func (r *relationRepo) Update(ctx context.Context, entity *pb.UpdateRelationRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "relation" SET
 		client_type_id = :client_type_id,
 		type = :type,
@@ -113,7 +114,7 @@ func (r *relationRepo) Update(entity *pb.UpdateRelationRequest) (rowsAffected in
 		"description":    entity.Description,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	result, err := r.db.NamedExecContext(ctx, query, params)
 	if err != nil {
 		return 0, err
 	}
@@ -126,10 +127,10 @@ func (r *relationRepo) Update(entity *pb.UpdateRelationRequest) (rowsAffected in
 	return rowsAffected, err
 }
 
-func (r *relationRepo) Remove(pKey *pb.RelationPrimaryKey) (rowsAffected int64, err error) {
+func (r *relationRepo) Remove(ctx context.Context, pKey *pb.RelationPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "relation" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.ExecContext(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}

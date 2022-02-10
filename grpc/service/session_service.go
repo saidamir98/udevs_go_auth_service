@@ -49,7 +49,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	user, err := s.strg.User().GetByUsername(req.Username)
+	user, err := s.strg.User().GetByUsername(ctx, req.Username)
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -94,7 +94,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 	res.UserFound = true
 	res.User = user
 
-	clientType, err := s.strg.ClientType().GetByPK(&pb.ClientTypePrimaryKey{
+	clientType, err := s.strg.ClientType().GetByPK(ctx, &pb.ClientTypePrimaryKey{
 		Id: user.ClientTypeId,
 	})
 	if err != nil {
@@ -103,7 +103,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 	}
 	res.ClientType = clientType
 
-	clientPlatform, err := s.strg.ClientPlatform().GetByPK(&pb.ClientPlatformPrimaryKey{
+	clientPlatform, err := s.strg.ClientPlatform().GetByPK(ctx, &pb.ClientPlatformPrimaryKey{
 		Id: user.ClientPlatformId,
 	})
 	if err != nil {
@@ -113,7 +113,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 
 	res.ClientPlatform = clientPlatform
 
-	client, err := s.strg.Client().GetByPK(&pb.ClientPrimaryKey{
+	client, err := s.strg.Client().GetByPK(ctx, &pb.ClientPrimaryKey{
 		ClientPlatformId: user.ClientPlatformId,
 		ClientTypeId:     user.ClientTypeId,
 	})
@@ -128,7 +128,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	role, err := s.strg.Role().GetByPK(&pb.RolePrimaryKey{Id: user.RoleId})
+	role, err := s.strg.Role().GetByPK(ctx, &pb.RolePrimaryKey{Id: user.RoleId})
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -137,14 +137,14 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 	res.Role = role
 
 	// TODO - Delete all old sessions & refresh token has this function too
-	rowsAffected, err := s.strg.Session().DeleteExpiredUserSessions(user.Id)
+	rowsAffected, err := s.strg.Session().DeleteExpiredUserSessions(ctx, user.Id)
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	s.log.Info("Login--->DeleteExpiredUserSessions", logger.Any("rowsAffected", rowsAffected))
 
-	userSessionList, err := s.strg.Session().GetSessionListByUserID(user.Id)
+	userSessionList, err := s.strg.Session().GetSessionListByUserID(ctx, user.Id)
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -152,7 +152,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 
 	res.Sessions = userSessionList.Sessions
 
-	sessionPKey, err := s.strg.Session().Create(&pb.CreateSessionRequest{
+	sessionPKey, err := s.strg.Session().Create(ctx, &pb.CreateSessionRequest{
 		ProjectId:        user.ProjectId,
 		ClientPlatformId: user.ClientPlatformId,
 		ClientTypeId:     user.ClientTypeId,
@@ -167,7 +167,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	session, err := s.strg.Session().GetByPK(sessionPKey)
+	session, err := s.strg.Session().GetByPK(ctx, sessionPKey)
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
@@ -216,7 +216,7 @@ func (s *sessionService) Logout(ctx context.Context, req *pb.LogoutRequest) (*em
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	rowsAffected, err := s.strg.Session().Delete(&pb.SessionPrimaryKey{Id: tokenInfo.ID})
+	rowsAffected, err := s.strg.Session().Delete(ctx, &pb.SessionPrimaryKey{Id: tokenInfo.ID})
 	if err != nil {
 		s.log.Error("!!!Logout--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -237,13 +237,13 @@ func (s *sessionService) RefreshToken(ctx context.Context, req *pb.RefreshTokenR
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	session, err := s.strg.Session().GetByPK(&pb.SessionPrimaryKey{Id: tokenInfo.ID})
+	session, err := s.strg.Session().GetByPK(ctx, &pb.SessionPrimaryKey{Id: tokenInfo.ID})
 	if err != nil {
 		s.log.Error("!!!RefreshToken--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	user, err := s.strg.User().GetByPK(&pb.UserPrimaryKey{Id: session.UserId})
+	user, err := s.strg.User().GetByPK(ctx, &pb.UserPrimaryKey{Id: session.UserId})
 	if err != nil {
 		s.log.Error("!!!RefreshToken--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -317,13 +317,13 @@ func (s *sessionService) HasAccess(ctx context.Context, req *pb.HasAccessRequest
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	session, err := s.strg.Session().GetByPK(&pb.SessionPrimaryKey{Id: tokenInfo.ID})
+	session, err := s.strg.Session().GetByPK(ctx, &pb.SessionPrimaryKey{Id: tokenInfo.ID})
 	if err != nil {
 		s.log.Error("!!!HasAccess--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	user, err := s.strg.User().GetByPK(&pb.UserPrimaryKey{Id: session.UserId})
+	user, err := s.strg.User().GetByPK(ctx, &pb.UserPrimaryKey{Id: session.UserId})
 	if err != nil {
 		s.log.Error("!!!HasAccess--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -353,7 +353,7 @@ func (s *sessionService) HasAccess(ctx context.Context, req *pb.HasAccessRequest
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	_, err = s.strg.Scope().Upsert(&pb.UpsertScopeRequest{
+	_, err = s.strg.Scope().Upsert(ctx, &pb.UpsertScopeRequest{
 		ClientPlatformId: req.ClientPlatformId,
 		Path:             req.Path,
 		Method:           req.Method,
@@ -363,7 +363,7 @@ func (s *sessionService) HasAccess(ctx context.Context, req *pb.HasAccessRequest
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	hasAccess, err := s.strg.PermissionScope().HasAccess(user.RoleId, req.ClientPlatformId, req.Path, req.Method)
+	hasAccess, err := s.strg.PermissionScope().HasAccess(ctx, user.RoleId, req.ClientPlatformId, req.Path, req.Method)
 	if err != nil {
 		s.log.Error("!!!HasAccess--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())

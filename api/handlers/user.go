@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"upm/udevs_go_auth_service/api/http"
 
 	"upm/udevs_go_auth_service/genproto/auth_service"
@@ -35,7 +34,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().CreateUser(
-		context.Background(),
+		c.Request.Context(),
 		&user,
 	)
 
@@ -75,7 +74,7 @@ func (h *Handler) GetUserList(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().GetUserList(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.GetUserListRequest{
 			Limit:  int32(limit),
 			Offset: int32(offset),
@@ -112,7 +111,7 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().GetUserByID(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.UserPrimaryKey{
 			Id: userID,
 		},
@@ -148,7 +147,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().UpdateUser(
-		context.Background(),
+		c.Request.Context(),
 		&user,
 	)
 
@@ -181,7 +180,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().DeleteUser(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.UserPrimaryKey{
 			Id: userID,
 		},
@@ -217,7 +216,7 @@ func (h *Handler) AddUserRelation(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().AddUserRelation(
-		context.Background(),
+		c.Request.Context(),
 		&user_relation,
 	)
 
@@ -251,7 +250,7 @@ func (h *Handler) RemoveUserRelation(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().RemoveUserRelation(
-		context.Background(),
+		c.Request.Context(),
 		&user_relation,
 	)
 
@@ -292,7 +291,7 @@ func (h *Handler) UpsertUserInfo(c *gin.Context) {
 	}
 
 	resp, err := h.services.UserService().UpsertUserInfo(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.UpsertUserInfoRequest{
 			UserId: userID,
 			Data:   &data,
