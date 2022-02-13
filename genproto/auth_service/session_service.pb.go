@@ -6,7 +6,7 @@ package auth_service
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	_ "google.golang.org/protobuf/types/known/emptypb"
+	_ "github.com/golang/protobuf/ptypes/empty"
 	math "math"
 )
 

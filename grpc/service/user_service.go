@@ -64,6 +64,18 @@ func (s *userService) GetUserByID(ctx context.Context, req *pb.UserPrimaryKey) (
 	return res, nil
 }
 
+func (s *userService) GetUserListByIDs(ctx context.Context, req *pb.UserPrimaryKeyList) (*pb.GetUserListResponse, error) {
+	s.log.Info("---GetUserListByIDs--->", logger.Any("req", req))
+
+	res, err := s.strg.User().GetListByPKs(req)
+	if err != nil {
+		s.log.Error("!!!GetUserListByIDs--->", logger.Error(err))
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	return res, err
+}
+
 func (s *userService) GetUserList(ctx context.Context, req *pb.GetUserListRequest) (*pb.GetUserListResponse, error) {
 	s.log.Info("---GetUserList--->", logger.Any("req", req))
 

@@ -6,7 +6,7 @@ package auth_service
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	structpb "google.golang.org/protobuf/types/known/structpb"
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	math "math"
 )
 
@@ -948,11 +948,11 @@ func (m *UserRelation) GetRelationId() string {
 }
 
 type UserInfo struct {
-	UserId               string           `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Data                 *structpb.Struct `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	UserId               string          `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Data                 *_struct.Struct `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *UserInfo) Reset()         { *m = UserInfo{} }
@@ -987,7 +987,7 @@ func (m *UserInfo) GetUserId() string {
 	return ""
 }
 
-func (m *UserInfo) GetData() *structpb.Struct {
+func (m *UserInfo) GetData() *_struct.Struct {
 	if m != nil {
 		return m.Data
 	}
