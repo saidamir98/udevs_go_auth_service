@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
@@ -18,7 +19,7 @@ func NewClientRepo(db *sqlx.DB) storage.ClientRepoI {
 	}
 }
 
-func (r *clientRepo) Add(projectID string, entity *pb.AddClientRequest) (err error) {
+func (r *clientRepo) Add(ctx context.Context, projectID string, entity *pb.AddClientRequest) (err error) {
 	query := `INSERT INTO "client" (
 		project_id,
 		client_platform_id,
@@ -31,7 +32,7 @@ func (r *clientRepo) Add(projectID string, entity *pb.AddClientRequest) (err err
 		$4
 	)`
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		projectID,
 		entity.ClientPlatformId,
 		entity.ClientTypeId,
@@ -41,7 +42,7 @@ func (r *clientRepo) Add(projectID string, entity *pb.AddClientRequest) (err err
 	return err
 }
 
-func (r *clientRepo) GetByPK(pKey *pb.ClientPrimaryKey) (res *pb.Client, err error) {
+func (r *clientRepo) GetByPK(ctx context.Context, pKey *pb.ClientPrimaryKey) (res *pb.Client, err error) {
 	res = &pb.Client{}
 	query := `SELECT
 		project_id,
@@ -53,7 +54,7 @@ func (r *clientRepo) GetByPK(pKey *pb.ClientPrimaryKey) (res *pb.Client, err err
 	WHERE
 		client_platform_id = $1 AND client_type_id = $2`
 
-	row, err := r.db.Query(query, pKey.ClientPlatformId, pKey.ClientTypeId)
+	row, err := r.db.QueryContext(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId)
 	if err != nil {
 		return res, err
 	}
@@ -81,7 +82,7 @@ func (r *clientRepo) GetByPK(pKey *pb.ClientPrimaryKey) (res *pb.Client, err err
 	return res, nil
 }
 
-func (r *clientRepo) Update(entity *pb.UpdateClientRequest) (rowsAffected int64, err error) {
+func (r *clientRepo) Update(ctx context.Context, entity *pb.UpdateClientRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "client" SET
 		login_strategy = :login_strategy,
 		updated_at = now()
@@ -94,7 +95,7 @@ func (r *clientRepo) Update(entity *pb.UpdateClientRequest) (rowsAffected int64,
 		"login_strategy":     entity.LoginStrategy.String(),
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	result, err := r.db.NamedExecContext(ctx, query, params)
 	if err != nil {
 		return 0, err
 	}
@@ -107,10 +108,10 @@ func (r *clientRepo) Update(entity *pb.UpdateClientRequest) (rowsAffected int64,
 	return rowsAffected, err
 }
 
-func (r *clientRepo) Remove(pKey *pb.ClientPrimaryKey) (rowsAffected int64, err error) {
+func (r *clientRepo) Remove(ctx context.Context, pKey *pb.ClientPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "client" WHERE client_platform_id = $1 AND client_type_id = $2`
 
-	result, err := r.db.Exec(query, pKey.ClientPlatformId, pKey.ClientTypeId)
+	result, err := r.db.ExecContext(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId)
 	if err != nil {
 		return 0, err
 	}
@@ -123,7 +124,7 @@ func (r *clientRepo) Remove(pKey *pb.ClientPrimaryKey) (rowsAffected int64, err 
 	return rowsAffected, err
 }
 
-func (r *clientRepo) GetList(queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error) {
+func (r *clientRepo) GetList(ctx context.Context, queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error) {
 	res = &pb.GetClientListResponse{}
 	params := make(map[string]interface{})
 	query := `SELECT
@@ -160,7 +161,7 @@ func (r *clientRepo) GetList(queryParam *pb.GetClientListRequest) (res *pb.GetCl
 	}
 
 	cQ := `SELECT count(1) FROM "client"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	row, err := r.db.NamedQueryContext(ctx, cQ, params)
 	if err != nil {
 		return res, err
 	}
@@ -176,7 +177,7 @@ func (r *clientRepo) GetList(queryParam *pb.GetClientListRequest) (res *pb.GetCl
 	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+	rows, err := r.db.NamedQueryContext(ctx, q, params)
 	if err != nil {
 		return res, err
 	}
@@ -201,7 +202,7 @@ func (r *clientRepo) GetList(queryParam *pb.GetClientListRequest) (res *pb.GetCl
 	return res, nil
 }
 
-func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClientMatrixResponse, err error) {
+func (r *clientRepo) GetMatrix(ctx context.Context, req *pb.GetClientMatrixRequest) (res *pb.GetClientMatrixResponse, err error) {
 	if !util.IsValidUUID(req.ProjectId) {
 		return res, storage.ErrorProjectId
 	}
@@ -217,7 +218,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 	WHERE
 		project_id = $1`
 
-	clientPlatformRows, err := r.db.Query(queryClientPlatform, req.ProjectId)
+	clientPlatformRows, err := r.db.QueryContext(ctx, queryClientPlatform, req.ProjectId)
 	if err != nil {
 		return res, err
 	}
@@ -250,7 +251,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 	WHERE
 		project_id = $1`
 
-	clientTypeRows, err := r.db.Query(queryClientType, req.ProjectId)
+	clientTypeRows, err := r.db.QueryContext(ctx, queryClientType, req.ProjectId)
 	if err != nil {
 		return res, err
 	}
@@ -284,7 +285,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 	WHERE
 		project_id = $1`
 
-	clientRows, err := r.db.Query(queryClient, req.ProjectId)
+	clientRows, err := r.db.QueryContext(ctx, queryClient, req.ProjectId)
 	if err != nil {
 		return res, err
 	}

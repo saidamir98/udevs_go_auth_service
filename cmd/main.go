@@ -41,7 +41,7 @@ func main() {
 		cfg.PostgresUser,
 		cfg.PostgresPassword,
 		cfg.PostgresDatabase,
-	))
+	), cfg)
 	if err != nil {
 		panic(err)
 	}

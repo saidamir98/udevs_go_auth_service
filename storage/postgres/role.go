@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
@@ -18,7 +19,7 @@ func NewRoleRepo(db *sqlx.DB) storage.RoleRepoI {
 	}
 }
 
-func (r *roleRepo) Add(entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error) {
+func (r *roleRepo) Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error) {
 	query := `INSERT INTO "role" (
 		id,
 		client_type_id,
@@ -34,7 +35,7 @@ func (r *roleRepo) Add(entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err 
 		return pKey, err
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		uuid,
 		entity.ClientTypeId,
 		entity.Name,
@@ -47,7 +48,7 @@ func (r *roleRepo) Add(entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err 
 	return pKey, err
 }
 
-func (r *roleRepo) GetByPK(pKey *pb.RolePrimaryKey) (res *pb.Role, err error) {
+func (r *roleRepo) GetByPK(ctx context.Context, pKey *pb.RolePrimaryKey) (res *pb.Role, err error) {
 	res = &pb.Role{}
 	query := `SELECT
 		id,
@@ -58,7 +59,7 @@ func (r *roleRepo) GetByPK(pKey *pb.RolePrimaryKey) (res *pb.Role, err error) {
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	row, err := r.db.QueryContext(ctx, query, pKey.Id)
 	if err != nil {
 		return res, err
 	}
@@ -82,7 +83,7 @@ func (r *roleRepo) GetByPK(pKey *pb.RolePrimaryKey) (res *pb.Role, err error) {
 	return res, nil
 }
 
-func (r *roleRepo) Update(entity *pb.UpdateRoleRequest) (rowsAffected int64, err error) {
+func (r *roleRepo) Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "role" SET
 		client_type_id = :client_type_id,
 		name = :name,
@@ -96,7 +97,7 @@ func (r *roleRepo) Update(entity *pb.UpdateRoleRequest) (rowsAffected int64, err
 		"name":           entity.Name,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	result, err := r.db.NamedExecContext(ctx, query, params)
 	if err != nil {
 		return 0, err
 	}
@@ -109,10 +110,10 @@ func (r *roleRepo) Update(entity *pb.UpdateRoleRequest) (rowsAffected int64, err
 	return rowsAffected, err
 }
 
-func (r *roleRepo) Remove(pKey *pb.RolePrimaryKey) (rowsAffected int64, err error) {
+func (r *roleRepo) Remove(ctx context.Context, pKey *pb.RolePrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "role" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.ExecContext(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
@@ -18,7 +19,7 @@ func NewPermissionScopeRepo(db *sqlx.DB) storage.PermissionScopeRepoI {
 	}
 }
 
-func (r *permissionScopeRepo) Add(entity *pb.AddPermissionScopeRequest) (pKey *pb.PermissionScopePrimaryKey, err error) {
+func (r *permissionScopeRepo) Add(ctx context.Context, entity *pb.AddPermissionScopeRequest) (pKey *pb.PermissionScopePrimaryKey, err error) {
 	query := `INSERT INTO "permission_scope" (
 		permission_id,
 		client_platform_id,
@@ -31,7 +32,7 @@ func (r *permissionScopeRepo) Add(entity *pb.AddPermissionScopeRequest) (pKey *p
 		$4
 	)`
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		entity.PermissionId,
 		entity.ClientPlatformId,
 		entity.Path,
@@ -48,7 +49,7 @@ func (r *permissionScopeRepo) Add(entity *pb.AddPermissionScopeRequest) (pKey *p
 	return pKey, err
 }
 
-func (r *permissionScopeRepo) GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error) {
+func (r *permissionScopeRepo) GetByPK(ctx context.Context, pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error) {
 	res = &pb.PermissionScope{}
 	query := `SELECT
 		permission_id,
@@ -60,7 +61,7 @@ func (r *permissionScopeRepo) GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *
 	WHERE
 		permission_id = $1 AND client_platform_id = $2 AND path = $3 AND method = $4`
 
-	row, err := r.db.Query(query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method)
+	row, err := r.db.QueryContext(ctx, query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method)
 	if err != nil {
 		return res, err
 	}
@@ -84,13 +85,13 @@ func (r *permissionScopeRepo) GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *
 	return res, nil
 }
 
-func (r *permissionScopeRepo) Remove(pKey *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error) {
+func (r *permissionScopeRepo) Remove(ctx context.Context, pKey *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM
 		"permission_scope"
 	WHERE
 		permission_id = $1 AND client_platform_id = $2 AND path = $3 AND method = $4`
 
-	result, err := r.db.Exec(query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method)
+	result, err := r.db.ExecContext(ctx, query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method)
 	if err != nil {
 		return 0, err
 	}
@@ -103,7 +104,7 @@ func (r *permissionScopeRepo) Remove(pKey *pb.PermissionScopePrimaryKey) (rowsAf
 	return rowsAffected, err
 }
 
-func (r *permissionScopeRepo) HasAccess(roleID, clientPlatformID, path, method string) (hasAccess bool, err error) {
+func (r *permissionScopeRepo) HasAccess(ctx context.Context, roleID, clientPlatformID, path, method string) (hasAccess bool, err error) {
 	query := `SELECT COUNT(*) FROM
 	(SELECT * FROM "role_permission" 
 	WHERE role_id = $1
@@ -113,7 +114,7 @@ func (r *permissionScopeRepo) HasAccess(roleID, clientPlatformID, path, method s
 	WHERE client_platform_id = $2 AND path = $3 AND method = $4) AS ps
 	ON rp.permission_id = ps.permission_id`
 
-	row, err := r.db.Query(query, roleID, clientPlatformID, path, method)
+	row, err := r.db.QueryContext(ctx, query, roleID, clientPlatformID, path, method)
 	if err != nil {
 		return hasAccess, err
 	}

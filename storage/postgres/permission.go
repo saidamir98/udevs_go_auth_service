@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
@@ -18,7 +19,7 @@ func NewPermissionRepo(db *sqlx.DB) storage.PermissionRepoI {
 	}
 }
 
-func (r *permissionRepo) Create(entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error) {
+func (r *permissionRepo) Create(ctx context.Context, entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error) {
 	query := `INSERT INTO "permission" (
 		id,
 		client_platform_id,
@@ -46,7 +47,7 @@ func (r *permissionRepo) Create(entity *pb.CreatePermissionRequest) (pKey *pb.Pe
 		nullStr = &entity.ParentId
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		uuid,
 		entity.ClientPlatformId,
 		nullStr,
@@ -60,7 +61,7 @@ func (r *permissionRepo) Create(entity *pb.CreatePermissionRequest) (pKey *pb.Pe
 	return pKey, err
 }
 
-func (r *permissionRepo) GetByPK(pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error) {
+func (r *permissionRepo) GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error) {
 	res = &pb.Permission{}
 	query := `SELECT
 		id,
@@ -72,7 +73,7 @@ func (r *permissionRepo) GetByPK(pKey *pb.PermissionPrimaryKey) (res *pb.Permiss
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	row, err := r.db.QueryContext(ctx, query, pKey.Id)
 	if err != nil {
 		return res, err
 	}
@@ -99,7 +100,7 @@ func (r *permissionRepo) GetByPK(pKey *pb.PermissionPrimaryKey) (res *pb.Permiss
 	return res, nil
 }
 
-func (r *permissionRepo) GetList(queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error) {
+func (r *permissionRepo) GetList(ctx context.Context, queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error) {
 	res = &pb.GetPermissionListResponse{}
 	params := make(map[string]interface{})
 	query := `SELECT
@@ -131,7 +132,7 @@ func (r *permissionRepo) GetList(queryParam *pb.GetPermissionListRequest) (res *
 	}
 
 	cQ := `SELECT count(1) FROM "permission"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	row, err := r.db.NamedQueryContext(ctx, cQ, params)
 	if err != nil {
 		return res, err
 	}
@@ -147,7 +148,7 @@ func (r *permissionRepo) GetList(queryParam *pb.GetPermissionListRequest) (res *
 	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+	rows, err := r.db.NamedQueryContext(ctx, q, params)
 	if err != nil {
 		return res, err
 	}
@@ -175,7 +176,7 @@ func (r *permissionRepo) GetList(queryParam *pb.GetPermissionListRequest) (res *
 	return res, nil
 }
 
-func (r *permissionRepo) Update(entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error) {
+func (r *permissionRepo) Update(ctx context.Context, entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error) {
 	if entity.Id == entity.ParentId {
 		err = storage.ErrorTheSameId
 		return
@@ -201,7 +202,7 @@ func (r *permissionRepo) Update(entity *pb.UpdatePermissionRequest) (rowsAffecte
 		"name":               entity.Name,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	result, err := r.db.NamedExecContext(ctx, query, params)
 	if err != nil {
 		return 0, err
 	}
@@ -214,10 +215,10 @@ func (r *permissionRepo) Update(entity *pb.UpdatePermissionRequest) (rowsAffecte
 	return rowsAffected, err
 }
 
-func (r *permissionRepo) Delete(pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error) {
+func (r *permissionRepo) Delete(ctx context.Context, pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "permission" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.ExecContext(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
