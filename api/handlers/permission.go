@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"upm/udevs_go_auth_service/api/http"
 
 	"upm/udevs_go_auth_service/genproto/auth_service"
@@ -33,7 +32,7 @@ func (h *Handler) AddRole(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().AddRole(
-		context.Background(),
+		c.Request.Context(),
 		&role,
 	)
 
@@ -67,7 +66,7 @@ func (h *Handler) UpdateRole(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().UpdateRole(
-		context.Background(),
+		c.Request.Context(),
 		&role,
 	)
 
@@ -100,7 +99,7 @@ func (h *Handler) RemoveRole(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().RemoveRole(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.RolePrimaryKey{
 			Id: roleID,
 		},
@@ -136,7 +135,7 @@ func (h *Handler) CreatePermission(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().CreatePermission(
-		context.Background(),
+		c.Request.Context(),
 		&permission,
 	)
 
@@ -176,7 +175,7 @@ func (h *Handler) GetPermissionList(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().GetPermissionList(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.GetPermissionListRequest{
 			Limit:  int32(limit),
 			Offset: int32(offset),
@@ -213,7 +212,7 @@ func (h *Handler) GetPermissionByID(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().GetPermissionByID(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.PermissionPrimaryKey{
 			Id: permissionID,
 		},
@@ -249,7 +248,7 @@ func (h *Handler) UpdatePermission(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().UpdatePermission(
-		context.Background(),
+		c.Request.Context(),
 		&permission,
 	)
 
@@ -282,7 +281,7 @@ func (h *Handler) DeletePermission(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().DeletePermission(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.PermissionPrimaryKey{
 			Id: permissionID,
 		},
@@ -318,7 +317,7 @@ func (h *Handler) UpsertScope(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().UpsertScope(
-		context.Background(),
+		c.Request.Context(),
 		&upsert_scope,
 	)
 
@@ -352,7 +351,7 @@ func (h *Handler) AddPermissionScope(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().AddPermissionScope(
-		context.Background(),
+		c.Request.Context(),
 		&permission_scope,
 	)
 
@@ -386,7 +385,7 @@ func (h *Handler) RemovePermissionScope(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().RemovePermissionScope(
-		context.Background(),
+		c.Request.Context(),
 		&permission_scope,
 	)
 
@@ -420,7 +419,7 @@ func (h *Handler) AddRolePermission(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().AddRolePermission(
-		context.Background(),
+		c.Request.Context(),
 		&role_permission,
 	)
 
@@ -454,7 +453,7 @@ func (h *Handler) RemoveRolePermission(c *gin.Context) {
 	}
 
 	resp, err := h.services.PermissionService().RemoveRolePermission(
-		context.Background(),
+		c.Request.Context(),
 		&role_permission,
 	)
 

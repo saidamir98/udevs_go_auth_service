@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
@@ -17,7 +18,7 @@ func NewScopeRepo(db *sqlx.DB) storage.ScopeRepoI {
 	}
 }
 
-func (r *scopeRepo) Upsert(entity *pb.UpsertScopeRequest) (pKey *pb.ScopePrimaryKey, err error) {
+func (r *scopeRepo) Upsert(ctx context.Context, entity *pb.UpsertScopeRequest) (pKey *pb.ScopePrimaryKey, err error) {
 	query := `INSERT INTO "scope" (
 		client_platform_id,
 		path,
@@ -34,7 +35,7 @@ func (r *scopeRepo) Upsert(entity *pb.UpsertScopeRequest) (pKey *pb.ScopePrimary
 		method
 	) DO UPDATE SET requests = "scope".requests + $4, updated_at = NOW()`
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		entity.ClientPlatformId,
 		entity.Path,
 		entity.Method,
@@ -50,7 +51,7 @@ func (r *scopeRepo) Upsert(entity *pb.UpsertScopeRequest) (pKey *pb.ScopePrimary
 	return pKey, err
 }
 
-func (r *scopeRepo) GetByPK(pKey *pb.ScopePrimaryKey) (res *pb.Scope, err error) {
+func (r *scopeRepo) GetByPK(ctx context.Context, pKey *pb.ScopePrimaryKey) (res *pb.Scope, err error) {
 	res = &pb.Scope{}
 	query := `SELECT
 		client_platform_id,
@@ -62,7 +63,7 @@ func (r *scopeRepo) GetByPK(pKey *pb.ScopePrimaryKey) (res *pb.Scope, err error)
 	WHERE
 		client_platform_id = $1 AND path = $2 AND method = $3`
 
-	row, err := r.db.Query(query, pKey.ClientPlatformId, pKey.Path, pKey.Method)
+	row, err := r.db.QueryContext(ctx, query, pKey.ClientPlatformId, pKey.Path, pKey.Method)
 	if err != nil {
 		return res, err
 	}

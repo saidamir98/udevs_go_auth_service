@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"upm/udevs_go_auth_service/api/http"
 
 	"upm/udevs_go_auth_service/genproto/settings_service"
@@ -33,7 +32,7 @@ func (h *Handler) CreateSphere(c *gin.Context) {
 	}
 
 	resp, err := h.services.SphereService().Create(
-		context.Background(),
+		c.Request.Context(),
 		&sphere,
 	)
 
@@ -73,7 +72,7 @@ func (h *Handler) GetSphereList(c *gin.Context) {
 	}
 
 	resp, err := h.services.SphereService().GetList(
-		context.Background(),
+		c.Request.Context(),
 		&settings_service.GetSphereListRequest{
 			Limit:  int32(limit),
 			Offset: int32(offset),
@@ -110,7 +109,7 @@ func (h *Handler) GetSphereByID(c *gin.Context) {
 	}
 
 	resp, err := h.services.SphereService().GetByID(
-		context.Background(),
+		c.Request.Context(),
 		&settings_service.SpherePrimaryKey{
 			Id: sphereID,
 		},
@@ -146,7 +145,7 @@ func (h *Handler) UpdateSphere(c *gin.Context) {
 	}
 
 	resp, err := h.services.SphereService().Update(
-		context.Background(),
+		c.Request.Context(),
 		&sphere,
 	)
 
@@ -179,7 +178,7 @@ func (h *Handler) DeleteSphere(c *gin.Context) {
 	}
 
 	resp, err := h.services.SphereService().Delete(
-		context.Background(),
+		c.Request.Context(),
 		&settings_service.SpherePrimaryKey{
 			Id: sphereID,
 		},

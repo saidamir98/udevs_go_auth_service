@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"upm/udevs_go_auth_service/api/http"
 
 	"upm/udevs_go_auth_service/genproto/auth_service"
@@ -33,7 +32,7 @@ func (h *Handler) CreateClientPlatform(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().CreateClientPlatform(
-		context.Background(),
+		c.Request.Context(),
 		&client_platform,
 	)
 
@@ -73,7 +72,7 @@ func (h *Handler) GetClientPlatformList(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().GetClientPlatformList(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.GetClientPlatformListRequest{
 			Limit:  int32(limit),
 			Offset: int32(offset),
@@ -110,7 +109,7 @@ func (h *Handler) GetClientPlatformByID(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().GetClientPlatformByID(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.ClientPlatformPrimaryKey{
 			Id: client_platformID,
 		},
@@ -146,7 +145,7 @@ func (h *Handler) UpdateClientPlatform(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().UpdateClientPlatform(
-		context.Background(),
+		c.Request.Context(),
 		&client_platform,
 	)
 
@@ -179,7 +178,7 @@ func (h *Handler) DeleteClientPlatform(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().DeleteClientPlatform(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.ClientPlatformPrimaryKey{
 			Id: client_platformID,
 		},
@@ -215,7 +214,7 @@ func (h *Handler) CreateClientType(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().CreateClientType(
-		context.Background(),
+		c.Request.Context(),
 		&client_type,
 	)
 
@@ -255,7 +254,7 @@ func (h *Handler) GetClientTypeList(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().GetClientTypeList(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.GetClientTypeListRequest{
 			Limit:  int32(limit),
 			Offset: int32(offset),
@@ -292,7 +291,7 @@ func (h *Handler) GetClientTypeByID(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().GetClientTypeByID(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.ClientTypePrimaryKey{
 			Id: client_typeID,
 		},
@@ -328,7 +327,7 @@ func (h *Handler) UpdateClientType(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().UpdateClientType(
-		context.Background(),
+		c.Request.Context(),
 		&client_type,
 	)
 
@@ -361,7 +360,7 @@ func (h *Handler) DeleteClientType(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().DeleteClientType(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.ClientTypePrimaryKey{
 			Id: client_typeID,
 		},
@@ -397,7 +396,7 @@ func (h *Handler) AddClient(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().AddClient(
-		context.Background(),
+		c.Request.Context(),
 		&client,
 	)
 
@@ -425,7 +424,7 @@ func (h *Handler) GetClientMatrix(c *gin.Context) {
 	project_id := c.Param("project-id")
 
 	resp, err := h.services.ClientService().GetClientMatrix(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.GetClientMatrixRequest{
 			ProjectId: project_id,
 		},
@@ -461,7 +460,7 @@ func (h *Handler) UpdateClient(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().UpdateClient(
-		context.Background(),
+		c.Request.Context(),
 		&client,
 	)
 
@@ -505,7 +504,7 @@ func (h *Handler) RemoveClient(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().RemoveClient(
-		context.Background(),
+		c.Request.Context(),
 		&removeClient,
 	)
 
@@ -539,7 +538,7 @@ func (h *Handler) AddRelation(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().AddRelation(
-		context.Background(),
+		c.Request.Context(),
 		&relation,
 	)
 
@@ -573,7 +572,7 @@ func (h *Handler) UpdateRelation(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().UpdateRelation(
-		context.Background(),
+		c.Request.Context(),
 		&relation,
 	)
 
@@ -606,7 +605,7 @@ func (h *Handler) RemoveRelation(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().RemoveRelation(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.RelationPrimaryKey{
 			Id: relationID,
 		},
@@ -642,7 +641,7 @@ func (h *Handler) AddUserInfoField(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().AddUserInfoField(
-		context.Background(),
+		c.Request.Context(),
 		&user_info_field,
 	)
 
@@ -676,7 +675,7 @@ func (h *Handler) UpdateUserInfoField(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().UpdateUserInfoField(
-		context.Background(),
+		c.Request.Context(),
 		&user_info_field,
 	)
 
@@ -709,7 +708,7 @@ func (h *Handler) RemoveUserInfoField(c *gin.Context) {
 	}
 
 	resp, err := h.services.ClientService().RemoveUserInfoField(
-		context.Background(),
+		c.Request.Context(),
 		&auth_service.UserInfoFieldPrimaryKey{
 			Id: userInfoFieldID,
 		},

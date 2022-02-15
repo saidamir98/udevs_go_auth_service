@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"errors"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 )
@@ -27,105 +28,105 @@ type StorageI interface {
 }
 
 type ClientPlatformRepoI interface {
-	Create(entity *pb.CreateClientPlatformRequest) (pKey *pb.ClientPlatformPrimaryKey, err error)
-	GetList(queryParam *pb.GetClientPlatformListRequest) (res *pb.GetClientPlatformListResponse, err error)
-	GetByPK(pKey *pb.ClientPlatformPrimaryKey) (res *pb.ClientPlatform, err error)
-	Update(entity *pb.UpdateClientPlatformRequest) (rowsAffected int64, err error)
-	Delete(pKey *pb.ClientPlatformPrimaryKey) (rowsAffected int64, err error)
+	Create(ctx context.Context, entity *pb.CreateClientPlatformRequest) (pKey *pb.ClientPlatformPrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetClientPlatformListRequest) (res *pb.GetClientPlatformListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (res *pb.ClientPlatform, err error)
+	Update(ctx context.Context, entity *pb.UpdateClientPlatformRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (rowsAffected int64, err error)
 }
 
 type ClientTypeRepoI interface {
-	Create(entity *pb.CreateClientTypeRequest) (pKey *pb.ClientTypePrimaryKey, err error)
-	GetList(queryParam *pb.GetClientTypeListRequest) (res *pb.GetClientTypeListResponse, err error)
-	GetByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.ClientType, err error)
-	Update(entity *pb.UpdateClientTypeRequest) (rowsAffected int64, err error)
-	Delete(pKey *pb.ClientTypePrimaryKey) (rowsAffected int64, err error)
-	GetCompleteByPK(pKey *pb.ClientTypePrimaryKey) (res *pb.CompleteClientType, err error)
+	Create(ctx context.Context, entity *pb.CreateClientTypeRequest) (pKey *pb.ClientTypePrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetClientTypeListRequest) (res *pb.GetClientTypeListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (res *pb.ClientType, err error)
+	Update(ctx context.Context, entity *pb.UpdateClientTypeRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (rowsAffected int64, err error)
+	GetCompleteByPK(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (res *pb.CompleteClientType, err error)
 }
 
 type ClientRepoI interface {
-	Add(projectID string, entity *pb.AddClientRequest) (err error)
-	GetByPK(entity *pb.ClientPrimaryKey) (res *pb.Client, err error)
-	Update(entity *pb.UpdateClientRequest) (rowsAffected int64, err error)
-	Remove(entity *pb.ClientPrimaryKey) (rowsAffected int64, err error)
-	GetList(queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error)
-	GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClientMatrixResponse, err error)
+	Add(ctx context.Context, projectID string, entity *pb.AddClientRequest) (err error)
+	GetByPK(ctx context.Context, entity *pb.ClientPrimaryKey) (res *pb.Client, err error)
+	Update(ctx context.Context, entity *pb.UpdateClientRequest) (rowsAffected int64, err error)
+	Remove(ctx context.Context, entity *pb.ClientPrimaryKey) (rowsAffected int64, err error)
+	GetList(ctx context.Context, queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error)
+	GetMatrix(ctx context.Context, req *pb.GetClientMatrixRequest) (res *pb.GetClientMatrixResponse, err error)
 }
 
 type RelationRepoI interface {
-	Add(entity *pb.AddRelationRequest) (pKey *pb.RelationPrimaryKey, err error)
-	GetByPK(entity *pb.RelationPrimaryKey) (res *pb.Relation, err error)
-	Update(entity *pb.UpdateRelationRequest) (rowsAffected int64, err error)
-	Remove(entity *pb.RelationPrimaryKey) (rowsAffected int64, err error)
+	Add(ctx context.Context, entity *pb.AddRelationRequest) (pKey *pb.RelationPrimaryKey, err error)
+	GetByPK(ctx context.Context, entity *pb.RelationPrimaryKey) (res *pb.Relation, err error)
+	Update(ctx context.Context, entity *pb.UpdateRelationRequest) (rowsAffected int64, err error)
+	Remove(ctx context.Context, entity *pb.RelationPrimaryKey) (rowsAffected int64, err error)
 }
 
 type UserInfoFieldRepoI interface {
-	Add(entity *pb.AddUserInfoFieldRequest) (pKey *pb.UserInfoFieldPrimaryKey, err error)
-	GetByPK(entity *pb.UserInfoFieldPrimaryKey) (res *pb.UserInfoField, err error)
-	Update(entity *pb.UpdateUserInfoFieldRequest) (rowsAffected int64, err error)
-	Remove(entity *pb.UserInfoFieldPrimaryKey) (rowsAffected int64, err error)
+	Add(ctx context.Context, entity *pb.AddUserInfoFieldRequest) (pKey *pb.UserInfoFieldPrimaryKey, err error)
+	GetByPK(ctx context.Context, entity *pb.UserInfoFieldPrimaryKey) (res *pb.UserInfoField, err error)
+	Update(ctx context.Context, entity *pb.UpdateUserInfoFieldRequest) (rowsAffected int64, err error)
+	Remove(ctx context.Context, entity *pb.UserInfoFieldPrimaryKey) (rowsAffected int64, err error)
 }
 
 type RoleRepoI interface {
-	Add(entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error)
-	GetByPK(entity *pb.RolePrimaryKey) (res *pb.Role, err error)
-	Update(entity *pb.UpdateRoleRequest) (rowsAffected int64, err error)
-	Remove(entity *pb.RolePrimaryKey) (rowsAffected int64, err error)
+	Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error)
+	GetByPK(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.Role, err error)
+	Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error)
+	Remove(ctx context.Context, entity *pb.RolePrimaryKey) (rowsAffected int64, err error)
 }
 
 type PermissionRepoI interface {
-	Create(entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error)
-	GetList(queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error)
-	GetByPK(pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error)
-	Update(entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error)
-	Delete(pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error)
+	Create(ctx context.Context, entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error)
+	Update(ctx context.Context, entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error)
 }
 
 type ScopeRepoI interface {
-	Upsert(entity *pb.UpsertScopeRequest) (res *pb.ScopePrimaryKey, err error)
-	GetByPK(pKey *pb.ScopePrimaryKey) (res *pb.Scope, err error)
+	Upsert(ctx context.Context, entity *pb.UpsertScopeRequest) (res *pb.ScopePrimaryKey, err error)
+	GetByPK(ctx context.Context, pKey *pb.ScopePrimaryKey) (res *pb.Scope, err error)
 }
 
 type PermissionScopeRepoI interface {
-	Add(entity *pb.AddPermissionScopeRequest) (res *pb.PermissionScopePrimaryKey, err error)
-	Remove(entity *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error)
-	GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error)
-	HasAccess(roleID, clientPlatformID, path, method string) (hasAccess bool, err error)
+	Add(ctx context.Context, entity *pb.AddPermissionScopeRequest) (res *pb.PermissionScopePrimaryKey, err error)
+	Remove(ctx context.Context, entity *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error)
+	GetByPK(ctx context.Context, pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error)
+	HasAccess(ctx context.Context, roleID, clientPlatformID, path, method string) (hasAccess bool, err error)
 }
 
 type RolePermissionRepoI interface {
-	Add(entity *pb.AddRolePermissionRequest) (res *pb.RolePermissionPrimaryKey, err error)
-	Remove(entity *pb.RolePermissionPrimaryKey) (rowsAffected int64, err error)
-	GetByPK(pKey *pb.RolePermissionPrimaryKey) (res *pb.RolePermission, err error)
+	Add(ctx context.Context, entity *pb.AddRolePermissionRequest) (res *pb.RolePermissionPrimaryKey, err error)
+	Remove(ctx context.Context, entity *pb.RolePermissionPrimaryKey) (rowsAffected int64, err error)
+	GetByPK(ctx context.Context, pKey *pb.RolePermissionPrimaryKey) (res *pb.RolePermission, err error)
 }
 
 type UserRepoI interface {
-	Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error)
-	GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error)
-	GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error)
-	GetListByPKs(pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error)
-	Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
-	Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
-	GetByUsername(username string) (res *pb.User, err error)
+	GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error)
+	Create(ctx context.Context, entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.UserPrimaryKey) (res *pb.User, err error)
+	Update(ctx context.Context, entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
+	GetByUsername(ctx context.Context, username string) (res *pb.User, err error)
 }
 
 type UserRelationRepoI interface {
-	Add(entity *pb.AddUserRelationRequest) (res *pb.UserRelationPrimaryKey, err error)
-	Remove(entity *pb.UserRelationPrimaryKey) (rowsAffected int64, err error)
-	GetByPK(pKey *pb.UserRelationPrimaryKey) (res *pb.UserRelation, err error)
+	Add(ctx context.Context, entity *pb.AddUserRelationRequest) (res *pb.UserRelationPrimaryKey, err error)
+	Remove(ctx context.Context, entity *pb.UserRelationPrimaryKey) (rowsAffected int64, err error)
+	GetByPK(ctx context.Context, pKey *pb.UserRelationPrimaryKey) (res *pb.UserRelation, err error)
 }
 
 type UserInfoRepoI interface {
-	Upsert(entity *pb.UpsertUserInfoRequest) (res *pb.UserInfoPrimaryKey, err error)
-	GetByPK(pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, err error)
+	Upsert(ctx context.Context, entity *pb.UpsertUserInfoRequest) (res *pb.UserInfoPrimaryKey, err error)
+	GetByPK(ctx context.Context, pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, err error)
 }
 
 type SessionRepoI interface {
-	Create(entity *pb.CreateSessionRequest) (pKey *pb.SessionPrimaryKey, err error)
-	GetList(queryParam *pb.GetSessionListRequest) (res *pb.GetSessionListResponse, err error)
-	GetByPK(pKey *pb.SessionPrimaryKey) (res *pb.Session, err error)
-	Update(entity *pb.UpdateSessionRequest) (rowsAffected int64, err error)
-	Delete(pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error)
-	DeleteExpiredUserSessions(userID string) (rowsAffected int64, err error)
-	GetSessionListByUserID(userID string) (res *pb.GetSessionListResponse, err error)
+	Create(ctx context.Context, entity *pb.CreateSessionRequest) (pKey *pb.SessionPrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetSessionListRequest) (res *pb.GetSessionListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (res *pb.Session, err error)
+	Update(ctx context.Context, entity *pb.UpdateSessionRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error)
+	DeleteExpiredUserSessions(ctx context.Context, userID string) (rowsAffected int64, err error)
+	GetSessionListByUserID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error)
 }

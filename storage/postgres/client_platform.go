@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
@@ -19,7 +20,7 @@ func NewClientPlatformRepo(db *sqlx.DB) storage.ClientPlatformRepoI {
 	}
 }
 
-func (r *clientPlatformRepo) Create(entity *pb.CreateClientPlatformRequest) (pKey *pb.ClientPlatformPrimaryKey, err error) {
+func (r *clientPlatformRepo) Create(ctx context.Context, entity *pb.CreateClientPlatformRequest) (pKey *pb.ClientPlatformPrimaryKey, err error) {
 	query := `INSERT INTO "client_platform" (
 		id,
 		project_id,
@@ -37,7 +38,7 @@ func (r *clientPlatformRepo) Create(entity *pb.CreateClientPlatformRequest) (pKe
 		return pKey, err
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.ExecContext(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.Name,
@@ -51,7 +52,7 @@ func (r *clientPlatformRepo) Create(entity *pb.CreateClientPlatformRequest) (pKe
 	return pKey, err
 }
 
-func (r *clientPlatformRepo) GetByPK(pKey *pb.ClientPlatformPrimaryKey) (res *pb.ClientPlatform, err error) {
+func (r *clientPlatformRepo) GetByPK(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (res *pb.ClientPlatform, err error) {
 	res = &pb.ClientPlatform{}
 	query := `SELECT
 		id,
@@ -63,7 +64,7 @@ func (r *clientPlatformRepo) GetByPK(pKey *pb.ClientPlatformPrimaryKey) (res *pb
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	row, err := r.db.QueryContext(ctx, query, pKey.Id)
 	if err != nil {
 		return res, err
 	}
@@ -86,7 +87,7 @@ func (r *clientPlatformRepo) GetByPK(pKey *pb.ClientPlatformPrimaryKey) (res *pb
 	return res, nil
 }
 
-func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest) (res *pb.GetClientPlatformListResponse, err error) {
+func (r *clientPlatformRepo) GetList(ctx context.Context, queryParam *pb.GetClientPlatformListRequest) (res *pb.GetClientPlatformListResponse, err error) {
 	res = &pb.GetClientPlatformListResponse{}
 	params := make(map[string]interface{})
 	query := `SELECT
@@ -123,7 +124,7 @@ func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest
 	}
 
 	cQ := `SELECT count(1) FROM "client_platform"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	row, err := r.db.NamedQueryContext(ctx, cQ, params)
 	if err != nil {
 		return res, err
 	}
@@ -139,7 +140,7 @@ func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest
 	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+	rows, err := r.db.NamedQueryContext(ctx, q, params)
 	if err != nil {
 		return res, err
 	}
@@ -162,7 +163,7 @@ func (r *clientPlatformRepo) GetList(queryParam *pb.GetClientPlatformListRequest
 	return res, nil
 }
 
-func (r *clientPlatformRepo) Update(entity *pb.UpdateClientPlatformRequest) (rowsAffected int64, err error) {
+func (r *clientPlatformRepo) Update(ctx context.Context, entity *pb.UpdateClientPlatformRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "client_platform" SET
 		name = :name,
 		subdomain = :subdomain,
@@ -176,7 +177,7 @@ func (r *clientPlatformRepo) Update(entity *pb.UpdateClientPlatformRequest) (row
 		"subdomain": entity.Subdomain,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	result, err := r.db.NamedExecContext(ctx, query, params)
 	if err != nil {
 		return 0, err
 	}
@@ -189,10 +190,10 @@ func (r *clientPlatformRepo) Update(entity *pb.UpdateClientPlatformRequest) (row
 	return rowsAffected, err
 }
 
-func (r *clientPlatformRepo) Delete(pKey *pb.ClientPlatformPrimaryKey) (rowsAffected int64, err error) {
+func (r *clientPlatformRepo) Delete(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "client_platform" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.ExecContext(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
