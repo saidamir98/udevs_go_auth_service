@@ -10,6 +10,7 @@ import "google/protobuf/struct.proto";
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (User) {}
     rpc GetUserByID(UserPrimaryKey) returns (User) {}
+    rpc GetUserListByIDs(UserPrimaryKeyList) returns (GetUserListResponse) {}
     rpc GetUserList(GetUserListRequest) returns (GetUserListResponse) {}
     rpc UpdateUser(UpdateUserRequest) returns (User) {}
     rpc DeleteUser(UserPrimaryKey) returns (google.protobuf.Empty) {}
@@ -44,10 +45,16 @@ message UserPrimaryKey {
     string id = 1;
 }
 
+message UserPrimaryKeyList {
+    repeated string ids = 1;
+}
+
 message GetUserListRequest {
     int32 limit = 1;
     int32 offset = 2;
     string search = 3;
+    string client_platform_id = 4;
+    string client_type_id = 5;
 }
 
 message GetUserListResponse {

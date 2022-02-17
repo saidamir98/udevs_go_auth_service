@@ -100,6 +100,7 @@ type RolePermissionRepoI interface {
 }
 
 type UserRepoI interface {
+	GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error)
 	Create(ctx context.Context, entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error)
 	GetList(ctx context.Context, queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error)
 	GetByPK(ctx context.Context, pKey *pb.UserPrimaryKey) (res *pb.User, err error)

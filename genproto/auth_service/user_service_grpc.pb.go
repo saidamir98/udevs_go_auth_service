@@ -25,6 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
 	GetUserByID(ctx context.Context, in *UserPrimaryKey, opts ...grpc.CallOption) (*User, error)
+	GetUserListByIDs(ctx context.Context, in *UserPrimaryKeyList, opts ...grpc.CallOption) (*GetUserListResponse, error)
 	GetUserList(ctx context.Context, in *GetUserListRequest, opts ...grpc.CallOption) (*GetUserListResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
 	DeleteUser(ctx context.Context, in *UserPrimaryKey, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -53,6 +54,15 @@ func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserReques
 func (c *userServiceClient) GetUserByID(ctx context.Context, in *UserPrimaryKey, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
 	err := c.cc.Invoke(ctx, "/auth_service.UserService/GetUserByID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUserListByIDs(ctx context.Context, in *UserPrimaryKeyList, opts ...grpc.CallOption) (*GetUserListResponse, error) {
+	out := new(GetUserListResponse)
+	err := c.cc.Invoke(ctx, "/auth_service.UserService/GetUserListByIDs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +129,7 @@ func (c *userServiceClient) UpsertUserInfo(ctx context.Context, in *UpsertUserIn
 type UserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*User, error)
 	GetUserByID(context.Context, *UserPrimaryKey) (*User, error)
+	GetUserListByIDs(context.Context, *UserPrimaryKeyList) (*GetUserListResponse, error)
 	GetUserList(context.Context, *GetUserListRequest) (*GetUserListResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
 	DeleteUser(context.Context, *UserPrimaryKey) (*emptypb.Empty, error)
@@ -137,6 +148,9 @@ func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserReq
 }
 func (UnimplementedUserServiceServer) GetUserByID(context.Context, *UserPrimaryKey) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserListByIDs(context.Context, *UserPrimaryKeyList) (*GetUserListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserListByIDs not implemented")
 }
 func (UnimplementedUserServiceServer) GetUserList(context.Context, *GetUserListRequest) (*GetUserListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserList not implemented")
@@ -201,6 +215,24 @@ func _UserService_GetUserByID_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUserByID(ctx, req.(*UserPrimaryKey))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUserListByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserPrimaryKeyList)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserListByIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.UserService/GetUserListByIDs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserListByIDs(ctx, req.(*UserPrimaryKeyList))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -327,6 +359,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserByID",
 			Handler:    _UserService_GetUserByID_Handler,
+		},
+		{
+			MethodName: "GetUserListByIDs",
+			Handler:    _UserService_GetUserListByIDs_Handler,
 		},
 		{
 			MethodName: "GetUserList",

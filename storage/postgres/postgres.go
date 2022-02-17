@@ -26,7 +26,7 @@ type Store struct {
 	session         storage.SessionRepoI
 }
 
-func NewPostgres(psqlConnString string, cfg config.Config) (storage.StorageI, error) {
+func NewPostgres(cfg config.Config) (storage.StorageI, error) {
 	// First set up the pgx connection pool
 	config, err := pgxpool.ParseConfig(psqlConnString)
 	if err != nil {
