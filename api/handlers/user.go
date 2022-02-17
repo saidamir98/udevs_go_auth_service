@@ -57,6 +57,8 @@ func (h *Handler) CreateUser(c *gin.Context) {
 // @Param offset query integer false "offset"
 // @Param limit query integer false "limit"
 // @Param search query string false "search"
+// @Param client-platform-id query string false "client-platform-id"
+// @Param client-type-id query string false "client-type-id"
 // @Success 200 {object} http.Response{data=auth_service.GetUserListResponse} "GetUserListResponseBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -76,9 +78,11 @@ func (h *Handler) GetUserList(c *gin.Context) {
 	resp, err := h.services.UserService().GetUserList(
 		c.Request.Context(),
 		&auth_service.GetUserListRequest{
-			Limit:  int32(limit),
-			Offset: int32(offset),
-			Search: c.Query("search"),
+			Limit:            int32(limit),
+			Offset:           int32(offset),
+			Search:           c.Query("search"),
+			ClientPlatformId: c.Query("client-platform-id"),
+			ClientTypeId:     c.Query("client-type-id"),
 		},
 	)
 

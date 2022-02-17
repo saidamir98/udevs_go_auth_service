@@ -3,6 +3,7 @@ module upm/udevs_go_auth_service
 go 1.16
 
 require (
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible

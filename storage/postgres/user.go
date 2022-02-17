@@ -127,6 +127,65 @@ func (r *userRepo) GetByPK(ctx context.Context, pKey *pb.UserPrimaryKey) (res *p
 	return res, nil
 }
 
+func (r *userRepo) GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error) {
+	res = &pb.GetUserListResponse{}
+	query := `SELECT
+		id,
+		project_id,
+		client_platform_id,
+		client_type_id,
+		role_id,
+		name,
+		photo_url,
+		phone,
+		email,
+		login,
+		password,
+		active,
+		expires_at,
+		created_at,
+		updated_at
+	FROM
+		"user"
+	WHERE
+		id = ANY($1)`
+
+	rows, err := r.db.QueryContext(ctx, query, pq.Array(pKeys.Ids))
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		user := &pb.User{}
+		err = rows.Scan(
+			&user.Id,
+			&user.ProjectId,
+			&user.ClientPlatformId,
+			&user.ClientTypeId,
+			&user.RoleId,
+			&user.Name,
+			&user.PhotoUrl,
+			&user.Phone,
+			&user.Email,
+			&user.Login,
+			&user.Password,
+			&user.Active,
+			&user.ExpiresAt,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Users = append(res.Users, user)
+	}
+
+	return res, nil
+}
+
 func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
 	res = &pb.GetUserListResponse{}
 	params := make(map[string]interface{})
@@ -158,6 +217,16 @@ func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListReques
 	if len(queryParam.Search) > 0 {
 		params["search"] = queryParam.Search
 		filter += " AND ((name || phone || email || login) ILIKE ('%' || :search || '%'))"
+	}
+
+	if len(queryParam.ClientPlatformId) > 0 {
+		params["client_platform_id"] = queryParam.ClientPlatformId
+		filter += " AND client_platform_id = :client_platform_id"
+	}
+
+	if len(queryParam.ClientTypeId) > 0 {
+		params["client_type_id"] = queryParam.ClientTypeId
+		filter += " AND client_type_id = :client_type_id"
 	}
 
 	if queryParam.Offset > 0 {
