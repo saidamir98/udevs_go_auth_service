@@ -5,14 +5,14 @@ import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type rolePermissionRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewRolePermissionRepo(db *sqlx.DB) storage.RolePermissionRepoI {
+func NewRolePermissionRepo(db *pgxpool.Pool) storage.RolePermissionRepoI {
 	return &rolePermissionRepo{
 		db: db,
 	}
@@ -27,7 +27,7 @@ func (r *rolePermissionRepo) Add(ctx context.Context, entity *pb.AddRolePermissi
 		$2
 	)`
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		entity.RoleId,
 		entity.PermissionId,
 	)
@@ -50,23 +50,12 @@ func (r *rolePermissionRepo) GetByPK(ctx context.Context, pKey *pb.RolePermissio
 	WHERE
 		role_id = $1 AND permission_id = $2`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.RoleId, pKey.PermissionId)
+	err = r.db.QueryRow(ctx, query, pKey.RoleId, pKey.PermissionId).Scan(
+		&res.RoleId,
+		&res.PermissionId,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.RoleId,
-			&res.PermissionId,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -78,15 +67,12 @@ func (r *rolePermissionRepo) Remove(ctx context.Context, pKey *pb.RolePermission
 	WHERE
 		role_id = $1 AND permission_id = $2`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.RoleId, pKey.PermissionId)
+	result, err := r.db.Exec(ctx, query, pKey.RoleId, pKey.PermissionId)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }

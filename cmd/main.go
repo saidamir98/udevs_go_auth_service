@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"upm/udevs_go_auth_service/api"
 	"upm/udevs_go_auth_service/api/handlers"
@@ -33,7 +34,14 @@ func main() {
 	log := logger.NewLogger(cfg.ServiceName, loggerLevel)
 	defer logger.Cleanup(log)
 
-	pgStore, err := postgres.NewPostgres(cfg)
+	pgStore, err := postgres.NewPostgres(fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.PostgresUser,
+		cfg.PostgresPassword,
+		cfg.PostgresHost,
+		cfg.PostgresPort,
+		cfg.PostgresDatabase,
+	), cfg)
 	if err != nil {
 		panic(err)
 	}

@@ -3,19 +3,20 @@ package postgres
 import (
 	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/lib/pq"
 )
 
 type userRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewUserRepo(db *sqlx.DB) storage.UserRepoI {
+func NewUserRepo(db *pgxpool.Pool) storage.UserRepoI {
 	return &userRepo{
 		db: db,
 	}
@@ -57,7 +58,7 @@ func (r *userRepo) Create(ctx context.Context, entity *pb.CreateUserRequest) (pK
 		return pKey, err
 	}
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.ClientPlatformId,
@@ -103,36 +104,25 @@ func (r *userRepo) GetByPK(ctx context.Context, pKey *pb.UserPrimaryKey) (res *p
 	WHERE
 		id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&res.RoleId,
+		&res.Name,
+		&res.PhotoUrl,
+		&res.Phone,
+		&res.Email,
+		&res.Login,
+		&res.Password,
+		&res.Active,
+		&res.ExpiresAt,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&res.RoleId,
-			&res.Name,
-			&res.PhotoUrl,
-			&res.Phone,
-			&res.Email,
-			&res.Login,
-			&res.Password,
-			&res.Active,
-			&res.ExpiresAt,
-			&res.CreatedAt,
-			&res.UpdatedAt,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -161,7 +151,7 @@ func (r *userRepo) GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyLis
 	WHERE
 		id = ANY($1)`
 
-	rows, err := r.db.QueryContext(ctx, query, pq.Array(pKeys.Ids))
+	rows, err := r.db.Query(ctx, query, pq.Array(pKeys.Ids))
 	if err != nil {
 		return res, err
 	}
@@ -200,6 +190,7 @@ func (r *userRepo) GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyLis
 func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
 	res = &pb.GetUserListResponse{}
 	params := make(map[string]interface{})
+	var arr []interface{}
 	query := `SELECT
 		id,
 		project_id,
@@ -250,23 +241,18 @@ func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListReques
 	}
 
 	cQ := `SELECT count(1) FROM "user"` + filter
-	row, err := r.db.NamedQueryContext(ctx, cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQueryContext(ctx, q, params)
+
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -334,15 +320,13 @@ func (r *userRepo) Update(ctx context.Context, entity *pb.UpdateUserRequest) (ro
 		"expires_at":         entity.ExpiresAt,
 	}
 
-	result, err := r.db.NamedExecContext(ctx, query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -350,15 +334,12 @@ func (r *userRepo) Update(ctx context.Context, entity *pb.UpdateUserRequest) (ro
 func (r *userRepo) Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "user" WHERE id = $1`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -394,36 +375,25 @@ func (r *userRepo) GetByUsername(ctx context.Context, username string) (res *pb.
 		query = query + ` login = $1`
 	}
 
-	row, err := r.db.QueryContext(ctx, query, username)
+	err = r.db.QueryRow(ctx, query, username).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&res.RoleId,
+		&res.Name,
+		&res.PhotoUrl,
+		&res.Phone,
+		&res.Email,
+		&res.Login,
+		&res.Password,
+		&res.Active,
+		&res.ExpiresAt,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&res.RoleId,
-			&res.Name,
-			&res.PhotoUrl,
-			&res.Phone,
-			&res.Email,
-			&res.Login,
-			&res.Password,
-			&res.Active,
-			&res.ExpiresAt,
-			&res.CreatedAt,
-			&res.UpdatedAt,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil

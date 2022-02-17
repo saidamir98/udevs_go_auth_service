@@ -3,17 +3,18 @@ package postgres
 import (
 	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type clientRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewClientRepo(db *sqlx.DB) storage.ClientRepoI {
+func NewClientRepo(db *pgxpool.Pool) storage.ClientRepoI {
 	return &clientRepo{
 		db: db,
 	}
@@ -32,7 +33,7 @@ func (r *clientRepo) Add(ctx context.Context, projectID string, entity *pb.AddCl
 		$4
 	)`
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		projectID,
 		entity.ClientPlatformId,
 		entity.ClientTypeId,
@@ -44,6 +45,7 @@ func (r *clientRepo) Add(ctx context.Context, projectID string, entity *pb.AddCl
 
 func (r *clientRepo) GetByPK(ctx context.Context, pKey *pb.ClientPrimaryKey) (res *pb.Client, err error) {
 	res = &pb.Client{}
+	var loginStrategy string
 	query := `SELECT
 		project_id,
 		client_platform_id,
@@ -54,29 +56,17 @@ func (r *clientRepo) GetByPK(ctx context.Context, pKey *pb.ClientPrimaryKey) (re
 	WHERE
 		client_platform_id = $1 AND client_type_id = $2`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId)
+	err = r.db.QueryRow(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId).Scan(
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&loginStrategy,
+	)
+
+	res.LoginStrategy = pb.LoginStrategies(pb.LoginStrategies_value[loginStrategy])
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		var loginStrategy string
-
-		err = row.Scan(
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&loginStrategy,
-		)
-
-		res.LoginStrategy = pb.LoginStrategies(pb.LoginStrategies_value[loginStrategy])
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -95,15 +85,13 @@ func (r *clientRepo) Update(ctx context.Context, entity *pb.UpdateClientRequest)
 		"login_strategy":     entity.LoginStrategy.String(),
 	}
 
-	result, err := r.db.NamedExecContext(ctx, query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -111,15 +99,12 @@ func (r *clientRepo) Update(ctx context.Context, entity *pb.UpdateClientRequest)
 func (r *clientRepo) Remove(ctx context.Context, pKey *pb.ClientPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "client" WHERE client_platform_id = $1 AND client_type_id = $2`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId)
+	result, err := r.db.Exec(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -127,6 +112,7 @@ func (r *clientRepo) Remove(ctx context.Context, pKey *pb.ClientPrimaryKey) (row
 func (r *clientRepo) GetList(ctx context.Context, queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error) {
 	res = &pb.GetClientListResponse{}
 	params := make(map[string]interface{})
+	var arr []interface{}
 	query := `SELECT
 		project_id,
 		client_platform_id,
@@ -161,23 +147,18 @@ func (r *clientRepo) GetList(ctx context.Context, queryParam *pb.GetClientListRe
 	}
 
 	cQ := `SELECT count(1) FROM "client"` + filter
-	row, err := r.db.NamedQueryContext(ctx, cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQueryContext(ctx, q, params)
+
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -218,7 +199,7 @@ func (r *clientRepo) GetMatrix(ctx context.Context, req *pb.GetClientMatrixReque
 	WHERE
 		project_id = $1`
 
-	clientPlatformRows, err := r.db.QueryContext(ctx, queryClientPlatform, req.ProjectId)
+	clientPlatformRows, err := r.db.Query(ctx, queryClientPlatform, req.ProjectId)
 	if err != nil {
 		return res, err
 	}
@@ -251,7 +232,7 @@ func (r *clientRepo) GetMatrix(ctx context.Context, req *pb.GetClientMatrixReque
 	WHERE
 		project_id = $1`
 
-	clientTypeRows, err := r.db.QueryContext(ctx, queryClientType, req.ProjectId)
+	clientTypeRows, err := r.db.Query(ctx, queryClientType, req.ProjectId)
 	if err != nil {
 		return res, err
 	}
@@ -285,7 +266,7 @@ func (r *clientRepo) GetMatrix(ctx context.Context, req *pb.GetClientMatrixReque
 	WHERE
 		project_id = $1`
 
-	clientRows, err := r.db.QueryContext(ctx, queryClient, req.ProjectId)
+	clientRows, err := r.db.Query(ctx, queryClient, req.ProjectId)
 	if err != nil {
 		return res, err
 	}

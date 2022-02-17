@@ -1,19 +1,15 @@
 package postgres
 
 import (
-	"time"
+	"context"
 	"upm/udevs_go_auth_service/config"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jackc/pgx"
-	"github.com/jackc/pgx/stdlib"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type Store struct {
-	db              *sqlx.DB
+	db              *pgxpool.Pool
 	clientPlatform  storage.ClientPlatformRepoI
 	clientType      storage.ClientTypeRepoI
 	client          storage.ClientRepoI
@@ -30,33 +26,21 @@ type Store struct {
 	session         storage.SessionRepoI
 }
 
-func NewPostgres(cfg config.Config) (storage.StorageI, error) {
+func NewPostgres(psqlConnString string, cfg config.Config) (storage.StorageI, error) {
 	// First set up the pgx connection pool
-	connConfig := pgx.ConnConfig{
-		Host:     cfg.PostgresHost,
-		Database: cfg.PostgresDatabase,
-		Port:     uint16(cfg.PostgresPort),
-		User:     cfg.PostgresUser,
-		Password: cfg.PostgresPassword,
-	}
-
-	connPool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
-		ConnConfig:     connConfig,
-		AfterConnect:   nil,
-		MaxConnections: cfg.PostgresMaxConnections,
-		AcquireTimeout: 30 * time.Second,
-	})
-
+	config, err := pgxpool.ParseConfig(psqlConnString)
 	if err != nil {
-		return nil, errors.Wrap(err, "Call to pgx.NewConnPool failed")
+		return nil, err
 	}
 
-	// Then set up sqlx and return the created DB reference
-	nativeDB := stdlib.OpenDBFromPool(connPool)
+	config.AfterConnect = nil
+	config.MaxConns = int32(cfg.PostgresMaxConnections)
+
+	pool, err := pgxpool.ConnectConfig(context.Background(), config)
 
 	return &Store{
-		db: sqlx.NewDb(nativeDB, "pgx"),
-	}, nil
+		db: pool,
+	}, err
 }
 
 func (s *Store) ClientPlatform() storage.ClientPlatformRepoI {

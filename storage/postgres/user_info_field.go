@@ -3,17 +3,18 @@ package postgres
 import (
 	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type userInfoFieldRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewUserInfoFieldRepo(db *sqlx.DB) storage.UserInfoFieldRepoI {
+func NewUserInfoFieldRepo(db *pgxpool.Pool) storage.UserInfoFieldRepoI {
 	return &userInfoFieldRepo{
 		db: db,
 	}
@@ -39,7 +40,7 @@ func (r *userInfoFieldRepo) Add(ctx context.Context, entity *pb.AddUserInfoField
 		return pKey, err
 	}
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ClientTypeId,
 		entity.FieldName,
@@ -67,26 +68,16 @@ func (r *userInfoFieldRepo) GetByPK(ctx context.Context, pKey *pb.UserInfoFieldP
 	WHERE
 		id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ClientTypeId,
+		&res.FieldName,
+		&res.FieldType,
+		&res.DataType,
+	)
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ClientTypeId,
-			&res.FieldName,
-			&res.FieldType,
-			&res.DataType,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -110,15 +101,13 @@ func (r *userInfoFieldRepo) Update(ctx context.Context, entity *pb.UpdateUserInf
 		"data_type":      entity.DataType,
 	}
 
-	result, err := r.db.NamedExecContext(ctx, query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -126,15 +115,12 @@ func (r *userInfoFieldRepo) Update(ctx context.Context, entity *pb.UpdateUserInf
 func (r *userInfoFieldRepo) Remove(ctx context.Context, pKey *pb.UserInfoFieldPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "user_info_field" WHERE id = $1`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }

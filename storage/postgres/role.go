@@ -3,17 +3,18 @@ package postgres
 import (
 	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type roleRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewRoleRepo(db *sqlx.DB) storage.RoleRepoI {
+func NewRoleRepo(db *pgxpool.Pool) storage.RoleRepoI {
 	return &roleRepo{
 		db: db,
 	}
@@ -35,7 +36,7 @@ func (r *roleRepo) Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb
 		return pKey, err
 	}
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ClientTypeId,
 		entity.Name,
@@ -59,25 +60,13 @@ func (r *roleRepo) GetByPK(ctx context.Context, pKey *pb.RolePrimaryKey) (res *p
 	WHERE
 		id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ClientTypeId,
+		&res.Name,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-
-		err = row.Scan(
-			&res.Id,
-			&res.ClientTypeId,
-			&res.Name,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -97,15 +86,13 @@ func (r *roleRepo) Update(ctx context.Context, entity *pb.UpdateRoleRequest) (ro
 		"name":           entity.Name,
 	}
 
-	result, err := r.db.NamedExecContext(ctx, query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -113,15 +100,12 @@ func (r *roleRepo) Update(ctx context.Context, entity *pb.UpdateRoleRequest) (ro
 func (r *roleRepo) Remove(ctx context.Context, pKey *pb.RolePrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "role" WHERE id = $1`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }

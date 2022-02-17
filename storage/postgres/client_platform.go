@@ -3,18 +3,19 @@ package postgres
 import (
 	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type clientPlatformRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewClientPlatformRepo(db *sqlx.DB) storage.ClientPlatformRepoI {
+func NewClientPlatformRepo(db *pgxpool.Pool) storage.ClientPlatformRepoI {
 	return &clientPlatformRepo{
 		db: db,
 	}
@@ -38,7 +39,7 @@ func (r *clientPlatformRepo) Create(ctx context.Context, entity *pb.CreateClient
 		return pKey, err
 	}
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.Name,
@@ -64,24 +65,15 @@ func (r *clientPlatformRepo) GetByPK(ctx context.Context, pKey *pb.ClientPlatfor
 	WHERE
 		id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.Name,
+		&res.Subdomain,
+	)
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.Name,
-			&res.Subdomain,
-		)
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -89,6 +81,7 @@ func (r *clientPlatformRepo) GetByPK(ctx context.Context, pKey *pb.ClientPlatfor
 
 func (r *clientPlatformRepo) GetList(ctx context.Context, queryParam *pb.GetClientPlatformListRequest) (res *pb.GetClientPlatformListResponse, err error) {
 	res = &pb.GetClientPlatformListResponse{}
+	var arr []interface{}
 	params := make(map[string]interface{})
 	query := `SELECT
 		id,
@@ -97,7 +90,7 @@ func (r *clientPlatformRepo) GetList(ctx context.Context, queryParam *pb.GetClie
 		subdomain
 	FROM
 		"client_platform"`
-	filter := " WHERE 1=1"
+	filter := " WHERE true"
 	order := " ORDER BY created_at"
 	arrangement := " DESC"
 	offset := " OFFSET 0"
@@ -124,23 +117,19 @@ func (r *clientPlatformRepo) GetList(ctx context.Context, queryParam *pb.GetClie
 	}
 
 	cQ := `SELECT count(1) FROM "client_platform"` + filter
-	row, err := r.db.NamedQueryContext(ctx, cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
+
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQueryContext(ctx, q, params)
+
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -177,15 +166,13 @@ func (r *clientPlatformRepo) Update(ctx context.Context, entity *pb.UpdateClient
 		"subdomain": entity.Subdomain,
 	}
 
-	result, err := r.db.NamedExecContext(ctx, query, params)
+	query, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, query, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -193,15 +180,12 @@ func (r *clientPlatformRepo) Update(ctx context.Context, entity *pb.UpdateClient
 func (r *clientPlatformRepo) Delete(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "client_platform" WHERE id = $1`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }

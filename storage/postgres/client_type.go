@@ -3,18 +3,19 @@ package postgres
 import (
 	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type clientTypeRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewClientTypeRepo(db *sqlx.DB) storage.ClientTypeRepoI {
+func NewClientTypeRepo(db *pgxpool.Pool) storage.ClientTypeRepoI {
 	return &clientTypeRepo{
 		db: db,
 	}
@@ -42,7 +43,7 @@ func (r *clientTypeRepo) Create(ctx context.Context, entity *pb.CreateClientType
 		return pKey, err
 	}
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.Name,
@@ -60,6 +61,7 @@ func (r *clientTypeRepo) Create(ctx context.Context, entity *pb.CreateClientType
 
 func (r *clientTypeRepo) GetByPK(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (res *pb.ClientType, err error) {
 	res = &pb.ClientType{}
+	var confirmBy string
 	query := `SELECT
 		id,
 		project_id,
@@ -72,31 +74,19 @@ func (r *clientTypeRepo) GetByPK(ctx context.Context, pKey *pb.ClientTypePrimary
 	WHERE
 		id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.Name,
+		&confirmBy,
+		&res.SelfRegister,
+		&res.SelfRecover,
+	)
+
+	res.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		var confirmBy string
-
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.Name,
-			&confirmBy,
-			&res.SelfRegister,
-			&res.SelfRecover,
-		)
-
-		res.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -141,23 +131,21 @@ func (r *clientTypeRepo) GetList(ctx context.Context, queryParam *pb.GetClientTy
 	}
 
 	cQ := `SELECT count(1) FROM "client_type"` + filter
-	row, err := r.db.NamedQueryContext(ctx, cQ, params)
+	var arr []interface{}
+
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
+
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQueryContext(ctx, q, params)
+
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -202,15 +190,13 @@ func (r *clientTypeRepo) Update(ctx context.Context, entity *pb.UpdateClientType
 		"self_recover":  entity.SelfRecover,
 	}
 
-	result, err := r.db.NamedExecContext(ctx, query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -218,15 +204,12 @@ func (r *clientTypeRepo) Update(ctx context.Context, entity *pb.UpdateClientType
 func (r *clientTypeRepo) Delete(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "client_type" WHERE id = $1`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -251,31 +234,21 @@ func (r *clientTypeRepo) GetCompleteByPK(ctx context.Context, pKey *pb.ClientTyp
 	WHERE
 		id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.Id)
+	var confirmBy string
+
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.ClientType.Id,
+		&res.ClientType.ProjectId,
+		&res.ClientType.Name,
+		&confirmBy,
+		&res.ClientType.SelfRegister,
+		&res.ClientType.SelfRecover,
+	)
+
+	res.ClientType.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		var confirmBy string
-
-		err = row.Scan(
-			&res.ClientType.Id,
-			&res.ClientType.ProjectId,
-			&res.ClientType.Name,
-			&confirmBy,
-			&res.ClientType.SelfRegister,
-			&res.ClientType.SelfRecover,
-		)
-
-		res.ClientType.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	query1 := `SELECT
@@ -289,7 +262,7 @@ func (r *clientTypeRepo) GetCompleteByPK(ctx context.Context, pKey *pb.ClientTyp
 	WHERE
 		client_type_id = $1`
 
-	rows1, err := r.db.QueryContext(ctx, query1, res.ClientType.Id)
+	rows1, err := r.db.Query(ctx, query1, res.ClientType.Id)
 	if err != nil {
 		return res, err
 	}
@@ -326,7 +299,7 @@ func (r *clientTypeRepo) GetCompleteByPK(ctx context.Context, pKey *pb.ClientTyp
 	WHERE
 		client_type_id = $1`
 
-	rows2, err := r.db.QueryContext(ctx, query2, res.ClientType.Id)
+	rows2, err := r.db.Query(ctx, query2, res.ClientType.Id)
 	if err != nil {
 		return res, err
 	}
@@ -359,7 +332,7 @@ func (r *clientTypeRepo) GetCompleteByPK(ctx context.Context, pKey *pb.ClientTyp
 		WHERE
 			client_type_id = $1`
 
-	rows3, err := r.db.QueryContext(ctx, query3, res.ClientType.Id)
+	rows3, err := r.db.Query(ctx, query3, res.ClientType.Id)
 	if err != nil {
 		return res, err
 	}

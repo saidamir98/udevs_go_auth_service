@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 	"testing"
@@ -11,10 +12,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var s int64
+
 func TestCreateRole(t *testing.T) {
+	s = 0
 	wg := &sync.WaitGroup{}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 150; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -23,6 +27,8 @@ func TestCreateRole(t *testing.T) {
 	}
 
 	wg.Wait()
+
+	fmt.Println("s: ", s)
 }
 
 func createRole(t *testing.T) string {
@@ -39,6 +45,8 @@ func createRole(t *testing.T) string {
 	assert.NotNil(t, resp)
 	if resp != nil {
 		assert.Equal(t, resp.StatusCode, 201)
+	} else {
+		s++
 	}
 
 	return ""
