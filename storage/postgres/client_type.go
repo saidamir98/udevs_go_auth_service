@@ -61,6 +61,7 @@ func (r *clientTypeRepo) Create(ctx context.Context, entity *pb.CreateClientType
 
 func (r *clientTypeRepo) GetByPK(ctx context.Context, pKey *pb.ClientTypePrimaryKey) (res *pb.ClientType, err error) {
 	res = &pb.ClientType{}
+	var confirmBy string
 	query := `SELECT
 		id,
 		project_id,
@@ -73,31 +74,19 @@ func (r *clientTypeRepo) GetByPK(ctx context.Context, pKey *pb.ClientTypePrimary
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(ctx, query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.Name,
+		&confirmBy,
+		&res.SelfRegister,
+		&res.SelfRecover,
+	)
+
+	res.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		var confirmBy string
-
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.Name,
-			&confirmBy,
-			&res.SelfRegister,
-			&res.SelfRecover,
-		)
-
-		res.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil

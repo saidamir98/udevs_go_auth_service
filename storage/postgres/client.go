@@ -45,6 +45,7 @@ func (r *clientRepo) Add(ctx context.Context, projectID string, entity *pb.AddCl
 
 func (r *clientRepo) GetByPK(ctx context.Context, pKey *pb.ClientPrimaryKey) (res *pb.Client, err error) {
 	res = &pb.Client{}
+	var loginStrategy string
 	query := `SELECT
 		project_id,
 		client_platform_id,
@@ -55,29 +56,17 @@ func (r *clientRepo) GetByPK(ctx context.Context, pKey *pb.ClientPrimaryKey) (re
 	WHERE
 		client_platform_id = $1 AND client_type_id = $2`
 
-	row, err := r.db.Query(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId)
+	err = r.db.QueryRow(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId).Scan(
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&loginStrategy,
+	)
+
+	res.LoginStrategy = pb.LoginStrategies(pb.LoginStrategies_value[loginStrategy])
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		var loginStrategy string
-
-		err = row.Scan(
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&loginStrategy,
-		)
-
-		res.LoginStrategy = pb.LoginStrategies(pb.LoginStrategies_value[loginStrategy])
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil

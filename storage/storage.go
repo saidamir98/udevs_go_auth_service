@@ -6,7 +6,6 @@ import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 )
 
-var ErrorNotFound = errors.New("record not found")
 var ErrorTheSameId = errors.New("cannot use the same uuid for 'id' and 'parent_id' fields")
 var ErrorProjectId = errors.New("not valid 'project_id'")
 
