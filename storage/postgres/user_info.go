@@ -6,14 +6,14 @@ import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type userInfoRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewUserInfoRepo(db *sqlx.DB) storage.UserInfoRepoI {
+func NewUserInfoRepo(db *pgxpool.Pool) storage.UserInfoRepoI {
 	return &userInfoRepo{
 		db: db,
 	}
@@ -35,7 +35,7 @@ func (r *userInfoRepo) Upsert(ctx context.Context, entity *pb.UpsertUserInfoRequ
 		user_id
 	) DO UPDATE SET data = $2, updated_at = NOW()`
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		entity.UserId,
 		data,
 	)
@@ -49,6 +49,8 @@ func (r *userInfoRepo) Upsert(ctx context.Context, entity *pb.UpsertUserInfoRequ
 
 func (r *userInfoRepo) GetByPK(ctx context.Context, pKey *pb.UserInfoPrimaryKey) (res *pb.UserInfo, err error) {
 	res = &pb.UserInfo{}
+	var data []byte
+
 	query := `SELECT
 		user_id,
 		data
@@ -57,28 +59,17 @@ func (r *userInfoRepo) GetByPK(ctx context.Context, pKey *pb.UserInfoPrimaryKey)
 	WHERE
 		user_id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.UserId)
+	err = r.db.QueryRow(ctx, query, pKey.UserId).Scan(
+		&res.UserId,
+		&data,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
 
-	if row.Next() {
-		var data []byte
-		err = row.Scan(
-			&res.UserId,
-			&data,
-		)
-		if err != nil {
-			return res, err
-		}
-
-		err = json.Unmarshal(data, &res.Data)
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
+	err = json.Unmarshal(data, &res.Data)
+	if err != nil {
+		return res, err
 	}
 
 	return res, nil

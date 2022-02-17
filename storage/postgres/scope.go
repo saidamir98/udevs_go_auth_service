@@ -5,14 +5,14 @@ import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type scopeRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewScopeRepo(db *sqlx.DB) storage.ScopeRepoI {
+func NewScopeRepo(db *pgxpool.Pool) storage.ScopeRepoI {
 	return &scopeRepo{
 		db: db,
 	}
@@ -35,7 +35,7 @@ func (r *scopeRepo) Upsert(ctx context.Context, entity *pb.UpsertScopeRequest) (
 		method
 	) DO UPDATE SET requests = "scope".requests + $4, updated_at = NOW()`
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		entity.ClientPlatformId,
 		entity.Path,
 		entity.Method,
@@ -63,25 +63,14 @@ func (r *scopeRepo) GetByPK(ctx context.Context, pKey *pb.ScopePrimaryKey) (res 
 	WHERE
 		client_platform_id = $1 AND path = $2 AND method = $3`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.ClientPlatformId, pKey.Path, pKey.Method)
+	err = r.db.QueryRow(ctx, query, pKey.ClientPlatformId, pKey.Path, pKey.Method).Scan(
+		&res.ClientPlatformId,
+		&res.Path,
+		&res.Method,
+		&res.Requests,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.ClientPlatformId,
-			&res.Path,
-			&res.Method,
-			&res.Requests,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil

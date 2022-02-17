@@ -4,17 +4,18 @@ import (
 	"context"
 	"time"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type sessionRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewSessionRepo(db *sqlx.DB) storage.SessionRepoI {
+func NewSessionRepo(db *pgxpool.Pool) storage.SessionRepoI {
 	return &sessionRepo{
 		db: db,
 	}
@@ -48,7 +49,7 @@ func (r *sessionRepo) Create(ctx context.Context, entity *pb.CreateSessionReques
 		return pKey, err
 	}
 
-	_, err = r.db.ExecContext(ctx, query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.ClientPlatformId,
@@ -86,32 +87,21 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 	WHERE
 		id = $1`
 
-	row, err := r.db.QueryContext(ctx, query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&res.UserId,
+		&res.RoleId,
+		&res.Ip,
+		&res.Data,
+		&res.ExpiresAt,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&res.UserId,
-			&res.RoleId,
-			&res.Ip,
-			&res.Data,
-			&res.ExpiresAt,
-			&res.CreatedAt,
-			&res.UpdatedAt,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
@@ -120,6 +110,7 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 func (r *sessionRepo) GetList(ctx context.Context, queryParam *pb.GetSessionListRequest) (res *pb.GetSessionListResponse, err error) {
 	res = &pb.GetSessionListResponse{}
 	params := make(map[string]interface{})
+	var arr []interface{}
 	query := `SELECT
 		id,
 		project_id,
@@ -156,23 +147,17 @@ func (r *sessionRepo) GetList(ctx context.Context, queryParam *pb.GetSessionList
 	}
 
 	cQ := `SELECT count(1) FROM "session"` + filter
-	row, err := r.db.NamedQueryContext(ctx, cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQueryContext(ctx, q, params)
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -230,15 +215,13 @@ func (r *sessionRepo) Update(ctx context.Context, entity *pb.UpdateSessionReques
 		"expires_at":         entity.ExpiresAt,
 	}
 
-	result, err := r.db.NamedExecContext(ctx, query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -246,15 +229,12 @@ func (r *sessionRepo) Update(ctx context.Context, entity *pb.UpdateSessionReques
 func (r *sessionRepo) Delete(ctx context.Context, pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "session" WHERE id = $1`
 
-	result, err := r.db.ExecContext(ctx, query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -262,15 +242,12 @@ func (r *sessionRepo) Delete(ctx context.Context, pKey *pb.SessionPrimaryKey) (r
 func (r *sessionRepo) DeleteExpiredUserSessions(ctx context.Context, userID string) (rowsAffected int64, err error) {
 	query := `DELETE FROM "session" WHERE user_id = $1 AND expires_at < $2`
 
-	result, err := r.db.ExecContext(ctx, query, userID, time.Now().Format("2006-01-02 15:04:05"))
+	result, err := r.db.Exec(ctx, query, userID, time.Now().Format("2006-01-02 15:04:05"))
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
@@ -294,7 +271,7 @@ func (r *sessionRepo) GetSessionListByUserID(ctx context.Context, userID string)
 		"session"
 	WHERE user_id = $1`
 
-	rows, err := r.db.QueryContext(ctx, query, userID)
+	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
 		return res, err
 	}

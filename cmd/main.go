@@ -35,16 +35,18 @@ func main() {
 	defer logger.Cleanup(log)
 
 	pgStore, err := postgres.NewPostgres(fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		cfg.PostgresHost,
-		cfg.PostgresPort,
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.PostgresUser,
 		cfg.PostgresPassword,
+		cfg.PostgresHost,
+		cfg.PostgresPort,
 		cfg.PostgresDatabase,
 	), cfg)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("%+v\n\n", cfg)
 
 	svcs, err := client.NewGrpcClients(cfg)
 	if err != nil {
