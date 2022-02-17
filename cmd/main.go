@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"upm/udevs_go_auth_service/api"
 	"upm/udevs_go_auth_service/api/handlers"
@@ -44,8 +45,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Printf("%+v\n\n", cfg)
 
 	svcs, err := client.NewGrpcClients(cfg)
 	if err != nil {

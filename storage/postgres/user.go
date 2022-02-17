@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/lib/pq"
 )
 
 type userRepo struct {
@@ -150,7 +151,7 @@ func (r *userRepo) GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyLis
 	WHERE
 		id = ANY($1)`
 
-	rows, err := r.db.QueryContext(ctx, query, pq.Array(pKeys.Ids))
+	rows, err := r.db.Query(ctx, query, pq.Array(pKeys.Ids))
 	if err != nil {
 		return res, err
 	}
