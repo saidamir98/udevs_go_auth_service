@@ -1,24 +1,26 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type permissionRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewPermissionRepo(db *sqlx.DB) storage.PermissionRepoI {
+func NewPermissionRepo(db *pgxpool.Pool) storage.PermissionRepoI {
 	return &permissionRepo{
 		db: db,
 	}
 }
 
-func (r *permissionRepo) Create(entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error) {
+func (r *permissionRepo) Create(ctx context.Context, entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error) {
 	query := `INSERT INTO "permission" (
 		id,
 		client_platform_id,
@@ -46,7 +48,7 @@ func (r *permissionRepo) Create(entity *pb.CreatePermissionRequest) (pKey *pb.Pe
 		nullStr = &entity.ParentId
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ClientPlatformId,
 		nullStr,
@@ -60,8 +62,9 @@ func (r *permissionRepo) Create(entity *pb.CreatePermissionRequest) (pKey *pb.Pe
 	return pKey, err
 }
 
-func (r *permissionRepo) GetByPK(pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error) {
+func (r *permissionRepo) GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error) {
 	res = &pb.Permission{}
+	var nullableStr *string
 	query := `SELECT
 		id,
 		client_platform_id,
@@ -72,36 +75,26 @@ func (r *permissionRepo) GetByPK(pKey *pb.PermissionPrimaryKey) (res *pb.Permiss
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ClientPlatformId,
+		&nullableStr,
+		&res.Name,
+	)
+	if nullableStr != nil {
+		res.ParentId = *nullableStr
+	}
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		var nullableStr *string
-		err = row.Scan(
-			&res.Id,
-			&res.ClientPlatformId,
-			&nullableStr,
-			&res.Name,
-		)
-		if nullableStr != nil {
-			res.ParentId = *nullableStr
-		}
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
 }
 
-func (r *permissionRepo) GetList(queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error) {
+func (r *permissionRepo) GetList(ctx context.Context, queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error) {
 	res = &pb.GetPermissionListResponse{}
 	params := make(map[string]interface{})
+	var arr []interface{}
 	query := `SELECT
 		id,
 		client_platform_id,
@@ -131,23 +124,18 @@ func (r *permissionRepo) GetList(queryParam *pb.GetPermissionListRequest) (res *
 	}
 
 	cQ := `SELECT count(1) FROM "permission"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -175,7 +163,7 @@ func (r *permissionRepo) GetList(queryParam *pb.GetPermissionListRequest) (res *
 	return res, nil
 }
 
-func (r *permissionRepo) Update(entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error) {
+func (r *permissionRepo) Update(ctx context.Context, entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error) {
 	if entity.Id == entity.ParentId {
 		err = storage.ErrorTheSameId
 		return
@@ -201,31 +189,26 @@ func (r *permissionRepo) Update(entity *pb.UpdatePermissionRequest) (rowsAffecte
 		"name":               entity.Name,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *permissionRepo) Delete(pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error) {
+func (r *permissionRepo) Delete(ctx context.Context, pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "permission" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }

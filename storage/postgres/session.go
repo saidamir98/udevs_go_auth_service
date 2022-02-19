@@ -1,25 +1,27 @@
 package postgres
 
 import (
+	"context"
 	"time"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type sessionRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewSessionRepo(db *sqlx.DB) storage.SessionRepoI {
+func NewSessionRepo(db *pgxpool.Pool) storage.SessionRepoI {
 	return &sessionRepo{
 		db: db,
 	}
 }
 
-func (r *sessionRepo) Create(entity *pb.CreateSessionRequest) (pKey *pb.SessionPrimaryKey, err error) {
+func (r *sessionRepo) Create(ctx context.Context, entity *pb.CreateSessionRequest) (pKey *pb.SessionPrimaryKey, err error) {
 	query := `INSERT INTO "session" (
 		id,
 		project_id,
@@ -47,7 +49,7 @@ func (r *sessionRepo) Create(entity *pb.CreateSessionRequest) (pKey *pb.SessionP
 		return pKey, err
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.ClientPlatformId,
@@ -66,7 +68,7 @@ func (r *sessionRepo) Create(entity *pb.CreateSessionRequest) (pKey *pb.SessionP
 	return pKey, err
 }
 
-func (r *sessionRepo) GetByPK(pKey *pb.SessionPrimaryKey) (res *pb.Session, err error) {
+func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (res *pb.Session, err error) {
 	res = &pb.Session{}
 	query := `SELECT
 		id,
@@ -85,40 +87,30 @@ func (r *sessionRepo) GetByPK(pKey *pb.SessionPrimaryKey) (res *pb.Session, err 
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&res.UserId,
+		&res.RoleId,
+		&res.Ip,
+		&res.Data,
+		&res.ExpiresAt,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&res.UserId,
-			&res.RoleId,
-			&res.Ip,
-			&res.Data,
-			&res.ExpiresAt,
-			&res.CreatedAt,
-			&res.UpdatedAt,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
 }
 
-func (r *sessionRepo) GetList(queryParam *pb.GetSessionListRequest) (res *pb.GetSessionListResponse, err error) {
+func (r *sessionRepo) GetList(ctx context.Context, queryParam *pb.GetSessionListRequest) (res *pb.GetSessionListResponse, err error) {
 	res = &pb.GetSessionListResponse{}
 	params := make(map[string]interface{})
+	var arr []interface{}
 	query := `SELECT
 		id,
 		project_id,
@@ -155,23 +147,17 @@ func (r *sessionRepo) GetList(queryParam *pb.GetSessionListRequest) (res *pb.Get
 	}
 
 	cQ := `SELECT count(1) FROM "session"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -203,7 +189,7 @@ func (r *sessionRepo) GetList(queryParam *pb.GetSessionListRequest) (res *pb.Get
 	return res, nil
 }
 
-func (r *sessionRepo) Update(entity *pb.UpdateSessionRequest) (rowsAffected int64, err error) {
+func (r *sessionRepo) Update(ctx context.Context, entity *pb.UpdateSessionRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "session" SET
 		project_id = :project_id,
 		client_platform_id = :client_platform_id,
@@ -229,52 +215,44 @@ func (r *sessionRepo) Update(entity *pb.UpdateSessionRequest) (rowsAffected int6
 		"expires_at":         entity.ExpiresAt,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *sessionRepo) Delete(pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error) {
+func (r *sessionRepo) Delete(ctx context.Context, pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "session" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *sessionRepo) DeleteExpiredUserSessions(userID string) (rowsAffected int64, err error) {
+func (r *sessionRepo) DeleteExpiredUserSessions(ctx context.Context, userID string) (rowsAffected int64, err error) {
 	query := `DELETE FROM "session" WHERE user_id = $1 AND expires_at < $2`
 
-	result, err := r.db.Exec(query, userID, time.Now().Format("2006-01-02 15:04:05"))
+	result, err := r.db.Exec(ctx, query, userID, time.Now().Format("2006-01-02 15:04:05"))
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *sessionRepo) GetSessionListByUserID(userID string) (res *pb.GetSessionListResponse, err error) {
+func (r *sessionRepo) GetSessionListByUserID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error) {
 	res = &pb.GetSessionListResponse{}
 
 	query := `SELECT
@@ -293,7 +271,7 @@ func (r *sessionRepo) GetSessionListByUserID(userID string) (res *pb.GetSessionL
 		"session"
 	WHERE user_id = $1`
 
-	rows, err := r.db.Query(query, userID)
+	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
 		return res, err
 	}

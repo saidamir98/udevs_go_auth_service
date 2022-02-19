@@ -1,24 +1,26 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type clientRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewClientRepo(db *sqlx.DB) storage.ClientRepoI {
+func NewClientRepo(db *pgxpool.Pool) storage.ClientRepoI {
 	return &clientRepo{
 		db: db,
 	}
 }
 
-func (r *clientRepo) Add(projectID string, entity *pb.AddClientRequest) (err error) {
+func (r *clientRepo) Add(ctx context.Context, projectID string, entity *pb.AddClientRequest) (err error) {
 	query := `INSERT INTO "client" (
 		project_id,
 		client_platform_id,
@@ -31,7 +33,7 @@ func (r *clientRepo) Add(projectID string, entity *pb.AddClientRequest) (err err
 		$4
 	)`
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.Exec(ctx, query,
 		projectID,
 		entity.ClientPlatformId,
 		entity.ClientTypeId,
@@ -41,8 +43,9 @@ func (r *clientRepo) Add(projectID string, entity *pb.AddClientRequest) (err err
 	return err
 }
 
-func (r *clientRepo) GetByPK(pKey *pb.ClientPrimaryKey) (res *pb.Client, err error) {
+func (r *clientRepo) GetByPK(ctx context.Context, pKey *pb.ClientPrimaryKey) (res *pb.Client, err error) {
 	res = &pb.Client{}
+	var loginStrategy string
 	query := `SELECT
 		project_id,
 		client_platform_id,
@@ -53,35 +56,23 @@ func (r *clientRepo) GetByPK(pKey *pb.ClientPrimaryKey) (res *pb.Client, err err
 	WHERE
 		client_platform_id = $1 AND client_type_id = $2`
 
-	row, err := r.db.Query(query, pKey.ClientPlatformId, pKey.ClientTypeId)
+	err = r.db.QueryRow(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId).Scan(
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&loginStrategy,
+	)
+
+	res.LoginStrategy = pb.LoginStrategies(pb.LoginStrategies_value[loginStrategy])
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		var loginStrategy string
-
-		err = row.Scan(
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&loginStrategy,
-		)
-
-		res.LoginStrategy = pb.LoginStrategies(pb.LoginStrategies_value[loginStrategy])
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
 }
 
-func (r *clientRepo) Update(entity *pb.UpdateClientRequest) (rowsAffected int64, err error) {
+func (r *clientRepo) Update(ctx context.Context, entity *pb.UpdateClientRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "client" SET
 		login_strategy = :login_strategy,
 		updated_at = now()
@@ -94,38 +85,34 @@ func (r *clientRepo) Update(entity *pb.UpdateClientRequest) (rowsAffected int64,
 		"login_strategy":     entity.LoginStrategy.String(),
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *clientRepo) Remove(pKey *pb.ClientPrimaryKey) (rowsAffected int64, err error) {
+func (r *clientRepo) Remove(ctx context.Context, pKey *pb.ClientPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "client" WHERE client_platform_id = $1 AND client_type_id = $2`
 
-	result, err := r.db.Exec(query, pKey.ClientPlatformId, pKey.ClientTypeId)
+	result, err := r.db.Exec(ctx, query, pKey.ClientPlatformId, pKey.ClientTypeId)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *clientRepo) GetList(queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error) {
+func (r *clientRepo) GetList(ctx context.Context, queryParam *pb.GetClientListRequest) (res *pb.GetClientListResponse, err error) {
 	res = &pb.GetClientListResponse{}
 	params := make(map[string]interface{})
+	var arr []interface{}
 	query := `SELECT
 		project_id,
 		client_platform_id,
@@ -160,23 +147,18 @@ func (r *clientRepo) GetList(queryParam *pb.GetClientListRequest) (res *pb.GetCl
 	}
 
 	cQ := `SELECT count(1) FROM "client"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -201,7 +183,7 @@ func (r *clientRepo) GetList(queryParam *pb.GetClientListRequest) (res *pb.GetCl
 	return res, nil
 }
 
-func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClientMatrixResponse, err error) {
+func (r *clientRepo) GetMatrix(ctx context.Context, req *pb.GetClientMatrixRequest) (res *pb.GetClientMatrixResponse, err error) {
 	if !util.IsValidUUID(req.ProjectId) {
 		return res, storage.ErrorProjectId
 	}
@@ -217,7 +199,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 	WHERE
 		project_id = $1`
 
-	clientPlatformRows, err := r.db.Query(queryClientPlatform, req.ProjectId)
+	clientPlatformRows, err := r.db.Query(ctx, queryClientPlatform, req.ProjectId)
 	if err != nil {
 		return res, err
 	}
@@ -250,7 +232,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 	WHERE
 		project_id = $1`
 
-	clientTypeRows, err := r.db.Query(queryClientType, req.ProjectId)
+	clientTypeRows, err := r.db.Query(ctx, queryClientType, req.ProjectId)
 	if err != nil {
 		return res, err
 	}
@@ -284,7 +266,7 @@ func (r *clientRepo) GetMatrix(req *pb.GetClientMatrixRequest) (res *pb.GetClien
 	WHERE
 		project_id = $1`
 
-	clientRows, err := r.db.Query(queryClient, req.ProjectId)
+	clientRows, err := r.db.Query(ctx, queryClient, req.ProjectId)
 	if err != nil {
 		return res, err
 	}

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"upm/udevs_go_auth_service/api/http"
 
 	"upm/udevs_go_auth_service/genproto/settings_service"
@@ -33,7 +32,7 @@ func (h *Handler) CreatePosition(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().Create(
-		context.Background(),
+		c.Request.Context(),
 		&position,
 	)
 
@@ -73,7 +72,7 @@ func (h *Handler) GetPositionList(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().GetList(
-		context.Background(),
+		c.Request.Context(),
 		&settings_service.GetPositionListRequest{
 			Limit:  int32(limit),
 			Offset: int32(offset),
@@ -110,7 +109,7 @@ func (h *Handler) GetPositionByID(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().GetByID(
-		context.Background(),
+		c.Request.Context(),
 		&settings_service.PositionPrimaryKey{
 			Id: positionID,
 		},
@@ -146,7 +145,7 @@ func (h *Handler) UpdatePosition(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().Update(
-		context.Background(),
+		c.Request.Context(),
 		&position,
 	)
 
@@ -179,7 +178,7 @@ func (h *Handler) DeletePosition(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().Delete(
-		context.Background(),
+		c.Request.Context(),
 		&settings_service.PositionPrimaryKey{
 			Id: positionID,
 		},
@@ -215,7 +214,7 @@ func (h *Handler) AddLevelItem(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().AddLevelItem(
-		context.Background(),
+		c.Request.Context(),
 		&levelItem,
 	)
 
@@ -249,7 +248,7 @@ func (h *Handler) UpdateLevelItem(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().UpdateLevelItem(
-		context.Background(),
+		c.Request.Context(),
 		&levelItem,
 	)
 
@@ -288,7 +287,7 @@ func (h *Handler) RemoveLevelItem(c *gin.Context) {
 	}
 
 	resp, err := h.services.PositionService().RemoveLevelItem(
-		context.Background(),
+		c.Request.Context(),
 		&settings_service.RemoveLevelItemRequest{
 			Id:         levelID,
 			PositionId: positionID,
