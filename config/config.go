@@ -31,6 +31,8 @@ type Config struct {
 	PostgresPassword string
 	PostgresDatabase string
 
+	PostgresMaxConnections int32
+
 	DefaultOffset string
 	DefaultLimit  string
 
@@ -44,8 +46,6 @@ type Config struct {
 
 	AuthServiceHost string
 	AuthGRPCPort    string
-
-	PostgresMaxConnections int
 }
 
 // Load ...
@@ -69,6 +69,8 @@ func Load() Config {
 	config.PostgresPassword = cast.ToString(getOrReturnDefaultValue("POSTGRES_PASSWORD", "your_db_password"))
 	config.PostgresDatabase = cast.ToString(getOrReturnDefaultValue("POSTGRES_DATABASE", config.ServiceName))
 
+	config.PostgresMaxConnections = cast.ToInt32(getOrReturnDefaultValue("POSTGRES_MAX_CONNECTIONS", 30))
+
 	config.DefaultOffset = cast.ToString(getOrReturnDefaultValue("DEFAULT_OFFSET", "0"))
 	config.DefaultLimit = cast.ToString(getOrReturnDefaultValue("DEFAULT_LIMIT", "10"))
 
@@ -82,8 +84,6 @@ func Load() Config {
 
 	config.AuthServiceHost = cast.ToString(getOrReturnDefaultValue("AUTH_SERVICE_HOST", "0.0.0.0"))
 	config.AuthGRPCPort = cast.ToString(getOrReturnDefaultValue("AUTH_GRPC_PORT", ":9102"))
-
-	config.PostgresMaxConnections = cast.ToInt(getOrReturnDefaultValue("POSTGRES_MAX_CONNECTIONS", 5))
 
 	return config
 }

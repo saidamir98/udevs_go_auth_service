@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"upm/udevs_go_auth_service/config"
 	"upm/udevs_go_auth_service/storage"
 
@@ -26,21 +27,33 @@ type Store struct {
 	session         storage.SessionRepoI
 }
 
-func NewPostgres(psqlConnString string, cfg config.Config) (storage.StorageI, error) {
-	// First set up the pgx connection pool
-	config, err := pgxpool.ParseConfig(psqlConnString)
+func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, error) {
+	config, err := pgxpool.ParseConfig(fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.PostgresUser,
+		cfg.PostgresPassword,
+		cfg.PostgresHost,
+		cfg.PostgresPort,
+		cfg.PostgresDatabase,
+	))
 	if err != nil {
 		return nil, err
 	}
 
-	config.AfterConnect = nil
-	config.MaxConns = int32(cfg.PostgresMaxConnections)
+	config.MaxConns = cfg.PostgresMaxConnections
 
-	pool, err := pgxpool.ConnectConfig(context.Background(), config)
+	pool, err := pgxpool.ConnectConfig(ctx, config)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Store{
 		db: pool,
 	}, err
+}
+
+func (s *Store) CloseDB() {
+	s.db.Close()
 }
 
 func (s *Store) ClientPlatform() storage.ClientPlatformRepoI {
