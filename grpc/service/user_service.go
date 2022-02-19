@@ -41,20 +41,20 @@ func (s *userService) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	}
 	req.Password = hashedPassword
 
-	pKey, err := s.strg.User().Create(req)
+	pKey, err := s.strg.User().Create(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!CreateUser--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	return s.strg.User().GetByPK(pKey)
+	return s.strg.User().GetByPK(ctx, pKey)
 }
 
 func (s *userService) GetUserByID(ctx context.Context, req *pb.UserPrimaryKey) (*pb.User, error) {
 	s.log.Info("---GetUserByID--->", logger.Any("req", req))
 
-	res, err := s.strg.User().GetByPK(req)
+	res, err := s.strg.User().GetByPK(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!GetUserByID--->", logger.Error(err))
@@ -67,7 +67,7 @@ func (s *userService) GetUserByID(ctx context.Context, req *pb.UserPrimaryKey) (
 func (s *userService) GetUserListByIDs(ctx context.Context, req *pb.UserPrimaryKeyList) (*pb.GetUserListResponse, error) {
 	s.log.Info("---GetUserListByIDs--->", logger.Any("req", req))
 
-	res, err := s.strg.User().GetListByPKs(req)
+	res, err := s.strg.User().GetListByPKs(ctx, req)
 	if err != nil {
 		s.log.Error("!!!GetUserListByIDs--->", logger.Error(err))
 		return nil, status.Error(codes.NotFound, err.Error())
@@ -79,7 +79,7 @@ func (s *userService) GetUserListByIDs(ctx context.Context, req *pb.UserPrimaryK
 func (s *userService) GetUserList(ctx context.Context, req *pb.GetUserListRequest) (*pb.GetUserListResponse, error) {
 	s.log.Info("---GetUserList--->", logger.Any("req", req))
 
-	res, err := s.strg.User().GetList(req)
+	res, err := s.strg.User().GetList(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!GetUserList--->", logger.Error(err))
@@ -92,7 +92,7 @@ func (s *userService) GetUserList(ctx context.Context, req *pb.GetUserListReques
 func (s *userService) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.User, error) {
 	s.log.Info("---UpdateUser--->", logger.Any("req", req))
 
-	rowsAffected, err := s.strg.User().Update(req)
+	rowsAffected, err := s.strg.User().Update(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!UpdateUser--->", logger.Error(err))
@@ -103,7 +103,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
 	}
 
-	res, err := s.strg.User().GetByPK(&pb.UserPrimaryKey{Id: req.Id})
+	res, err := s.strg.User().GetByPK(ctx, &pb.UserPrimaryKey{Id: req.Id})
 	if err != nil {
 		s.log.Error("!!!UpdateUser--->", logger.Error(err))
 		return nil, status.Error(codes.NotFound, err.Error())
@@ -117,7 +117,7 @@ func (s *userService) DeleteUser(ctx context.Context, req *pb.UserPrimaryKey) (*
 
 	res := &emptypb.Empty{}
 
-	rowsAffected, err := s.strg.User().Delete(req)
+	rowsAffected, err := s.strg.User().Delete(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!DeleteUser--->", logger.Error(err))
@@ -134,26 +134,26 @@ func (s *userService) DeleteUser(ctx context.Context, req *pb.UserPrimaryKey) (*
 func (s *userService) AddUserRelation(ctx context.Context, req *pb.AddUserRelationRequest) (*pb.UserRelation, error) {
 	s.log.Info("---AddUserRelation--->", logger.Any("req", req))
 
-	pKey, err := s.strg.UserRelation().Add(req)
+	pKey, err := s.strg.UserRelation().Add(ctx, req)
 	if err != nil {
 		s.log.Error("!!!AddUserRelation--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	return s.strg.UserRelation().GetByPK(pKey)
+	return s.strg.UserRelation().GetByPK(ctx, pKey)
 }
 
 func (s *userService) RemoveUserRelation(ctx context.Context, req *pb.UserRelationPrimaryKey) (*pb.UserRelation, error) {
 	s.log.Info("---RemoveUserRelation--->", logger.Any("req", req))
 
-	res, err := s.strg.UserRelation().GetByPK(req)
+	res, err := s.strg.UserRelation().GetByPK(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!GetUserRelationPlatformByID--->", logger.Error(err))
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	rowsAffected, err := s.strg.UserRelation().Remove(req)
+	rowsAffected, err := s.strg.UserRelation().Remove(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!RemoveUserRelation--->", logger.Error(err))
@@ -170,12 +170,12 @@ func (s *userService) RemoveUserRelation(ctx context.Context, req *pb.UserRelati
 func (s *userService) UpsertUserInfo(ctx context.Context, req *pb.UpsertUserInfoRequest) (*pb.UserInfo, error) {
 	s.log.Info("---UpsertUserInfo--->", logger.Any("req", req))
 
-	pKey, err := s.strg.UserInfo().Upsert(req)
+	pKey, err := s.strg.UserInfo().Upsert(ctx, req)
 
 	if err != nil {
 		s.log.Error("!!!UpsertUserInfo--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	return s.strg.UserInfo().GetByPK(pKey)
+	return s.strg.UserInfo().GetByPK(ctx, pKey)
 }

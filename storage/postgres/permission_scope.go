@@ -1,24 +1,25 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type permissionScopeRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewPermissionScopeRepo(db *sqlx.DB) storage.PermissionScopeRepoI {
+func NewPermissionScopeRepo(db *pgxpool.Pool) storage.PermissionScopeRepoI {
 	return &permissionScopeRepo{
 		db: db,
 	}
 }
 
-func (r *permissionScopeRepo) Add(entity *pb.AddPermissionScopeRequest) (pKey *pb.PermissionScopePrimaryKey, err error) {
+func (r *permissionScopeRepo) Add(ctx context.Context, entity *pb.AddPermissionScopeRequest) (pKey *pb.PermissionScopePrimaryKey, err error) {
 	query := `INSERT INTO "permission_scope" (
 		permission_id,
 		client_platform_id,
@@ -31,7 +32,7 @@ func (r *permissionScopeRepo) Add(entity *pb.AddPermissionScopeRequest) (pKey *p
 		$4
 	)`
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.Exec(ctx, query,
 		entity.PermissionId,
 		entity.ClientPlatformId,
 		entity.Path,
@@ -48,7 +49,7 @@ func (r *permissionScopeRepo) Add(entity *pb.AddPermissionScopeRequest) (pKey *p
 	return pKey, err
 }
 
-func (r *permissionScopeRepo) GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error) {
+func (r *permissionScopeRepo) GetByPK(ctx context.Context, pKey *pb.PermissionScopePrimaryKey) (res *pb.PermissionScope, err error) {
 	res = &pb.PermissionScope{}
 	query := `SELECT
 		permission_id,
@@ -60,50 +61,39 @@ func (r *permissionScopeRepo) GetByPK(pKey *pb.PermissionScopePrimaryKey) (res *
 	WHERE
 		permission_id = $1 AND client_platform_id = $2 AND path = $3 AND method = $4`
 
-	row, err := r.db.Query(query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method)
+	err = r.db.QueryRow(ctx, query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method).Scan(
+		&res.PermissionId,
+		&res.ClientPlatformId,
+		&res.Path,
+		&res.Method,
+	)
+
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.PermissionId,
-			&res.ClientPlatformId,
-			&res.Path,
-			&res.Method,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
 }
 
-func (r *permissionScopeRepo) Remove(pKey *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error) {
+func (r *permissionScopeRepo) Remove(ctx context.Context, pKey *pb.PermissionScopePrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM
 		"permission_scope"
 	WHERE
 		permission_id = $1 AND client_platform_id = $2 AND path = $3 AND method = $4`
 
-	result, err := r.db.Exec(query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method)
+	result, err := r.db.Exec(ctx, query, pKey.PermissionId, pKey.ClientPlatformId, pKey.Path, pKey.Method)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *permissionScopeRepo) HasAccess(roleID, clientPlatformID, path, method string) (hasAccess bool, err error) {
+func (r *permissionScopeRepo) HasAccess(ctx context.Context, roleID, clientPlatformID, path, method string) (hasAccess bool, err error) {
+	var count int32
+
 	query := `SELECT COUNT(*) FROM
 	(SELECT * FROM "role_permission" 
 	WHERE role_id = $1
@@ -113,23 +103,11 @@ func (r *permissionScopeRepo) HasAccess(roleID, clientPlatformID, path, method s
 	WHERE client_platform_id = $2 AND path = $3 AND method = $4) AS ps
 	ON rp.permission_id = ps.permission_id`
 
-	row, err := r.db.Query(query, roleID, clientPlatformID, path, method)
+	err = r.db.QueryRow(ctx, query, roleID, clientPlatformID, path, method).Scan(
+		&count,
+	)
 	if err != nil {
 		return hasAccess, err
-	}
-	defer row.Close()
-
-	var count int32
-	if row.Next() {
-		err = row.Scan(
-			&count,
-		)
-
-		if err != nil {
-			return hasAccess, err
-		}
-	} else {
-		return hasAccess, storage.ErrorNotFound
 	}
 
 	fmt.Println(count)

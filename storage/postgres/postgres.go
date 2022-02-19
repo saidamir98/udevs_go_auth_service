@@ -1,14 +1,16 @@
 package postgres
 
 import (
+	"context"
+	"fmt"
+	"upm/udevs_go_auth_service/config"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type Store struct {
-	db              *sqlx.DB
+	db              *pgxpool.Pool
 	clientPlatform  storage.ClientPlatformRepoI
 	clientType      storage.ClientTypeRepoI
 	client          storage.ClientRepoI
@@ -25,16 +27,33 @@ type Store struct {
 	session         storage.SessionRepoI
 }
 
-func NewPostgres(psqlConnString string) (storage.StorageI, error) {
-	db, err := sqlx.Connect("postgres", psqlConnString)
+func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, error) {
+	config, err := pgxpool.ParseConfig(fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.PostgresUser,
+		cfg.PostgresPassword,
+		cfg.PostgresHost,
+		cfg.PostgresPort,
+		cfg.PostgresDatabase,
+	))
+	if err != nil {
+		return nil, err
+	}
 
+	config.MaxConns = cfg.PostgresMaxConnections
+
+	pool, err := pgxpool.ConnectConfig(ctx, config)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Store{
-		db: db,
-	}, nil
+		db: pool,
+	}, err
+}
+
+func (s *Store) CloseDB() {
+	s.db.Close()
 }
 
 func (s *Store) ClientPlatform() storage.ClientPlatformRepoI {

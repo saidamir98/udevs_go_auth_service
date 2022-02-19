@@ -1,23 +1,24 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/storage"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type userRelationRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewUserRelationRepo(db *sqlx.DB) storage.UserRelationRepoI {
+func NewUserRelationRepo(db *pgxpool.Pool) storage.UserRelationRepoI {
 	return &userRelationRepo{
 		db: db,
 	}
 }
 
-func (r *userRelationRepo) Add(entity *pb.AddUserRelationRequest) (pKey *pb.UserRelationPrimaryKey, err error) {
+func (r *userRelationRepo) Add(ctx context.Context, entity *pb.AddUserRelationRequest) (pKey *pb.UserRelationPrimaryKey, err error) {
 	query := `INSERT INTO "user_relation" (
 		user_id,
 		relation_id
@@ -26,7 +27,7 @@ func (r *userRelationRepo) Add(entity *pb.AddUserRelationRequest) (pKey *pb.User
 		$2
 	)`
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.Exec(ctx, query,
 		entity.UserId,
 		entity.RelationId,
 	)
@@ -39,7 +40,7 @@ func (r *userRelationRepo) Add(entity *pb.AddUserRelationRequest) (pKey *pb.User
 	return pKey, err
 }
 
-func (r *userRelationRepo) GetByPK(pKey *pb.UserRelationPrimaryKey) (res *pb.UserRelation, err error) {
+func (r *userRelationRepo) GetByPK(ctx context.Context, pKey *pb.UserRelationPrimaryKey) (res *pb.UserRelation, err error) {
 	res = &pb.UserRelation{}
 	query := `SELECT
 		user_id,
@@ -49,43 +50,29 @@ func (r *userRelationRepo) GetByPK(pKey *pb.UserRelationPrimaryKey) (res *pb.Use
 	WHERE
 		user_id = $1 AND relation_id = $2`
 
-	row, err := r.db.Query(query, pKey.UserId, pKey.RelationId)
+	err = r.db.QueryRow(ctx, query, pKey.UserId, pKey.RelationId).Scan(
+		&res.UserId,
+		&res.RelationId,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.UserId,
-			&res.RelationId,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
 }
 
-func (r *userRelationRepo) Remove(pKey *pb.UserRelationPrimaryKey) (rowsAffected int64, err error) {
+func (r *userRelationRepo) Remove(ctx context.Context, pKey *pb.UserRelationPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM
 		"user_relation"
 	WHERE
 		user_id = $1 AND relation_id = $2`
 
-	result, err := r.db.Exec(query, pKey.UserId, pKey.RelationId)
+	result, err := r.db.Exec(ctx, query, pKey.UserId, pKey.RelationId)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }

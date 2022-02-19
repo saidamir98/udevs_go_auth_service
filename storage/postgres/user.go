@@ -1,26 +1,28 @@
 package postgres
 
 import (
+	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/lib/pq"
 )
 
 type userRepo struct {
-	db *sqlx.DB
+	db *pgxpool.Pool
 }
 
-func NewUserRepo(db *sqlx.DB) storage.UserRepoI {
+func NewUserRepo(db *pgxpool.Pool) storage.UserRepoI {
 	return &userRepo{
 		db: db,
 	}
 }
 
-func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error) {
+func (r *userRepo) Create(ctx context.Context, entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey, err error) {
 	query := `INSERT INTO "user" (
 		id,
 		project_id,
@@ -56,7 +58,7 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 		return pKey, err
 	}
 
-	_, err = r.db.Exec(query,
+	_, err = r.db.Exec(ctx, query,
 		uuid,
 		entity.ProjectId,
 		entity.ClientPlatformId,
@@ -79,7 +81,7 @@ func (r *userRepo) Create(entity *pb.CreateUserRequest) (pKey *pb.UserPrimaryKey
 	return pKey, err
 }
 
-func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
+func (r *userRepo) GetByPK(ctx context.Context, pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 	res = &pb.User{}
 	query := `SELECT
 		id,
@@ -102,42 +104,31 @@ func (r *userRepo) GetByPK(pKey *pb.UserPrimaryKey) (res *pb.User, err error) {
 	WHERE
 		id = $1`
 
-	row, err := r.db.Query(query, pKey.Id)
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&res.RoleId,
+		&res.Name,
+		&res.PhotoUrl,
+		&res.Phone,
+		&res.Email,
+		&res.Login,
+		&res.Password,
+		&res.Active,
+		&res.ExpiresAt,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&res.RoleId,
-			&res.Name,
-			&res.PhotoUrl,
-			&res.Phone,
-			&res.Email,
-			&res.Login,
-			&res.Password,
-			&res.Active,
-			&res.ExpiresAt,
-			&res.CreatedAt,
-			&res.UpdatedAt,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil
 }
 
-func (r *userRepo) GetListByPKs(pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error) {
+func (r *userRepo) GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserListResponse, err error) {
 	res = &pb.GetUserListResponse{}
 	query := `SELECT
 		id,
@@ -160,7 +151,7 @@ func (r *userRepo) GetListByPKs(pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserLi
 	WHERE
 		id = ANY($1)`
 
-	rows, err := r.db.Query(query, pq.Array(pKeys.Ids))
+	rows, err := r.db.Query(ctx, query, pq.Array(pKeys.Ids))
 	if err != nil {
 		return res, err
 	}
@@ -196,9 +187,10 @@ func (r *userRepo) GetListByPKs(pKeys *pb.UserPrimaryKeyList) (res *pb.GetUserLi
 	return res, nil
 }
 
-func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
+func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListRequest) (res *pb.GetUserListResponse, err error) {
 	res = &pb.GetUserListResponse{}
 	params := make(map[string]interface{})
+	var arr []interface{}
 	query := `SELECT
 		id,
 		project_id,
@@ -249,23 +241,18 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 	}
 
 	cQ := `SELECT count(1) FROM "user"` + filter
-	row, err := r.db.NamedQuery(cQ, params)
+	cQ, arr = helper.ReplaceQueryParams(cQ, params)
+	err = r.db.QueryRow(ctx, cQ, arr...).Scan(
+		&res.Count,
+	)
 	if err != nil {
 		return res, err
 	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Count,
-		)
-		if err != nil {
-			return res, err
-		}
-	}
 
 	q := query + filter + order + arrangement + offset + limit
-	rows, err := r.db.NamedQuery(q, params)
+
+	q, arr = helper.ReplaceQueryParams(q, params)
+	rows, err := r.db.Query(ctx, q, arr...)
 	if err != nil {
 		return res, err
 	}
@@ -301,7 +288,7 @@ func (r *userRepo) GetList(queryParam *pb.GetUserListRequest) (res *pb.GetUserLi
 	return res, nil
 }
 
-func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err error) {
+func (r *userRepo) Update(ctx context.Context, entity *pb.UpdateUserRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "user" SET
 		project_id = :project_id,
 		client_platform_id = :client_platform_id,
@@ -333,36 +320,31 @@ func (r *userRepo) Update(entity *pb.UpdateUserRequest) (rowsAffected int64, err
 		"expires_at":         entity.ExpiresAt,
 	}
 
-	result, err := r.db.NamedExec(query, params)
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *userRepo) Delete(pKey *pb.UserPrimaryKey) (rowsAffected int64, err error) {
+func (r *userRepo) Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error) {
 	query := `DELETE FROM "user" WHERE id = $1`
 
-	result, err := r.db.Exec(query, pKey.Id)
+	result, err := r.db.Exec(ctx, query, pKey.Id)
 	if err != nil {
 		return 0, err
 	}
 
-	rowsAffected, err = result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
+	rowsAffected = result.RowsAffected()
 
 	return rowsAffected, err
 }
 
-func (r *userRepo) GetByUsername(username string) (res *pb.User, err error) {
+func (r *userRepo) GetByUsername(ctx context.Context, username string) (res *pb.User, err error) {
 	res = &pb.User{}
 
 	query := `SELECT
@@ -393,36 +375,25 @@ func (r *userRepo) GetByUsername(username string) (res *pb.User, err error) {
 		query = query + ` login = $1`
 	}
 
-	row, err := r.db.Query(query, username)
+	err = r.db.QueryRow(ctx, query, username).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&res.RoleId,
+		&res.Name,
+		&res.PhotoUrl,
+		&res.Phone,
+		&res.Email,
+		&res.Login,
+		&res.Password,
+		&res.Active,
+		&res.ExpiresAt,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
 	if err != nil {
 		return res, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		err = row.Scan(
-			&res.Id,
-			&res.ProjectId,
-			&res.ClientPlatformId,
-			&res.ClientTypeId,
-			&res.RoleId,
-			&res.Name,
-			&res.PhotoUrl,
-			&res.Phone,
-			&res.Email,
-			&res.Login,
-			&res.Password,
-			&res.Active,
-			&res.ExpiresAt,
-			&res.CreatedAt,
-			&res.UpdatedAt,
-		)
-
-		if err != nil {
-			return res, err
-		}
-	} else {
-		return res, storage.ErrorNotFound
 	}
 
 	return res, nil

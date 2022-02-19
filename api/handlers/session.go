@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"upm/udevs_go_auth_service/api/http"
 
 	"upm/udevs_go_auth_service/genproto/auth_service"
@@ -31,7 +30,7 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	resp, err := h.services.SessionService().Login(
-		context.Background(),
+		c.Request.Context(),
 		&login,
 	)
 
@@ -65,7 +64,7 @@ func (h *Handler) Logout(c *gin.Context) {
 	}
 
 	resp, err := h.services.SessionService().Logout(
-		context.Background(),
+		c.Request.Context(),
 		&logout,
 	)
 
@@ -99,7 +98,7 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 	}
 
 	resp, err := h.services.SessionService().RefreshToken(
-		context.Background(),
+		c.Request.Context(),
 		&user,
 	)
 
@@ -133,7 +132,7 @@ func (h *Handler) HasAccess(c *gin.Context) {
 	}
 
 	resp, err := h.services.SessionService().HasAccess(
-		context.Background(),
+		c.Request.Context(),
 		&login,
 	)
 
