@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
@@ -158,6 +159,13 @@ func (r *userRepo) GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyLis
 	defer rows.Close()
 
 	for rows.Next() {
+		var (
+			active    sql.NullInt32
+			expiresAt sql.NullString
+			createdAt sql.NullString
+			updatedAt sql.NullString
+		)
+
 		user := &pb.User{}
 		err = rows.Scan(
 			&user.Id,
@@ -171,14 +179,30 @@ func (r *userRepo) GetListByPKs(ctx context.Context, pKeys *pb.UserPrimaryKeyLis
 			&user.Email,
 			&user.Login,
 			&user.Password,
-			&user.Active,
-			&user.ExpiresAt,
-			&user.CreatedAt,
-			&user.UpdatedAt,
+			&active,
+			&expiresAt,
+			&createdAt,
+			&updatedAt,
 		)
 
 		if err != nil {
 			return res, err
+		}
+
+		if active.Valid {
+			user.Active = active.Int32
+		}
+
+		if expiresAt.Valid {
+			user.ExpiresAt = expiresAt.String
+		}
+
+		if createdAt.Valid {
+			user.CreatedAt = createdAt.String
+		}
+
+		if updatedAt.Valid {
+			user.UpdatedAt = updatedAt.String
 		}
 
 		res.Users = append(res.Users, user)
