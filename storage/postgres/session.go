@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"time"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
@@ -79,13 +80,19 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 		role_id,
 		ip,
 		data,
-		expires_at::varchar,
-		created_at::varchar,
-		updated_at::varchar
+		expires_at,
+		created_at,
+		updated_at
 	FROM
 		"session"
 	WHERE
 		id = $1`
+
+	var (
+		expiresAt sql.NullString
+		createdAt sql.NullString
+		updatedAt sql.NullString
+	)
 
 	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
 		&res.Id,
@@ -96,12 +103,27 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 		&res.RoleId,
 		&res.Ip,
 		&res.Data,
-		&res.ExpiresAt,
-		&res.CreatedAt,
-		&res.UpdatedAt,
+		// &res.ExpiresAt,
+		&expiresAt,
+		// &res.CreatedAt,
+		&createdAt,
+		// &res.UpdatedAt,
+		&updatedAt,
 	)
 	if err != nil {
 		return res, err
+	}
+
+	if expiresAt.Valid {
+		res.ExpiresAt = expiresAt.String
+	}
+
+	if expiresAt.Valid {
+		res.CreatedAt = createdAt.String
+	}
+
+	if expiresAt.Valid {
+		res.UpdatedAt = updatedAt.String
 	}
 
 	return res, nil
