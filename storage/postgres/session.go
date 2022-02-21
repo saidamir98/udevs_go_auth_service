@@ -79,9 +79,9 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 		role_id,
 		ip,
 		data,
-		expires_at,
-		created_at,
-		updated_at
+		expires_at::varchar,
+		created_at::varchar,
+		updated_at::varchar
 	FROM
 		"session"
 	WHERE
