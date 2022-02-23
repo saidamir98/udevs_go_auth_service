@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"time"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -38,10 +36,6 @@ type loggerImpl struct {
 	zap *zap.Logger
 }
 
-const (
-	customTimeFormat = time.RFC3339Nano
-)
-
 // NewLogger ...
 func NewLogger(namespace string, level string) LoggerI {
 	if level == "" {
@@ -49,7 +43,7 @@ func NewLogger(namespace string, level string) LoggerI {
 	}
 
 	logger := loggerImpl{
-		zap: newZapLogger(namespace, level, customTimeFormat),
+		zap: newZapLogger(namespace, level),
 	}
 
 	return &logger
