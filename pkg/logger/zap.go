@@ -2,13 +2,14 @@ package logger
 
 import (
 	"os"
-	"time"
 
+	"github.com/streamingfast/logging"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
-func newZapLogger(namespace, level, timeFormat string) *zap.Logger {
+func newZapLogger(namespace, level string) *zap.Logger {
 	globalLevel := parseLevel(level)
 
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
@@ -19,37 +20,27 @@ func newZapLogger(namespace, level, timeFormat string) *zap.Logger {
 		return lvl >= globalLevel && lvl < zapcore.ErrorLevel
 	})
 
-	consoleInfos := zapcore.Lock(os.Stdout)
+	logStdErrorWriter := zapcore.Lock(os.Stderr)
+	logStdInfoWriter := zapcore.Lock(os.Stdout)
 
-	consoleErrors := zapcore.Lock(os.Stderr)
-
-	// Configure console output.
-	encoderCfg := zap.NewProductionEncoderConfig()
-	if len(timeFormat) > 0 {
-		encoderCfg.EncodeTime = customTimeEncoder(timeFormat)
-	} else {
-		encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
-	}
-	consoleEncoder := zapcore.NewJSONEncoder(encoderCfg)
+	isTTY := terminal.IsTerminal(int(os.Stderr.Fd()))
 
 	core := zapcore.NewTee(
-		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
-		zapcore.NewCore(consoleEncoder, consoleInfos, lowPriority),
+		zapcore.NewCore(logging.NewEncoder(4, isTTY), logStdErrorWriter, highPriority),
+		zapcore.NewCore(logging.NewEncoder(4, isTTY), logStdInfoWriter, lowPriority),
 	)
 
-	logger := zap.New(core)
+	logger := zap.New(
+		core,
+		zap.AddCaller(), zap.AddCallerSkip(1),
+		// zap.AddStacktrace(globalLevel),
+	)
 
 	logger = logger.Named(namespace)
 
 	zap.RedirectStdLog(logger)
 
 	return logger
-}
-
-func customTimeEncoder(timeFormat string) func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	return func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-		enc.AppendString(t.Format(timeFormat))
-	}
 }
 
 func parseLevel(level string) zapcore.Level {

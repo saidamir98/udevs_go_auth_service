@@ -14,6 +14,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cast v1.4.1
+	github.com/streamingfast/logging v0.0.0-20220222131651-12c3943aac2e
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.3.3
 	github.com/swaggo/swag v1.7.6

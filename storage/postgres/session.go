@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
@@ -78,11 +79,11 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 		client_type_id,
 		user_id,
 		role_id,
-		ip,
+		TEXT(ip) AS ip,
 		data,
-		expires_at,
-		created_at,
-		updated_at
+		TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+		TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+		TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
 	FROM
 		"session"
 	WHERE
@@ -140,11 +141,11 @@ func (r *sessionRepo) GetList(ctx context.Context, queryParam *pb.GetSessionList
 		client_type_id,
 		user_id,
 		role_id,
-		ip,
+		TEXT(ip) AS ip,
 		data,
-		expires_at,
-		created_at,
-		updated_at
+		TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+		TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+		TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
 	FROM
 		"session"`
 	filter := " WHERE 1=1"
@@ -284,11 +285,11 @@ func (r *sessionRepo) GetSessionListByUserID(ctx context.Context, userID string)
 		client_type_id,
 		user_id,
 		role_id,
-		ip,
+		TEXT(ip) AS ip,
 		data,
-		expires_at,
-		created_at,
-		updated_at
+		TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+		TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+		TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
 	FROM
 		"session"
 	WHERE user_id = $1`
