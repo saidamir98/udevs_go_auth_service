@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
@@ -97,9 +98,9 @@ func (r *userRepo) GetByPK(ctx context.Context, pKey *pb.UserPrimaryKey) (res *p
 		login,
 		password,
 		active,
-		expires_at,
-		created_at,
-		updated_at
+		TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+		TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+		TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
 	FROM
 		"user"
 	WHERE
@@ -284,6 +285,13 @@ func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListReques
 
 	for rows.Next() {
 		obj := &pb.User{}
+		var (
+			active    sql.NullInt32
+			expiresAt sql.NullString
+			createdAt sql.NullString
+			updatedAt sql.NullString
+		)
+
 		err = rows.Scan(
 			&obj.Id,
 			&obj.ProjectId,
@@ -296,14 +304,30 @@ func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListReques
 			&obj.Email,
 			&obj.Login,
 			&obj.Password,
-			&obj.Active,
-			&obj.ExpiresAt,
-			&obj.CreatedAt,
-			&obj.UpdatedAt,
+			&active,
+			&expiresAt,
+			&createdAt,
+			&updatedAt,
 		)
 
 		if err != nil {
 			return res, err
+		}
+
+		if active.Valid {
+			obj.Active = active.Int32
+		}
+
+		if expiresAt.Valid {
+			obj.ExpiresAt = expiresAt.String
+		}
+
+		if createdAt.Valid {
+			obj.CreatedAt = createdAt.String
+		}
+
+		if updatedAt.Valid {
+			obj.UpdatedAt = updatedAt.String
 		}
 
 		res.Users = append(res.Users, obj)
@@ -384,9 +408,9 @@ func (r *userRepo) GetByUsername(ctx context.Context, username string) (res *pb.
 		login,
 		password,
 		active,
-		expires_at,
-		created_at,
-		updated_at
+		TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+		TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+		TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
 	FROM
 		"user"
 	WHERE`
