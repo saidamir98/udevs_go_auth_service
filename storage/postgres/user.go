@@ -61,7 +61,7 @@ func (r *userRepo) Create(ctx context.Context, entity *pb.CreateUserRequest) (pK
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ProjectId,
 		entity.ClientPlatformId,
 		entity.ClientTypeId,

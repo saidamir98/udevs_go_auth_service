@@ -49,7 +49,7 @@ func (r *permissionRepo) Create(ctx context.Context, entity *pb.CreatePermission
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ClientPlatformId,
 		nullStr,
 		entity.Name,

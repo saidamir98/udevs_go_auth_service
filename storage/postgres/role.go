@@ -37,7 +37,7 @@ func (r *roleRepo) Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ClientTypeId,
 		entity.Name,
 	)
