@@ -36,26 +36,26 @@ func main() {
 
 	pgStore, err := postgres.NewPostgres(context.Background(), cfg)
 	if err != nil {
-		panic(err)
+		log.Panic("postgres.NewPostgres", logger.Error(err))
 	}
 	defer pgStore.CloseDB()
 
 	svcs, err := client.NewGrpcClients(cfg)
 	if err != nil {
-		panic(err)
+		log.Panic("client.NewGrpcClients", logger.Error(err))
 	}
 
 	grpcServer := grpc.SetUpServer(cfg, log, pgStore, svcs)
 	go func() {
 		lis, err := net.Listen("tcp", cfg.AuthGRPCPort)
 		if err != nil {
-			panic(err)
+			log.Panic("net.Listen", logger.Error(err))
 		}
 
 		log.Info("GRPC: Server being started...", logger.String("port", cfg.AuthGRPCPort))
 
 		if err := grpcServer.Serve(lis); err != nil {
-			panic(err)
+			log.Panic("grpcServer.Serve", logger.Error(err))
 		}
 	}()
 
