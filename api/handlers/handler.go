@@ -28,7 +28,7 @@ func (h *Handler) handleResponse(c *gin.Context, status http.Status, data interf
 	switch code := status.Code; {
 	case code < 300:
 		h.log.Info(
-			"response",
+			"---Response--->",
 			logger.Int("code", status.Code),
 			logger.String("status", status.Status),
 			logger.Any("description", status.Description),
@@ -36,7 +36,7 @@ func (h *Handler) handleResponse(c *gin.Context, status http.Status, data interf
 		)
 	case code < 400:
 		h.log.Warn(
-			"response",
+			"!!!Response--->",
 			logger.Int("code", status.Code),
 			logger.String("status", status.Status),
 			logger.Any("description", status.Description),
@@ -44,7 +44,7 @@ func (h *Handler) handleResponse(c *gin.Context, status http.Status, data interf
 		)
 	default:
 		h.log.Error(
-			"response",
+			"!!!Response--->",
 			logger.Int("code", status.Code),
 			logger.String("status", status.Status),
 			logger.Any("description", status.Description),

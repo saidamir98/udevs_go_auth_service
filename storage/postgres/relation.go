@@ -41,7 +41,7 @@ func (r *relationRepo) Add(ctx context.Context, entity *pb.AddRelationRequest) (
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ClientTypeId,
 		entity.Type.String(),
 		entity.Name,

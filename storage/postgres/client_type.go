@@ -44,7 +44,7 @@ func (r *clientTypeRepo) Create(ctx context.Context, entity *pb.CreateClientType
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ProjectId,
 		entity.Name,
 		entity.ConfirmBy.String(),

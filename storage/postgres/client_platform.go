@@ -40,7 +40,7 @@ func (r *clientPlatformRepo) Create(ctx context.Context, entity *pb.CreateClient
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ProjectId,
 		entity.Name,
 		entity.Subdomain,

@@ -41,7 +41,7 @@ func (r *userInfoFieldRepo) Add(ctx context.Context, entity *pb.AddUserInfoField
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ClientTypeId,
 		entity.FieldName,
 		entity.FieldType,

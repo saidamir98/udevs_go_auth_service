@@ -52,7 +52,7 @@ func (r *sessionRepo) Create(ctx context.Context, entity *pb.CreateSessionReques
 	}
 
 	_, err = r.db.Exec(ctx, query,
-		uuid,
+		uuid.String(),
 		entity.ProjectId,
 		entity.ClientPlatformId,
 		entity.ClientTypeId,
