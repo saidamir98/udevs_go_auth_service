@@ -124,12 +124,15 @@ func (r *clientPlatformRepo) GetByPKDetailed(ctx context.Context, pKey *pb.Clien
 			name            sql.NullString
 			parentId        sql.NullString
 		)
-		permissionRows.Scan(
+		err = permissionRows.Scan(
 			&tempPersmission.Id,
 			&tempPersmission.ClientPlatformId,
 			&parentId,
 			&name,
 		)
+		if err != nil {
+			return res, err
+		}
 		tempPersmission.ParentId = parentId.String
 		tempPersmission.Name = name.String
 
@@ -153,12 +156,15 @@ func (r *clientPlatformRepo) GetByPKDetailed(ctx context.Context, pKey *pb.Clien
 
 	for scopeRows.Next() {
 		var tempScope pb.Scope
-		scopeRows.Scan(
+		err = scopeRows.Scan(
 			&tempScope.ClientPlatformId,
 			&tempScope.Path,
 			&tempScope.Method,
 			&tempScope.Requests,
 		)
+		if err != nil {
+			return res, err
+		}
 		res.Scopes = append(res.Scopes, &tempScope)
 	}
 
