@@ -57,6 +57,19 @@ func (s *clientService) GetClientPlatformByID(ctx context.Context, req *pb.Clien
 	return res, nil
 }
 
+func (s *clientService) GetClientPlatformByIDDetailed(ctx context.Context, req *pb.ClientPlatformPrimaryKey) (*pb.ClientPlatformDetailedResponse, error) {
+	s.log.Info("---GetClientPlatformByID--->", logger.Any("req", req))
+
+	res, err := s.strg.ClientPlatform().GetByPKDetailed(ctx, req)
+
+	if err != nil {
+		s.log.Error("!!!GetClientPlatformByID--->", logger.Error(err))
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	return res, nil
+}
+
 func (s *clientService) GetClientPlatformList(ctx context.Context, req *pb.GetClientPlatformListRequest) (*pb.GetClientPlatformListResponse, error) {
 	s.log.Info("---GetClientPlatformList--->", logger.Any("req", req))
 

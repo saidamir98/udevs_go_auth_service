@@ -9,6 +9,7 @@ import "google/protobuf/empty.proto";
 service ClientService {
     rpc CreateClientPlatform(CreateClientPlatformRequest) returns (ClientPlatform) {}
     rpc GetClientPlatformByID(ClientPlatformPrimaryKey) returns (ClientPlatform) {}
+    rpc GetClientPlatformByIDDetailed(ClientPlatformPrimaryKey) returns (ClientPlatformDetailedResponse) {}
     rpc GetClientPlatformList(GetClientPlatformListRequest) returns (GetClientPlatformListResponse) {}
     rpc UpdateClientPlatform(UpdateClientPlatformRequest) returns (ClientPlatform) {}
     rpc DeleteClientPlatform(ClientPlatformPrimaryKey) returns (google.protobuf.Empty) {}
@@ -33,6 +34,16 @@ service ClientService {
     rpc AddUserInfoField(AddUserInfoFieldRequest) returns (UserInfoField) {}
     rpc UpdateUserInfoField(UpdateUserInfoFieldRequest) returns (UserInfoField) {}
     rpc RemoveUserInfoField(UserInfoFieldPrimaryKey) returns (UserInfoField) {}
+}
+
+message ClientPlatformDetailedResponse {
+    string id = 1;
+    string project_id = 2;
+    string name = 3;
+    string subdomain = 4;
+    
+    repeated Permission permissions = 5;
+    repeated Scope scopes = 6;
 }
 
 message GetClientMatrixRequest {

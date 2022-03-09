@@ -508,6 +508,87 @@ var doc = `{
                 }
             }
         },
+        "/client-platform-detailed/{client-platform-id}": {
+            "get": {
+                "description": "Get ClientPlatform By ID Detailed",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ClientPlatform"
+                ],
+                "summary": "Get ClientPlatform By ID Detailed",
+                "operationId": "get_client_platform_detailed_by_id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "client-platform-id",
+                        "name": "client-platform-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ClientPlatformDetailedBody",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.ClientPlatformDetailedResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/client-platform/{client-platform-id}": {
             "get": {
                 "description": "Get ClientPlatform By ID",
@@ -4727,6 +4808,35 @@ var doc = `{
                 }
             }
         },
+        "auth_service.ClientPlatformDetailedResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Permission"
+                    }
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "scopes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Scope"
+                    }
+                },
+                "subdomain": {
+                    "type": "string"
+                }
+            }
+        },
         "auth_service.ClientPrimaryKey": {
             "type": "object",
             "properties": {
@@ -5106,6 +5216,23 @@ var doc = `{
                 },
                 "role_id": {
                     "type": "string"
+                }
+            }
+        },
+        "auth_service.Scope": {
+            "type": "object",
+            "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "requests": {
+                    "type": "integer"
                 }
             }
         },
@@ -5678,5 +5805,5 @@ func (s *s) ReadDoc() string {
 }
 
 func init() {
-	swag.Register("swagger", &s{})
+	swag.Register(swag.Name, &s{})
 }

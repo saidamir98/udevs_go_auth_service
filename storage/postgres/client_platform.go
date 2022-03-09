@@ -79,6 +79,84 @@ func (r *clientPlatformRepo) GetByPK(ctx context.Context, pKey *pb.ClientPlatfor
 	return res, nil
 }
 
+func (r *clientPlatformRepo) GetByPKDetailed(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (res *pb.ClientPlatformDetailedResponse, err error) {
+	res = &pb.ClientPlatformDetailedResponse{}
+	query := `SELECT
+	  id,
+	  project_id,
+	  name,
+	  subdomain
+	FROM
+	  "client_platform"
+	WHERE
+	  id = $1`
+
+	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.Name,
+		&res.Subdomain,
+	)
+
+	if err != nil {
+		return res, err
+	}
+
+	query = `SELECT
+	  id,
+	  client_platform_id,
+	  parent_id,
+	  name
+	FROM
+	  "permission"
+	WHERE
+	  client_platform_id = $1`
+
+	permissionRows, err := r.db.Query(ctx, query, pKey.Id)
+	if err != nil {
+		return res, nil
+	}
+	defer permissionRows.Close()
+	for permissionRows.Next() {
+		var tempPersmission pb.Permission
+		permissionRows.Scan(
+			&tempPersmission.Id,
+			&tempPersmission.ClientPlatformId,
+			&tempPersmission.ParentId,
+			&tempPersmission.Name,
+		)
+		res.Permissions = append(res.Permissions, &tempPersmission)
+	}
+
+	query = `SELECT
+	  client_platform_id,
+	  path,
+	  method,
+	  requests
+	FROM
+	  "scope"
+	WHERE client_platform_id = $1`
+
+	scopeRows, err := r.db.Query(ctx, query, pKey.Id)
+	if err != nil {
+		return res, nil
+	}
+	defer scopeRows.Close()
+
+	for scopeRows.Next() {
+		var tempScope pb.Scope
+		scopeRows.Scan(
+			&tempScope.ClientPlatformId,
+			&tempScope.Path,
+			&tempScope.Method,
+			&tempScope.Requests,
+		)
+		res.Scopes = append(res.Scopes, &tempScope)
+	}
+
+	return res, nil
+}
+
 func (r *clientPlatformRepo) GetList(ctx context.Context, queryParam *pb.GetClientPlatformListRequest) (res *pb.GetClientPlatformListResponse, err error) {
 	res = &pb.GetClientPlatformListResponse{}
 	var arr []interface{}
