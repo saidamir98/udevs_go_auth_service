@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/util"
@@ -118,21 +119,28 @@ func (r *clientPlatformRepo) GetByPKDetailed(ctx context.Context, pKey *pb.Clien
 	}
 	defer permissionRows.Close()
 	for permissionRows.Next() {
-		var tempPersmission pb.Permission
+		var (
+			tempPersmission pb.Permission
+			name            sql.NullString
+			parentId        sql.NullString
+		)
 		permissionRows.Scan(
 			&tempPersmission.Id,
 			&tempPersmission.ClientPlatformId,
-			&tempPersmission.ParentId,
-			&tempPersmission.Name,
+			&parentId,
+			&name,
 		)
+		tempPersmission.ParentId = parentId.String
+		tempPersmission.Name = name.String
+
 		res.Permissions = append(res.Permissions, &tempPersmission)
 	}
 
 	query = `SELECT
 	  client_platform_id,
-	  path,
-	  method,
-	  requests
+	  COALESCE(path, ''),
+	  COALESCE(method, ''),
+	  COALESCE(requests, 0) AS requests
 	FROM
 	  "scope"
 	WHERE client_platform_id = $1`
