@@ -20,7 +20,7 @@ AddRole
 UpdateRole
 RemoveRole
 
-GetClientPlatformByID // Include Nested Permission & Scope List
+GetClientPlatformByID // Include Nested Permission & Scope List [DONE GetClientPlatformByIDDetailed]
 CreatePermission
 UpdatePermission
 DeletePermission
