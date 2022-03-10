@@ -76,6 +76,7 @@ func (s *userService) GetUserListByIDs(ctx context.Context, req *pb.UserPrimaryK
 	return res, err
 }
 
+//
 func (s *userService) GetUserList(ctx context.Context, req *pb.GetUserListRequest) (*pb.GetUserListResponse, error) {
 	s.log.Info("---GetUserList--->", logger.Any("req", req))
 
