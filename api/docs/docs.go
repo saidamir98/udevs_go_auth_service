@@ -5910,5 +5910,9 @@ func (s *s) ReadDoc() string {
 }
 
 func init() {
+<<<<<<< HEAD
 	swag.Register(swag.Name, &s{})
+=======
+	swag.Register("swagger", &s{})
+>>>>>>> a251d7c50bd99680fe4d0a1f6f1f4cda3292997e
 }
