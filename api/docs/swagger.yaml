@@ -84,6 +84,25 @@ definitions:
       subdomain:
         type: string
     type: object
+  auth_service.ClientPlatformDetailedResponse:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/auth_service.Permission'
+        type: array
+      project_id:
+        type: string
+      scopes:
+        items:
+          $ref: '#/definitions/auth_service.Scope'
+        type: array
+      subdomain:
+        type: string
+    type: object
   auth_service.ClientPrimaryKey:
     properties:
       client_platform_id:
@@ -330,6 +349,17 @@ definitions:
         type: string
       role_id:
         type: string
+    type: object
+  auth_service.Scope:
+    properties:
+      client_platform_id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+      requests:
+        type: integer
     type: object
   auth_service.UpdateClientPlatformRequest:
     properties:
@@ -940,6 +970,51 @@ paths:
                   type: string
               type: object
       summary: Update ClientPlatform
+      tags:
+      - ClientPlatform
+  /client-platform-detailed/{client-platform-id}:
+    get:
+      consumes:
+      - application/json
+      description: Get ClientPlatform By ID Detailed
+      operationId: get_client_platform_detailed_by_id
+      parameters:
+      - description: client-platform-id
+        in: path
+        name: client-platform-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ClientPlatformDetailedBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.ClientPlatformDetailedResponse'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get ClientPlatform By ID Detailed
       tags:
       - ClientPlatform
   /client-platform/{client-platform-id}:
@@ -2821,6 +2896,10 @@ paths:
       - description: client-type-id
         in: query
         name: client-type-id
+        type: string
+      - description: project-id
+        in: query
+        name: project-id
         type: string
       produces:
       - application/json

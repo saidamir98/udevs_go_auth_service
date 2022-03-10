@@ -43,6 +43,18 @@ func (s *permissionService) AddRole(ctx context.Context, req *pb.AddRoleRequest)
 	return s.strg.Role().GetByPK(ctx, pKey)
 }
 
+func (s *permissionService) GetRoleById(ctx context.Context, req *pb.RolePrimaryKey) (*pb.GetRoleByIdResponse, error) {
+	s.log.Info("---GetRoleById--->", logger.Any("req", req))
+
+	res, err := s.strg.Role().GetRoleByIdDetailed(ctx, req)
+
+	if err != nil {
+		return res, err
+	}
+
+	return s.strg.Role().GetRoleByIdDetailed(ctx, req)
+}
+
 func (s *permissionService) UpdateRole(ctx context.Context, req *pb.UpdateRoleRequest) (*pb.Role, error) {
 	s.log.Info("---UpdateRole--->", logger.Any("req", req))
 

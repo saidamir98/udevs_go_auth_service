@@ -55,6 +55,7 @@ message GetUserListRequest {
     string search = 3;
     string client_platform_id = 4;
     string client_type_id = 5;
+    string project_id = 6;
 }
 
 message GetUserListResponse {

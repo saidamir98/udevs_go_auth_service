@@ -47,6 +47,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.POST("/client-platform", h.CreateClientPlatform)
 	r.GET("/client-platform", h.GetClientPlatformList)
 	r.GET("/client-platform/:client-platform-id", h.GetClientPlatformByID)
+	r.GET("/client-platform-detailed/:client-platform-id", h.GetClientPlatformByIDDetailed)
 	r.PUT("/client-platform", h.UpdateClientPlatform)
 	r.DELETE("/client-platform/:client-platform-id", h.DeleteClientPlatform)
 
@@ -70,6 +71,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.DELETE("/user-info-field/:user-info-field-id", h.RemoveUserInfoField)
 
 	// PERMISSION SERVICE
+	// r.GET("/role/:role-id", h.GetRoleByID)
 	r.POST("/role", h.AddRole)
 	r.PUT("/role", h.UpdateRole)
 	r.DELETE("/role/:role-id", h.RemoveRole)

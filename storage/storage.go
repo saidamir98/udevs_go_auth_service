@@ -31,6 +31,7 @@ type ClientPlatformRepoI interface {
 	Create(ctx context.Context, entity *pb.CreateClientPlatformRequest) (pKey *pb.ClientPlatformPrimaryKey, err error)
 	GetList(ctx context.Context, queryParam *pb.GetClientPlatformListRequest) (res *pb.GetClientPlatformListResponse, err error)
 	GetByPK(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (res *pb.ClientPlatform, err error)
+	GetByPKDetailed(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (res *pb.ClientPlatformDetailedResponse, err error)
 	Update(ctx context.Context, entity *pb.UpdateClientPlatformRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.ClientPlatformPrimaryKey) (rowsAffected int64, err error)
 }
@@ -70,6 +71,7 @@ type UserInfoFieldRepoI interface {
 type RoleRepoI interface {
 	Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error)
 	GetByPK(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.Role, err error)
+	GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.GetRoleByIdResponse, err error)
 	Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error)
 	Remove(ctx context.Context, entity *pb.RolePrimaryKey) (rowsAffected int64, err error)
 }

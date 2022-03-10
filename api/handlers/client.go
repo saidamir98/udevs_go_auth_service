@@ -123,6 +123,41 @@ func (h *Handler) GetClientPlatformByID(c *gin.Context) {
 	h.handleResponse(c, http.OK, resp)
 }
 
+// GetClientPlatformByID godoc
+// @ID get_client_platform_detailed_by_id
+// @Router /client-platform-detailed/{client-platform-id} [GET]
+// @Summary Get ClientPlatform By ID Detailed
+// @Description Get ClientPlatform By ID Detailed
+// @Tags ClientPlatform
+// @Accept json
+// @Produce json
+// @Param client-platform-id path string true "client-platform-id"
+// @Success 200 {object} http.Response{data=auth_service.ClientPlatformDetailedResponse} "ClientPlatformDetailedBody"
+// @Response 400 {object} http.Response{data=string} "Invalid Argument"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetClientPlatformByIDDetailed(c *gin.Context) {
+	client_platformID := c.Param("client-platform-id")
+
+	if !util.IsValidUUID(client_platformID) {
+		h.handleResponse(c, http.InvalidArgument, "client_platform id is an invalid uuid")
+		return
+	}
+
+	resp, err := h.services.ClientService().GetClientPlatformByIDDetailed(
+		c.Request.Context(),
+		&auth_service.ClientPlatformPrimaryKey{
+			Id: client_platformID,
+		},
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, resp)
+}
+
 // UpdateClientPlatform godoc
 // @ID update_client_platform
 // @Router /client-platform [PUT]

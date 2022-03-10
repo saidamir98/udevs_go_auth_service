@@ -59,6 +59,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 // @Param search query string false "search"
 // @Param client-platform-id query string false "client-platform-id"
 // @Param client-type-id query string false "client-type-id"
+// @Param project-id query string false "project-id"
 // @Success 200 {object} http.Response{data=auth_service.GetUserListResponse} "GetUserListResponseBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -83,6 +84,7 @@ func (h *Handler) GetUserList(c *gin.Context) {
 			Search:           c.Query("search"),
 			ClientPlatformId: c.Query("client-platform-id"),
 			ClientTypeId:     c.Query("client-type-id"),
+			ProjectId:        c.Query("project-id"),
 		},
 	)
 

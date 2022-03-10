@@ -72,6 +72,10 @@ func (r *roleRepo) GetByPK(ctx context.Context, pKey *pb.RolePrimaryKey) (res *p
 	return res, nil
 }
 
+func (r *roleRepo) GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.GetRoleByIdResponse, err error) {
+	return nil, nil
+}
+
 func (r *roleRepo) Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "role" SET
 		client_type_id = :client_type_id,
