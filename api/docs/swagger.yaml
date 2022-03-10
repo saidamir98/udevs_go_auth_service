@@ -39,9 +39,13 @@ definitions:
     type: object
   auth_service.AddRoleRequest:
     properties:
+      client_platform_id:
+        type: string
       client_type_id:
         type: string
       name:
+        type: string
+      project_id:
         type: string
     type: object
   auth_service.AddUserInfoFieldRequest:
@@ -329,11 +333,15 @@ definitions:
     type: object
   auth_service.Role:
     properties:
+      client_platform_id:
+        type: string
       client_type_id:
         type: string
       id:
         type: string
       name:
+        type: string
+      project_id:
         type: string
     type: object
   auth_service.RolePermission:
@@ -418,11 +426,15 @@ definitions:
     type: object
   auth_service.UpdateRoleRequest:
     properties:
+      client_platform_id:
+        type: string
       client_type_id:
         type: string
       id:
         type: string
       name:
+        type: string
+      project_id:
         type: string
     type: object
   auth_service.UpdateUserInfoFieldRequest:
@@ -2598,6 +2610,51 @@ paths:
                   type: string
               type: object
       summary: Delete Role
+      tags:
+      - Role
+  /role/{role_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Role By ID
+      operationId: get_role_by_id
+      parameters:
+      - description: role-id
+        in: path
+        name: role-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ClientTypeBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.CompleteClientType'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Role By ID
       tags:
       - Role
   /sphere:

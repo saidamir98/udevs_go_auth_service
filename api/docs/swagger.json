@@ -3384,6 +3384,87 @@
                 }
             }
         },
+        "/role/{role_id}": {
+            "get": {
+                "description": "Get Role By ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Get Role By ID",
+                "operationId": "get_role_by_id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "role-id",
+                        "name": "role-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ClientTypeBody",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.CompleteClientType"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/sphere": {
             "get": {
                 "description": "Get Sphere List",
@@ -4726,10 +4807,16 @@
         "auth_service.AddRoleRequest": {
             "type": "object",
             "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
                 "client_type_id": {
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "project_id": {
                     "type": "string"
                 }
             }
@@ -5174,6 +5261,9 @@
         "auth_service.Role": {
             "type": "object",
             "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
                 "client_type_id": {
                     "type": "string"
                 },
@@ -5181,6 +5271,9 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "project_id": {
                     "type": "string"
                 }
             }
@@ -5312,6 +5405,9 @@
         "auth_service.UpdateRoleRequest": {
             "type": "object",
             "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
                 "client_type_id": {
                     "type": "string"
                 },
@@ -5319,6 +5415,9 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "project_id": {
                     "type": "string"
                 }
             }

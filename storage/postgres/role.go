@@ -24,11 +24,15 @@ func (r *roleRepo) Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb
 	query := `INSERT INTO "role" (
 		id,
 		client_type_id,
-		name
+		name,
+		client_platform_id,
+		project_id
 	) VALUES (
 		$1,
 		$2,
-		$3
+		$3,
+		$4,
+		$5
 	)`
 
 	uuid, err := uuid.NewRandom()
@@ -38,8 +42,10 @@ func (r *roleRepo) Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb
 
 	_, err = r.db.Exec(ctx, query,
 		uuid.String(),
-		entity.ClientTypeId,
-		entity.Name,
+		entity.GetClientTypeId(),
+		entity.GetName(),
+		entity.GetClientPlatformId(),
+		entity.GetProjectId(),
 	)
 
 	pKey = &pb.RolePrimaryKey{
@@ -54,7 +60,9 @@ func (r *roleRepo) GetByPK(ctx context.Context, pKey *pb.RolePrimaryKey) (res *p
 	query := `SELECT
 		id,
 		client_type_id,
-		name
+		name,
+		client_platform_id,
+		project_id
 	FROM
 		"role"
 	WHERE
@@ -64,6 +72,8 @@ func (r *roleRepo) GetByPK(ctx context.Context, pKey *pb.RolePrimaryKey) (res *p
 		&res.Id,
 		&res.ClientTypeId,
 		&res.Name,
+		&res.ClientPlatformId,
+		&res.ProjectId,
 	)
 	if err != nil {
 		return res, err
@@ -80,14 +90,18 @@ func (r *roleRepo) Update(ctx context.Context, entity *pb.UpdateRoleRequest) (ro
 	query := `UPDATE "role" SET
 		client_type_id = :client_type_id,
 		name = :name,
+		client_platform_id = :client_platform_id,
+		project_id = :project_id,
 		updated_at = now()
 	WHERE
 		id = :id`
 
 	params := map[string]interface{}{
-		"id":             entity.Id,
-		"client_type_id": entity.ClientTypeId,
-		"name":           entity.Name,
+		"id":                 entity.Id,
+		"client_type_id":     entity.ClientTypeId,
+		"name":               entity.Name,
+		"client_platform_id": entity.ClientPlatformId,
+		"project_id":         entity.ProjectId,
 	}
 
 	q, arr := helper.ReplaceQueryParams(query, params)
