@@ -24,6 +24,7 @@ service PermissionService {
     rpc RemovePermissionScope(PermissionScopePrimaryKey) returns (PermissionScope) {}
 
     rpc AddRolePermission(AddRolePermissionRequest) returns (RolePermission) {}
+    rpc AddRolePermissions(AddRolePermissionsRequest) returns (AddRolePermissionsResponse) {}
     rpc RemoveRolePermission(RolePermissionPrimaryKey) returns (RolePermission) {}
 }
 
@@ -111,6 +112,14 @@ message PermissionScopePrimaryKey {
 message AddRolePermissionRequest {
     string role_id = 1;
     string permission_id = 2;
+}
+
+message AddRolePermissionsRequest {
+    repeated AddRolePermissionRequest permissions = 1;
+}
+
+message AddRolePermissionsResponse {
+    int64 added_roles = 1;
 }
 
 message RolePermissionPrimaryKey {

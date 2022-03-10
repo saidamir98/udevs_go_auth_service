@@ -247,6 +247,20 @@ func (s *permissionService) AddRolePermission(ctx context.Context, req *pb.AddRo
 	return s.strg.RolePermission().GetByPK(ctx, pKey)
 }
 
+func (s *permissionService) AddRolePermissions(ctx context.Context, req *pb.AddRolePermissionsRequest) (*pb.AddRolePermissionsResponse, error) {
+	s.log.Info("---AddRolePermissions--->", logger.Any("req", req))
+
+	rowsAffected, err := s.strg.RolePermission().AddMultiple(ctx, req)
+	if err != nil {
+		s.log.Error("!!!AddRolePermissions--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &pb.AddRolePermissionsResponse{
+		AddedRoles: rowsAffected,
+	}, err
+}
+
 func (s *permissionService) RemoveRolePermission(ctx context.Context, req *pb.RolePermissionPrimaryKey) (*pb.RolePermission, error) {
 	s.log.Info("---RemoveRolePermission--->", logger.Any("req", req))
 

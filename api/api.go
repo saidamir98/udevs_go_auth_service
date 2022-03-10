@@ -88,6 +88,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.DELETE("/permission-scope", h.RemovePermissionScope)
 
 	r.POST("/role-permission", h.AddRolePermission)
+	r.POST("/role-permission/many", h.AddRolePermissions)
 	r.DELETE("/role-permission", h.RemoveRolePermission)
 
 	r.POST("/user", h.CreateUser)

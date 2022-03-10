@@ -98,6 +98,7 @@ type PermissionScopeRepoI interface {
 
 type RolePermissionRepoI interface {
 	Add(ctx context.Context, entity *pb.AddRolePermissionRequest) (res *pb.RolePermissionPrimaryKey, err error)
+	AddMultiple(ctx context.Context, entity *pb.AddRolePermissionsRequest) (rowsAffected int64, err error)
 	Remove(ctx context.Context, entity *pb.RolePermissionPrimaryKey) (rowsAffected int64, err error)
 	GetByPK(ctx context.Context, pKey *pb.RolePermissionPrimaryKey) (res *pb.RolePermission, err error)
 }

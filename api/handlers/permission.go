@@ -454,6 +454,40 @@ func (h *Handler) AddRolePermission(c *gin.Context) {
 	h.handleResponse(c, http.Created, resp)
 }
 
+// AddRolePermission godoc
+// @ID add_role_permissions
+// @Router /role-permission/many [POST]
+// @Summary Create RolePermissions
+// @Description Create RolePermissions
+// @Tags RolePermission
+// @Accept json
+// @Produce json
+// @Param role-permission body auth_service.AddRolePermissionsRequest true "AddRolePermissionsRequestBody"
+// @Success 201 {object} http.Response{data=auth_service.AddRolePermissionsResponse} "RolePermission Added Amount"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) AddRolePermissions(c *gin.Context) {
+	var role_permissions auth_service.AddRolePermissionsRequest
+
+	err := c.ShouldBindJSON(&role_permissions)
+	if err != nil {
+		h.handleResponse(c, http.BadRequest, err.Error())
+		return
+	}
+
+	resp, err := h.services.PermissionService().AddRolePermissions(
+		c.Request.Context(),
+		&role_permissions,
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.Created, resp)
+}
+
 // RemoveRolePermission godoc
 // @ID delete_role_permission
 // @Router /role-permission [DELETE]

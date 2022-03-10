@@ -32,6 +32,7 @@ type PermissionServiceClient interface {
 	AddPermissionScope(ctx context.Context, in *AddPermissionScopeRequest, opts ...grpc.CallOption) (*PermissionScope, error)
 	RemovePermissionScope(ctx context.Context, in *PermissionScopePrimaryKey, opts ...grpc.CallOption) (*PermissionScope, error)
 	AddRolePermission(ctx context.Context, in *AddRolePermissionRequest, opts ...grpc.CallOption) (*RolePermission, error)
+	AddRolePermissions(ctx context.Context, in *AddRolePermissionsRequest, opts ...grpc.CallOption) (*AddRolePermissionsResponse, error)
 	RemoveRolePermission(ctx context.Context, in *RolePermissionPrimaryKey, opts ...grpc.CallOption) (*RolePermission, error)
 }
 
@@ -160,6 +161,15 @@ func (c *permissionServiceClient) AddRolePermission(ctx context.Context, in *Add
 	return out, nil
 }
 
+func (c *permissionServiceClient) AddRolePermissions(ctx context.Context, in *AddRolePermissionsRequest, opts ...grpc.CallOption) (*AddRolePermissionsResponse, error) {
+	out := new(AddRolePermissionsResponse)
+	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/AddRolePermissions", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *permissionServiceClient) RemoveRolePermission(ctx context.Context, in *RolePermissionPrimaryKey, opts ...grpc.CallOption) (*RolePermission, error) {
 	out := new(RolePermission)
 	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/RemoveRolePermission", in, out, opts...)
@@ -186,6 +196,7 @@ type PermissionServiceServer interface {
 	AddPermissionScope(context.Context, *AddPermissionScopeRequest) (*PermissionScope, error)
 	RemovePermissionScope(context.Context, *PermissionScopePrimaryKey) (*PermissionScope, error)
 	AddRolePermission(context.Context, *AddRolePermissionRequest) (*RolePermission, error)
+	AddRolePermissions(context.Context, *AddRolePermissionsRequest) (*AddRolePermissionsResponse, error)
 	RemoveRolePermission(context.Context, *RolePermissionPrimaryKey) (*RolePermission, error)
 	mustEmbedUnimplementedPermissionServiceServer()
 }
@@ -232,6 +243,9 @@ func (UnimplementedPermissionServiceServer) RemovePermissionScope(context.Contex
 }
 func (UnimplementedPermissionServiceServer) AddRolePermission(context.Context, *AddRolePermissionRequest) (*RolePermission, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddRolePermission not implemented")
+}
+func (UnimplementedPermissionServiceServer) AddRolePermissions(context.Context, *AddRolePermissionsRequest) (*AddRolePermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRolePermissions not implemented")
 }
 func (UnimplementedPermissionServiceServer) RemoveRolePermission(context.Context, *RolePermissionPrimaryKey) (*RolePermission, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveRolePermission not implemented")
@@ -483,6 +497,24 @@ func _PermissionService_AddRolePermission_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PermissionService_AddRolePermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddRolePermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServiceServer).AddRolePermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.PermissionService/AddRolePermissions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServiceServer).AddRolePermissions(ctx, req.(*AddRolePermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PermissionService_RemoveRolePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RolePermissionPrimaryKey)
 	if err := dec(in); err != nil {
@@ -559,6 +591,10 @@ var PermissionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddRolePermission",
 			Handler:    _PermissionService_AddRolePermission_Handler,
+		},
+		{
+			MethodName: "AddRolePermissions",
+			Handler:    _PermissionService_AddRolePermissions_Handler,
 		},
 		{
 			MethodName: "RemoveRolePermission",
