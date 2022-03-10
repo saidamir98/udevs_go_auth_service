@@ -44,6 +44,29 @@ func (h *Handler) AddRole(c *gin.Context) {
 	h.handleResponse(c, http.Created, resp)
 }
 
+// GetRoleById godoc
+// @ID get_role_by_id
+// @Router /role/{role_id} [GET]
+// @Summary Get Role By ID
+// @Description Get Role By ID
+// @Tags Role
+// @Accept json
+// @Produce json
+// @Param role-id path string true "role-id"
+// @Success 200 {object} http.Response{data=auth_service.CompleteClientType} "ClientTypeBody"
+// @Response 400 {object} http.Response{data=string} "Invalid Argument"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetRoleByID(c *gin.Context) {
+	roleId := c.Param("role-id")
+
+	if !util.IsValidUUID(roleId) {
+		h.handleResponse(c, http.InvalidArgument, "role id is an invalid uuid")
+		return
+	}
+
+	// resp, err := h.services.PermissionService().GetRoleByID()
+}
+
 // UpdateRole godoc
 // @ID update_role
 // @Router /role [PUT]

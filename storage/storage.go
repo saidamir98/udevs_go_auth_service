@@ -71,6 +71,7 @@ type UserInfoFieldRepoI interface {
 type RoleRepoI interface {
 	Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error)
 	GetByPK(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.Role, err error)
+	GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.GetRoleByIdResponse, err error)
 	Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error)
 	Remove(ctx context.Context, entity *pb.RolePrimaryKey) (rowsAffected int64, err error)
 }

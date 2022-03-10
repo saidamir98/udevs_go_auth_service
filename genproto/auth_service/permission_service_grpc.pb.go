@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PermissionServiceClient interface {
+	GetRoleById(ctx context.Context, in *RolePrimaryKey, opts ...grpc.CallOption) (*GetRoleByIdResponse, error)
 	AddRole(ctx context.Context, in *AddRoleRequest, opts ...grpc.CallOption) (*Role, error)
 	UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*Role, error)
 	RemoveRole(ctx context.Context, in *RolePrimaryKey, opts ...grpc.CallOption) (*Role, error)
@@ -40,6 +41,15 @@ type permissionServiceClient struct {
 
 func NewPermissionServiceClient(cc grpc.ClientConnInterface) PermissionServiceClient {
 	return &permissionServiceClient{cc}
+}
+
+func (c *permissionServiceClient) GetRoleById(ctx context.Context, in *RolePrimaryKey, opts ...grpc.CallOption) (*GetRoleByIdResponse, error) {
+	out := new(GetRoleByIdResponse)
+	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/GetRoleById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *permissionServiceClient) AddRole(ctx context.Context, in *AddRoleRequest, opts ...grpc.CallOption) (*Role, error) {
@@ -163,6 +173,7 @@ func (c *permissionServiceClient) RemoveRolePermission(ctx context.Context, in *
 // All implementations must embed UnimplementedPermissionServiceServer
 // for forward compatibility
 type PermissionServiceServer interface {
+	GetRoleById(context.Context, *RolePrimaryKey) (*GetRoleByIdResponse, error)
 	AddRole(context.Context, *AddRoleRequest) (*Role, error)
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
 	RemoveRole(context.Context, *RolePrimaryKey) (*Role, error)
@@ -183,6 +194,9 @@ type PermissionServiceServer interface {
 type UnimplementedPermissionServiceServer struct {
 }
 
+func (UnimplementedPermissionServiceServer) GetRoleById(context.Context, *RolePrimaryKey) (*GetRoleByIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoleById not implemented")
+}
 func (UnimplementedPermissionServiceServer) AddRole(context.Context, *AddRoleRequest) (*Role, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddRole not implemented")
 }
@@ -233,6 +247,24 @@ type UnsafePermissionServiceServer interface {
 
 func RegisterPermissionServiceServer(s grpc.ServiceRegistrar, srv PermissionServiceServer) {
 	s.RegisterService(&PermissionService_ServiceDesc, srv)
+}
+
+func _PermissionService_GetRoleById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RolePrimaryKey)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServiceServer).GetRoleById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.PermissionService/GetRoleById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServiceServer).GetRoleById(ctx, req.(*RolePrimaryKey))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _PermissionService_AddRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -476,6 +508,10 @@ var PermissionService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "auth_service.PermissionService",
 	HandlerType: (*PermissionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetRoleById",
+			Handler:    _PermissionService_GetRoleById_Handler,
+		},
 		{
 			MethodName: "AddRole",
 			Handler:    _PermissionService_AddRole_Handler,

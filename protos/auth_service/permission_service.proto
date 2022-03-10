@@ -7,6 +7,7 @@ import "auth.proto";
 import "google/protobuf/empty.proto";
 
 service PermissionService {
+    rpc GetRoleById(RolePrimaryKey) returns (GetRoleByIdResponse) {}
     rpc AddRole(AddRoleRequest) returns (Role) {}
     rpc UpdateRole(UpdateRoleRequest) returns (Role) {}
     rpc RemoveRole(RolePrimaryKey) returns (Role) {}
@@ -24,6 +25,14 @@ service PermissionService {
 
     rpc AddRolePermission(AddRolePermissionRequest) returns (RolePermission) {}
     rpc RemoveRolePermission(RolePermissionPrimaryKey) returns (RolePermission) {}
+}
+
+message GetRoleByIdResponse {
+    string id = 1;
+    string client_type_id = 2;
+    string name = 3;
+    ClientType client_type = 4;
+    repeated Permission permissions = 5;
 }
 
 message UpsertScopeRequest {
