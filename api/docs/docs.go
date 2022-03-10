@@ -4825,10 +4825,16 @@ var doc = `{
         "auth_service.AddRoleRequest": {
             "type": "object",
             "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
                 "client_type_id": {
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "project_id": {
                     "type": "string"
                 }
             }
@@ -5273,6 +5279,9 @@ var doc = `{
         "auth_service.Role": {
             "type": "object",
             "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
                 "client_type_id": {
                     "type": "string"
                 },
@@ -5280,6 +5289,9 @@ var doc = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "project_id": {
                     "type": "string"
                 }
             }
@@ -5411,6 +5423,9 @@ var doc = `{
         "auth_service.UpdateRoleRequest": {
             "type": "object",
             "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
                 "client_type_id": {
                     "type": "string"
                 },
@@ -5418,6 +5433,9 @@ var doc = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "project_id": {
                     "type": "string"
                 }
             }
