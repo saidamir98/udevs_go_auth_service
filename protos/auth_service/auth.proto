@@ -1,5 +1,5 @@
 syntax="proto3";
-
+// 
 package auth_service;
 option go_package="genproto/auth_service";
 
@@ -68,6 +68,8 @@ message Role {
     string id = 1;
     string client_type_id = 2;
     string name = 3;
+    string client_platform_id = 4;
+    string project_id = 5;
 }
 
 message Scope {

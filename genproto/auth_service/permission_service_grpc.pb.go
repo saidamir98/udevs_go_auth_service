@@ -27,10 +27,10 @@ type PermissionServiceClient interface {
 	AddRole(ctx context.Context, in *AddRoleRequest, opts ...grpc.CallOption) (*Role, error)
 	UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*Role, error)
 	RemoveRole(ctx context.Context, in *RolePrimaryKey, opts ...grpc.CallOption) (*Role, error)
-	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*Permission, error)
-	GetPermissionByID(ctx context.Context, in *PermissionPrimaryKey, opts ...grpc.CallOption) (*Permission, error)
+	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*GetPermissionByIDResponse, error)
+	GetPermissionByID(ctx context.Context, in *PermissionPrimaryKey, opts ...grpc.CallOption) (*GetPermissionByIDResponse, error)
 	GetPermissionList(ctx context.Context, in *GetPermissionListRequest, opts ...grpc.CallOption) (*GetPermissionListResponse, error)
-	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*Permission, error)
+	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*GetPermissionByIDResponse, error)
 	DeletePermission(ctx context.Context, in *PermissionPrimaryKey, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpsertScope(ctx context.Context, in *UpsertScopeRequest, opts ...grpc.CallOption) (*Scope, error)
 	AddPermissionScope(ctx context.Context, in *AddPermissionScopeRequest, opts ...grpc.CallOption) (*PermissionScope, error)
@@ -83,8 +83,8 @@ func (c *permissionServiceClient) RemoveRole(ctx context.Context, in *RolePrimar
 	return out, nil
 }
 
-func (c *permissionServiceClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*Permission, error) {
-	out := new(Permission)
+func (c *permissionServiceClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*GetPermissionByIDResponse, error) {
+	out := new(GetPermissionByIDResponse)
 	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/CreatePermission", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -92,8 +92,8 @@ func (c *permissionServiceClient) CreatePermission(ctx context.Context, in *Crea
 	return out, nil
 }
 
-func (c *permissionServiceClient) GetPermissionByID(ctx context.Context, in *PermissionPrimaryKey, opts ...grpc.CallOption) (*Permission, error) {
-	out := new(Permission)
+func (c *permissionServiceClient) GetPermissionByID(ctx context.Context, in *PermissionPrimaryKey, opts ...grpc.CallOption) (*GetPermissionByIDResponse, error) {
+	out := new(GetPermissionByIDResponse)
 	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/GetPermissionByID", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -110,8 +110,8 @@ func (c *permissionServiceClient) GetPermissionList(ctx context.Context, in *Get
 	return out, nil
 }
 
-func (c *permissionServiceClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*Permission, error) {
-	out := new(Permission)
+func (c *permissionServiceClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*GetPermissionByIDResponse, error) {
+	out := new(GetPermissionByIDResponse)
 	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/UpdatePermission", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -181,10 +181,10 @@ type PermissionServiceServer interface {
 	AddRole(context.Context, *AddRoleRequest) (*Role, error)
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
 	RemoveRole(context.Context, *RolePrimaryKey) (*Role, error)
-	CreatePermission(context.Context, *CreatePermissionRequest) (*Permission, error)
-	GetPermissionByID(context.Context, *PermissionPrimaryKey) (*Permission, error)
+	CreatePermission(context.Context, *CreatePermissionRequest) (*GetPermissionByIDResponse, error)
+	GetPermissionByID(context.Context, *PermissionPrimaryKey) (*GetPermissionByIDResponse, error)
 	GetPermissionList(context.Context, *GetPermissionListRequest) (*GetPermissionListResponse, error)
-	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
+	UpdatePermission(context.Context, *UpdatePermissionRequest) (*GetPermissionByIDResponse, error)
 	DeletePermission(context.Context, *PermissionPrimaryKey) (*emptypb.Empty, error)
 	UpsertScope(context.Context, *UpsertScopeRequest) (*Scope, error)
 	AddPermissionScope(context.Context, *AddPermissionScopeRequest) (*PermissionScope, error)
@@ -210,16 +210,16 @@ func (UnimplementedPermissionServiceServer) UpdateRole(context.Context, *UpdateR
 func (UnimplementedPermissionServiceServer) RemoveRole(context.Context, *RolePrimaryKey) (*Role, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveRole not implemented")
 }
-func (UnimplementedPermissionServiceServer) CreatePermission(context.Context, *CreatePermissionRequest) (*Permission, error) {
+func (UnimplementedPermissionServiceServer) CreatePermission(context.Context, *CreatePermissionRequest) (*GetPermissionByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePermission not implemented")
 }
-func (UnimplementedPermissionServiceServer) GetPermissionByID(context.Context, *PermissionPrimaryKey) (*Permission, error) {
+func (UnimplementedPermissionServiceServer) GetPermissionByID(context.Context, *PermissionPrimaryKey) (*GetPermissionByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPermissionByID not implemented")
 }
 func (UnimplementedPermissionServiceServer) GetPermissionList(context.Context, *GetPermissionListRequest) (*GetPermissionListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPermissionList not implemented")
 }
-func (UnimplementedPermissionServiceServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error) {
+func (UnimplementedPermissionServiceServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*GetPermissionByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePermission not implemented")
 }
 func (UnimplementedPermissionServiceServer) DeletePermission(context.Context, *PermissionPrimaryKey) (*emptypb.Empty, error) {

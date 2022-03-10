@@ -62,8 +62,8 @@ func (r *permissionRepo) Create(ctx context.Context, entity *pb.CreatePermission
 	return pKey, err
 }
 
-func (r *permissionRepo) GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error) {
-	res = &pb.Permission{}
+func (r *permissionRepo) GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.GetPermissionByIDResponse, err error) {
+	res = &pb.GetPermissionByIDResponse{}
 	var nullableStr *string
 	query := `SELECT
 		id,
@@ -81,11 +81,41 @@ func (r *permissionRepo) GetByPK(ctx context.Context, pKey *pb.PermissionPrimary
 		&nullableStr,
 		&res.Name,
 	)
+	if err != nil {
+		return res, err
+	}
 	if nullableStr != nil {
 		res.ParentId = *nullableStr
 	}
+
+	queryPermissionScopes := `SELECT
+		permission_id,
+		client_platform_id,
+		path,
+		method
+	FROM
+		"permission_scope"
+	WHERE
+		permission_id = $1`
+
+	permissionScopesRows, err := r.db.Query(ctx, queryPermissionScopes, res.Id)
 	if err != nil {
 		return res, err
+	}
+	defer permissionScopesRows.Close()
+
+	for permissionScopesRows.Next() {
+		obj := &pb.PermissionScope{}
+		err = permissionScopesRows.Scan(
+			&obj.PermissionId,
+			&obj.ClientPlatformId,
+			&obj.Path,
+			&obj.Method,
+		)
+		if err != nil {
+			return res, err
+		}
+		res.PermissionScopes = append(res.PermissionScopes, obj)
 	}
 
 	return res, nil
