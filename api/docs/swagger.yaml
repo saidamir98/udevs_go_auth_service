@@ -37,6 +37,18 @@ definitions:
       role_id:
         type: string
     type: object
+  auth_service.AddRolePermissionsRequest:
+    properties:
+      permissions:
+        items:
+          $ref: '#/definitions/auth_service.AddRolePermissionRequest'
+        type: array
+    type: object
+  auth_service.AddRolePermissionsResponse:
+    properties:
+      added_roles:
+        type: integer
+    type: object
   auth_service.AddRoleRequest:
     properties:
       client_platform_id:
@@ -2572,6 +2584,52 @@ paths:
                   type: string
               type: object
       summary: Create RolePermission
+      tags:
+      - RolePermission
+  /role-permission/many:
+    post:
+      consumes:
+      - application/json
+      description: Create RolePermissions
+      operationId: add_role_permissions
+      parameters:
+      - description: AddRolePermissionsRequestBody
+        in: body
+        name: role-permission
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddRolePermissionsRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: RolePermission Added Amount
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.AddRolePermissionsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create RolePermissions
       tags:
       - RolePermission
   /role/{role-id}:

@@ -3336,6 +3336,89 @@ var doc = `{
                 }
             }
         },
+        "/role-permission/many": {
+            "post": {
+                "description": "Create RolePermissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RolePermission"
+                ],
+                "summary": "Create RolePermissions",
+                "operationId": "add_role_permissions",
+                "parameters": [
+                    {
+                        "description": "AddRolePermissionsRequestBody",
+                        "name": "role-permission",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_service.AddRolePermissionsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "RolePermission Added Amount",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.AddRolePermissionsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/role/{role-id}": {
             "delete": {
                 "description": "Get Role",
@@ -4822,6 +4905,25 @@ var doc = `{
                 }
             }
         },
+        "auth_service.AddRolePermissionsRequest": {
+            "type": "object",
+            "properties": {
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.AddRolePermissionRequest"
+                    }
+                }
+            }
+        },
+        "auth_service.AddRolePermissionsResponse": {
+            "type": "object",
+            "properties": {
+                "added_roles": {
+                    "type": "integer"
+                }
+            }
+        },
         "auth_service.AddRoleRequest": {
             "type": "object",
             "properties": {
@@ -5910,9 +6012,5 @@ func (s *s) ReadDoc() string {
 }
 
 func init() {
-<<<<<<< HEAD
 	swag.Register(swag.Name, &s{})
-=======
-	swag.Register("swagger", &s{})
->>>>>>> a251d7c50bd99680fe4d0a1f6f1f4cda3292997e
 }
