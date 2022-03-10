@@ -12,10 +12,10 @@ service PermissionService {
     rpc UpdateRole(UpdateRoleRequest) returns (Role) {}
     rpc RemoveRole(RolePrimaryKey) returns (Role) {}
 
-    rpc CreatePermission(CreatePermissionRequest) returns (Permission) {}
-    rpc GetPermissionByID(PermissionPrimaryKey) returns (Permission) {}
+    rpc CreatePermission(CreatePermissionRequest) returns (GetPermissionByIDResponse) {}
+    rpc GetPermissionByID(PermissionPrimaryKey) returns (GetPermissionByIDResponse) {}
     rpc GetPermissionList(GetPermissionListRequest) returns (GetPermissionListResponse) {}
-    rpc UpdatePermission(UpdatePermissionRequest) returns (Permission) {}
+    rpc UpdatePermission(UpdatePermissionRequest) returns (GetPermissionByIDResponse) {}
     rpc DeletePermission(PermissionPrimaryKey) returns (google.protobuf.Empty) {}
 
     rpc UpsertScope(UpsertScopeRequest) returns (Scope) {}
@@ -26,6 +26,14 @@ service PermissionService {
     rpc AddRolePermission(AddRolePermissionRequest) returns (RolePermission) {}
     rpc AddRolePermissions(AddRolePermissionsRequest) returns (AddRolePermissionsResponse) {}
     rpc RemoveRolePermission(RolePermissionPrimaryKey) returns (RolePermission) {}
+}
+
+message GetPermissionByIDResponse {
+    string id = 1;
+    string client_platform_id = 2;
+    string parent_id = 3;
+    string name = 4;
+    repeated PermissionScope permission_scopes = 5;
 }
 
 message GetRoleByIdResponse {
