@@ -249,6 +249,10 @@ func (r *userRepo) GetList(ctx context.Context, queryParam *pb.GetUserListReques
 		params["client_platform_id"] = queryParam.ClientPlatformId
 		filter += " AND client_platform_id = :client_platform_id"
 	}
+	if len(queryParam.ProjectId) > 0 {
+		params["project_id"] = queryParam.ProjectId
+		filter += " AND project_id = :project_id"
+	}
 
 	if len(queryParam.ClientTypeId) > 0 {
 		params["client_type_id"] = queryParam.ClientTypeId
