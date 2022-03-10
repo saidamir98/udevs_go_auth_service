@@ -27,7 +27,7 @@ DeletePermission
 AddPermissionScope
 RemovePermissionScope
 
-*GetRoleByID // Include user_type & permissions
+*GetRoleByID // Include client_type & permissions
 AddRolePermission
 RemoveRolePermission
 
@@ -36,7 +36,7 @@ GetUserByID // Include user_info, user_relation, role, client_type, client_platf
 UpsertUserInfo
 AddUserRelation
 RemoveUserRelation
-GetUserList // Filter by project_id
+GetUserList // Filter by project_id [DONE]
 UpdateUser
 
 Login
