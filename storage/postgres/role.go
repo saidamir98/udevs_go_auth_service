@@ -83,7 +83,51 @@ func (r *roleRepo) GetByPK(ctx context.Context, pKey *pb.RolePrimaryKey) (res *p
 }
 
 func (r *roleRepo) GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.GetRoleByIdResponse, err error) {
-	return nil, nil
+	res = &pb.GetRoleByIdResponse{}
+	var confirmBy string
+	query := `SELECT 
+		rl.id,
+		rl.client_type_id,
+		rl.name,
+		-- rl.client_platform_id,
+		-- rl.project_id,
+		ct.id AS client_type_id,
+		ct.confirm_by,
+		ct.project_id,
+		ct.self_register,
+		ct.self_recover,
+		ct.name AS client_type_name
+	FROM 
+		"role" 
+	AS
+		rl
+	
+	INNER JOIN
+		"client_type" AS ct
+	
+	ON
+		ct.id = rl.client_type_id
+	WHERE
+		rl.id = $1`
+
+	res.ClientType = new(pb.ClientType)
+	err = r.db.QueryRow(ctx, query, entity.Id).Scan(
+		&res.Id,
+		&res.ClientTypeId,
+		&res.Name,
+		&res.ClientType.Id,
+		&confirmBy,
+		&res.ClientType.ProjectId,
+		&res.ClientType.SelfRegister,
+		&res.ClientType.SelfRecover,
+		&res.ClientType.Name,
+	)
+	res.ClientType.ConfirmBy = pb.ConfirmStrategies(pb.ConfirmStrategies_value[confirmBy])
+
+	if err != nil {
+		return res, err
+	}
+	return res, nil
 }
 
 func (r *roleRepo) Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error) {

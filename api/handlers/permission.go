@@ -46,7 +46,7 @@ func (h *Handler) AddRole(c *gin.Context) {
 
 // GetRoleById godoc
 // @ID get_role_by_id
-// @Router /role/{role_id} [GET]
+// @Router /role/{role-id} [GET]
 // @Summary Get Role By ID
 // @Description Get Role By ID
 // @Tags Role
@@ -58,13 +58,24 @@ func (h *Handler) AddRole(c *gin.Context) {
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetRoleByID(c *gin.Context) {
 	roleId := c.Param("role-id")
-
+	println(roleId)
 	if !util.IsValidUUID(roleId) {
+		println("here")
 		h.handleResponse(c, http.InvalidArgument, "role id is an invalid uuid")
 		return
 	}
 
-	// resp, err := h.services.PermissionService().GetRoleByID()
+	resp, err := h.services.PermissionService().GetRoleById(c.Request.Context(), &auth_service.RolePrimaryKey{
+		Id: roleId,
+	})
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, resp)
+
 }
 
 // UpdateRole godoc

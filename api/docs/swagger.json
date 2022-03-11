@@ -3402,72 +3402,6 @@
             }
         },
         "/role/{role-id}": {
-            "delete": {
-                "description": "Get Role",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Role"
-                ],
-                "summary": "Delete Role",
-                "operationId": "delete_role",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "role-id",
-                        "name": "role-id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Invalid Argument",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/role/{role_id}": {
             "get": {
                 "description": "Get Role By ID",
                 "consumes": [
@@ -3508,6 +3442,70 @@
                                 }
                             ]
                         }
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Get Role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Delete Role",
+                "operationId": "delete_role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "role-id",
+                        "name": "role-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
                     },
                     "400": {
                         "description": "Invalid Argument",

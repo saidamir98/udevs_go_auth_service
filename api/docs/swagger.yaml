@@ -2685,7 +2685,6 @@ paths:
       summary: Delete Role
       tags:
       - Role
-  /role/{role_id}:
     get:
       consumes:
       - application/json
