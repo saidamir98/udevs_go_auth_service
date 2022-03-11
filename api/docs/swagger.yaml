@@ -249,6 +249,21 @@ definitions:
       count:
         type: integer
     type: object
+  auth_service.GetPermissionByIDResponse:
+    properties:
+      client_platform_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      permission_scopes:
+        items:
+          $ref: '#/definitions/auth_service.PermissionScope'
+        type: array
+    type: object
   auth_service.GetPermissionListResponse:
     properties:
       count:
@@ -1832,7 +1847,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/auth_service.Permission'
+                  $ref: '#/definitions/auth_service.GetPermissionByIDResponse'
               type: object
         "400":
           description: Invalid Argument

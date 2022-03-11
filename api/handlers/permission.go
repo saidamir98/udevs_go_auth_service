@@ -223,7 +223,7 @@ func (h *Handler) GetPermissionList(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param permission-id path string true "permission-id"
-// @Success 200 {object} http.Response{data=auth_service.Permission} "PermissionBody"
+// @Success 200 {object} http.Response{data=auth_service.GetPermissionByIDResponse} "PermissionBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetPermissionByID(c *gin.Context) {

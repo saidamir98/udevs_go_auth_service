@@ -1925,7 +1925,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/auth_service.Permission"
+                                            "$ref": "#/definitions/auth_service.GetPermissionByIDResponse"
                                         }
                                     }
                                 }
@@ -5229,6 +5229,29 @@ var doc = `{
                 },
                 "count": {
                     "type": "integer"
+                }
+            }
+        },
+        "auth_service.GetPermissionByIDResponse": {
+            "type": "object",
+            "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "permission_scopes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.PermissionScope"
+                    }
                 }
             }
         },
