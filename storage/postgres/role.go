@@ -130,6 +130,65 @@ func (r *roleRepo) GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrima
 	return res, nil
 }
 
+func (r *roleRepo) GetList(ctx context.Context, entity *pb.GetRolesListRequest) (*pb.GetRolesResponse, error) {
+	res := new(pb.GetRolesResponse)
+
+	params := map[string]interface{}{
+		"offset":             entity.Offset,
+		"limit":              entity.Limit,
+		"client_type_id":     entity.ClientTypeId,
+		"client_platform_id": entity.ClientPlatformId,
+	}
+
+	query := `
+	SELECT
+		id,
+		client_type_id,
+		name,
+		client_platform_id,
+		project_id
+	FROM "role"
+		WHERE 1=1 
+		`
+	if len(entity.ClientPlatformId) > 0 {
+		query += ` AND client_platform_id = :client_platform_id`
+	}
+	if len(entity.ClientTypeId) > 0 {
+		query += ` AND client_type_id = :client_type_id`
+	}
+	if entity.Offset != 0 {
+		query += ` OFFSET :offset`
+	}
+	if entity.Limit != 0 {
+		query += `  LIMIT :limit`
+	}
+
+	q, arr := helper.ReplaceQueryParams(query, params)
+	rows, err := r.db.Query(ctx, q, arr...)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var temp pb.Role
+		err = rows.Scan(
+			&temp.Id,
+			&temp.ClientTypeId,
+			&temp.Name,
+			&temp.ClientPlatformId,
+			&temp.ProjectId,
+		)
+		if err != nil {
+			return nil, err
+		}
+		res.Roles = append(res.Roles, &temp)
+	}
+
+	return res, nil
+}
+
 func (r *roleRepo) Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error) {
 	query := `UPDATE "role" SET
 		client_type_id = :client_type_id,

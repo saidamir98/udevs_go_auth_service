@@ -49,10 +49,24 @@ func (s *permissionService) GetRoleById(ctx context.Context, req *pb.RolePrimary
 	res, err := s.strg.Role().GetRoleByIdDetailed(ctx, req)
 
 	if err != nil {
-		return res, err
+		s.log.Error("!!!GetRoleById--->", logger.Error(err))
+		return res, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	return s.strg.Role().GetRoleByIdDetailed(ctx, req)
+	return res, err
+}
+
+func (s *permissionService) GetRolesList(ctx context.Context, req *pb.GetRolesListRequest) (*pb.GetRolesResponse, error) {
+	s.log.Info("---GetRolesList--->", logger.Any("req", req))
+
+	res, err := s.strg.Role().GetList(ctx, req)
+
+	if err != nil {
+		s.log.Error("!!!GetRolesList--->", logger.Error(err))
+		return res, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return res, err
 }
 
 func (s *permissionService) UpdateRole(ctx context.Context, req *pb.UpdateRoleRequest) (*pb.Role, error) {

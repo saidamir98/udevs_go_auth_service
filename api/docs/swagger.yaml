@@ -273,6 +273,13 @@ definitions:
           $ref: '#/definitions/auth_service.Permission'
         type: array
     type: object
+  auth_service.GetRolesResponse:
+    properties:
+      roles:
+        items:
+          $ref: '#/definitions/auth_service.Role'
+        type: array
+    type: object
   auth_service.GetUserListResponse:
     properties:
       count:
@@ -2427,6 +2434,61 @@ paths:
       tags:
       - Relation
   /role:
+    get:
+      consumes:
+      - application/json
+      description: Get Roles List
+      operationId: get_roles_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: client_platform_id
+        in: query
+        name: client_platform_id
+        type: string
+      - description: client_type_id
+        in: query
+        name: client_type_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetRolesListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetRolesResponse'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Roles List
+      tags:
+      - Role
     post:
       consumes:
       - application/json

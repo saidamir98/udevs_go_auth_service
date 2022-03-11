@@ -75,7 +75,52 @@ func (h *Handler) GetRoleByID(c *gin.Context) {
 	}
 
 	h.handleResponse(c, http.OK, resp)
+}
 
+// GetRolesList godoc
+// @ID get_roles_list
+// @Router /role [GET]
+// @Summary Get Roles List
+// @Description  Get Roles List
+// @Tags Role
+// @Accept json
+// @Produce json
+// @Param offset query integer false "offset"
+// @Param limit query integer false "limit"
+// @Param client_platform_id query string false "client_platform_id"
+// @Param client_type_id query string false "client_type_id"
+// @Success 200 {object} http.Response{data=auth_service.GetRolesResponse} "GetRolesListResponseBody"
+// @Response 400 {object} http.Response{data=string} "Invalid Argument"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetRolesList(c *gin.Context) {
+	offset, err := h.getOffsetParam(c)
+	if err != nil {
+		h.handleResponse(c, http.InvalidArgument, err.Error())
+		return
+	}
+
+	limit, err := h.getLimitParam(c)
+	if err != nil {
+		h.handleResponse(c, http.InvalidArgument, err.Error())
+		return
+	}
+
+	resp, err := h.services.PermissionService().GetRolesList(
+		c.Request.Context(),
+		&auth_service.GetRolesListRequest{
+			Offset:           uint32(offset),
+			Limit:            uint32(limit),
+			ClientPlatformId: c.Query("client_platform_id"),
+			ClientTypeId:     c.Query("client_type_id"),
+		},
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, resp)
 }
 
 // UpdateRole godoc
