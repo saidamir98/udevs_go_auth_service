@@ -2448,13 +2448,13 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: client_platform_id
+      - description: client-platform-id
         in: query
-        name: client_platform_id
+        name: client-platform-id
         type: string
-      - description: client_type_id
+      - description: client-type-id
         in: query
-        name: client_type_id
+        name: client-type-id
         type: string
       produces:
       - application/json

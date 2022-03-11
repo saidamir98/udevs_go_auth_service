@@ -3052,14 +3052,14 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "client_platform_id",
-                        "name": "client_platform_id",
+                        "description": "client-platform-id",
+                        "name": "client-platform-id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "client_type_id",
-                        "name": "client_type_id",
+                        "description": "client-type-id",
+                        "name": "client-type-id",
                         "in": "query"
                     }
                 ],

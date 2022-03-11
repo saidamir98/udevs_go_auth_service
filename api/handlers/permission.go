@@ -87,8 +87,8 @@ func (h *Handler) GetRoleByID(c *gin.Context) {
 // @Produce json
 // @Param offset query integer false "offset"
 // @Param limit query integer false "limit"
-// @Param client_platform_id query string false "client_platform_id"
-// @Param client_type_id query string false "client_type_id"
+// @Param client-platform-id query string false "client-platform-id"
+// @Param client-type-id query string false "client-type-id"
 // @Success 200 {object} http.Response{data=auth_service.GetRolesResponse} "GetRolesListResponseBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -110,8 +110,8 @@ func (h *Handler) GetRolesList(c *gin.Context) {
 		&auth_service.GetRolesListRequest{
 			Offset:           uint32(offset),
 			Limit:            uint32(limit),
-			ClientPlatformId: c.Query("client_platform_id"),
-			ClientTypeId:     c.Query("client_type_id"),
+			ClientPlatformId: c.Query("client-platform-id"),
+			ClientTypeId:     c.Query("client-type-id"),
 		},
 	)
 
