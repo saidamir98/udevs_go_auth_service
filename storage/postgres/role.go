@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
@@ -127,6 +128,46 @@ func (r *roleRepo) GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrima
 	if err != nil {
 		return res, err
 	}
+
+	getPermissionQuery := `SELECT
+			rp.permission_id,
+			p.name,
+			p.parent_id,
+			p.client_platform_id
+		FROM 
+			"role_permission"
+		AS
+			rp
+		INNER JOIN
+				"permission" 
+			AS 
+				p
+		ON
+			p.id = rp.permission_id
+		WHERE
+			rp.role_id = $1 `
+
+	rows, err := r.db.Query(ctx, getPermissionQuery, entity.GetId())
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		permission := &pb.Permission{}
+		var parentId sql.NullString
+		rows.Scan(
+			&permission.Id,
+			&permission.Name,
+			&parentId,
+			&permission.ClientPlatformId,
+		)
+		permission.ParentId = parentId.String
+		// if err != nil {
+		// 	return nil, err
+		// }
+		res.Permissions = append(res.Permissions, permission)
+	}
+
 	return res, nil
 }
 
