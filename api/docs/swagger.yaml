@@ -249,6 +249,21 @@ definitions:
       count:
         type: integer
     type: object
+  auth_service.GetPermissionByIDResponse:
+    properties:
+      client_platform_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      permission_scopes:
+        items:
+          $ref: '#/definitions/auth_service.PermissionScope'
+        type: array
+    type: object
   auth_service.GetPermissionListResponse:
     properties:
       count:
@@ -256,6 +271,13 @@ definitions:
       permissions:
         items:
           $ref: '#/definitions/auth_service.Permission'
+        type: array
+    type: object
+  auth_service.GetRolesResponse:
+    properties:
+      roles:
+        items:
+          $ref: '#/definitions/auth_service.Role'
         type: array
     type: object
   auth_service.GetUserListResponse:
@@ -1832,7 +1854,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/auth_service.Permission'
+                  $ref: '#/definitions/auth_service.GetPermissionByIDResponse'
               type: object
         "400":
           description: Invalid Argument
@@ -2412,6 +2434,61 @@ paths:
       tags:
       - Relation
   /role:
+    get:
+      consumes:
+      - application/json
+      description: Get Roles List
+      operationId: get_roles_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: client-platform-id
+        in: query
+        name: client-platform-id
+        type: string
+      - description: client-type-id
+        in: query
+        name: client-type-id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetRolesListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetRolesResponse'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Roles List
+      tags:
+      - Role
     post:
       consumes:
       - application/json
@@ -2670,7 +2747,6 @@ paths:
       summary: Delete Role
       tags:
       - Role
-  /role/{role_id}:
     get:
       consumes:
       - application/json

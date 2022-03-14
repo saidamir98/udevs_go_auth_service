@@ -8,6 +8,7 @@ import "google/protobuf/empty.proto";
 
 service PermissionService {
     rpc GetRoleById(RolePrimaryKey) returns (GetRoleByIdResponse) {}
+    rpc GetRolesList(GetRolesListRequest) returns (GetRolesResponse) {}
     rpc AddRole(AddRoleRequest) returns (Role) {}
     rpc UpdateRole(UpdateRoleRequest) returns (Role) {}
     rpc RemoveRole(RolePrimaryKey) returns (Role) {}
@@ -26,6 +27,17 @@ service PermissionService {
     rpc AddRolePermission(AddRolePermissionRequest) returns (RolePermission) {}
     rpc AddRolePermissions(AddRolePermissionsRequest) returns (AddRolePermissionsResponse) {}
     rpc RemoveRolePermission(RolePermissionPrimaryKey) returns (RolePermission) {}
+}
+
+message GetRolesListRequest {
+    uint32 offset = 1;
+    uint32 limit = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+}
+
+message GetRolesResponse {
+    repeated Role roles = 1;
 }
 
 message GetPermissionByIDResponse {
