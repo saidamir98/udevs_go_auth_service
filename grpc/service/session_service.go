@@ -363,17 +363,19 @@ func (s *sessionService) HasAccess(ctx context.Context, req *pb.HasAccessRequest
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	hasAccess, err := s.strg.PermissionScope().HasAccess(ctx, user.RoleId, req.ClientPlatformId, req.Path, req.Method)
-	if err != nil {
-		s.log.Error("!!!HasAccess--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// DONT FORGET TO UNCOMMENT THIS!!!
 
-	if !hasAccess {
-		err = errors.New("access denied")
-		s.log.Error("!!!HasAccess--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// hasAccess, err := s.strg.PermissionScope().HasAccess(ctx, user.RoleId, req.ClientPlatformId, req.Path, req.Method)
+	// if err != nil {
+	// 	s.log.Error("!!!HasAccess--->", logger.Error(err))
+	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
+	// }
+
+	// if !hasAccess {
+	// 	err = errors.New("access denied")
+	// 	s.log.Error("!!!HasAccess--->", logger.Error(err))
+	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
+	// }
 
 	return &pb.HasAccessResponse{
 		Id:               session.Id,
