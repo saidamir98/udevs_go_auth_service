@@ -83,7 +83,7 @@ func Load() Config {
 	config.SettingsGRPCPort = cast.ToString(getOrReturnDefaultValue("SETTINGS_GRPC_PORT", ":9101"))
 
 	config.AuthServiceHost = cast.ToString(getOrReturnDefaultValue("AUTH_SERVICE_HOST", "0.0.0.0"))
-	config.AuthGRPCPort = cast.ToString(getOrReturnDefaultValue("AUTH_GRPC_PORT", ":9102"))
+	config.AuthGRPCPort = cast.ToString(getOrReturnDefaultValue("AUTH_GRPC_PORT", ":9103"))
 
 	return config
 }
