@@ -180,6 +180,27 @@ definitions:
       self_register:
         type: boolean
     type: object
+  auth_service.CreateIntegrationRequest:
+    properties:
+      active:
+        type: integer
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      expires_at:
+        type: string
+      ip_whitelist:
+        type: string
+      project_id:
+        type: string
+      role_id:
+        type: string
+      secret_key:
+        type: string
+      title:
+        type: string
+    type: object
   auth_service.CreatePermissionRequest:
     properties:
       client_platform_id:
@@ -249,6 +270,15 @@ definitions:
       count:
         type: integer
     type: object
+  auth_service.GetIntegrationListResponse:
+    properties:
+      count:
+        type: integer
+      integrations:
+        items:
+          $ref: '#/definitions/auth_service.Integration'
+        type: array
+    type: object
   auth_service.GetPermissionByIDResponse:
     properties:
       client_platform_id:
@@ -300,6 +330,33 @@ definitions:
       path:
         type: string
       project_id:
+        type: string
+    type: object
+  auth_service.Integration:
+    properties:
+      active:
+        type: integer
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      created_at:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      ip_whitelist:
+        type: string
+      project_id:
+        type: string
+      role_id:
+        type: string
+      secret_key:
+        type: string
+      title:
+        type: string
+      updated_at:
         type: string
     type: object
   auth_service.LoginRequest:
@@ -433,6 +490,27 @@ definitions:
         type: boolean
       self_register:
         type: boolean
+    type: object
+  auth_service.UpdateIntegrationRequest:
+    properties:
+      active:
+        type: integer
+      client_platform_id:
+        type: string
+      client_type_id:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      ip_whitelist:
+        type: string
+      name:
+        type: string
+      project_id:
+        type: string
+      role_id:
+        type: string
     type: object
   auth_service.UpdatePermissionRequest:
     properties:
@@ -1484,6 +1562,242 @@ paths:
       summary: Has Access
       tags:
       - Session
+  /integration:
+    get:
+      consumes:
+      - application/json
+      description: Get Integration List
+      operationId: get_integration_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: search
+        in: query
+        name: search
+        type: string
+      - description: client-platform-id
+        in: query
+        name: client-platform-id
+        type: string
+      - description: client-type-id
+        in: query
+        name: client-type-id
+        type: string
+      - description: project-id
+        in: query
+        name: project-id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetIntegrationListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetIntegrationListResponse'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Integration List
+      tags:
+      - Integration
+    post:
+      consumes:
+      - application/json
+      description: Create Integration
+      operationId: create_Integration
+      parameters:
+      - description: CreateIntegrationRequestBody
+        in: body
+        name: Integration
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.CreateIntegrationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Integration data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Integration'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Integration
+      tags:
+      - Integration
+    put:
+      consumes:
+      - application/json
+      description: Update Integration
+      operationId: update_Integration
+      parameters:
+      - description: UpdateIntegrationRequestBody
+        in: body
+        name: Integration
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.UpdateIntegrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Integration data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Integration'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Integration
+      tags:
+      - Integration
+  /integration/{Integration-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Integration
+      operationId: delete_Integration
+      parameters:
+      - description: Integration-id
+        in: path
+        name: Integration-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Integration
+      tags:
+      - Integration
+    get:
+      consumes:
+      - application/json
+      description: Get Integration By ID
+      operationId: get_Integration_by_id
+      parameters:
+      - description: Integration-id
+        in: path
+        name: Integration-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: IntegrationBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Integration'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Integration By ID
+      tags:
+      - Integration
   /login:
     post:
       consumes:

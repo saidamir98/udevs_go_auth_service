@@ -98,6 +98,12 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.PUT("/user", h.UpdateUser)
 	r.DELETE("/user/:user-id", h.DeleteUser)
 
+	r.POST("/integration", h.CreateIntegration)
+	r.GET("/integration", h.GetIntegrationList)
+	r.GET("/integration/:Integration-id", h.GetIntegrationByID)
+	r.PUT("/integration", h.UpdateIntegration)
+	r.DELETE("/integration/:Integration-id", h.DeleteIntegration)
+
 	r.POST("/user-relation", h.AddUserRelation)
 	r.DELETE("/user-relation", h.RemoveUserRelation)
 

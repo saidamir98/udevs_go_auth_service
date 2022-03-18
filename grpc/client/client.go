@@ -11,7 +11,7 @@ import (
 type ServiceManagerI interface {
 	SphereService() settings_service.SphereServiceClient
 	PositionService() settings_service.PositionServiceClient
-
+	IntegrationService() auth_service.IntegrationServiceClient
 	ClientService() auth_service.ClientServiceClient
 	PermissionService() auth_service.PermissionServiceClient
 	UserService() auth_service.UserServiceClient
@@ -19,13 +19,13 @@ type ServiceManagerI interface {
 }
 
 type grpcClients struct {
-	sphereService   settings_service.SphereServiceClient
-	positionService settings_service.PositionServiceClient
-
-	clientService     auth_service.ClientServiceClient
-	permissionService auth_service.PermissionServiceClient
-	userService       auth_service.UserServiceClient
-	sessionService    auth_service.SessionServiceClient
+	sphereService      settings_service.SphereServiceClient
+	positionService    settings_service.PositionServiceClient
+	integrationService auth_service.IntegrationServiceClient
+	clientService      auth_service.ClientServiceClient
+	permissionService  auth_service.PermissionServiceClient
+	userService        auth_service.UserServiceClient
+	sessionService     auth_service.SessionServiceClient
 }
 
 func NewGrpcClients(cfg config.Config) (ServiceManagerI, error) {
@@ -46,13 +46,13 @@ func NewGrpcClients(cfg config.Config) (ServiceManagerI, error) {
 	}
 
 	return &grpcClients{
-		sphereService:   settings_service.NewSphereServiceClient(connSettingsService),
-		positionService: settings_service.NewPositionServiceClient(connSettingsService),
-
-		clientService:     auth_service.NewClientServiceClient(connAuthService),
-		permissionService: auth_service.NewPermissionServiceClient(connAuthService),
-		userService:       auth_service.NewUserServiceClient(connAuthService),
-		sessionService:    auth_service.NewSessionServiceClient(connAuthService),
+		sphereService:      settings_service.NewSphereServiceClient(connSettingsService),
+		positionService:    settings_service.NewPositionServiceClient(connSettingsService),
+		clientService:      auth_service.NewClientServiceClient(connAuthService),
+		permissionService:  auth_service.NewPermissionServiceClient(connAuthService),
+		userService:        auth_service.NewUserServiceClient(connAuthService),
+		sessionService:     auth_service.NewSessionServiceClient(connAuthService),
+		integrationService: auth_service.NewIntegrationServiceClient(connAuthService),
 	}, nil
 }
 
@@ -78,4 +78,8 @@ func (g *grpcClients) UserService() auth_service.UserServiceClient {
 
 func (g *grpcClients) SessionService() auth_service.SessionServiceClient {
 	return g.sessionService
+}
+
+func (g *grpcClients) IntegrationService() auth_service.IntegrationServiceClient {
+	return g.integrationService
 }

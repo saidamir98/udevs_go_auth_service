@@ -22,6 +22,7 @@ type StorageI interface {
 	PermissionScope() PermissionScopeRepoI
 	RolePermission() RolePermissionRepoI
 	User() UserRepoI
+	Integration() IntegrationRepoI
 	UserRelation() UserRelationRepoI
 	UserInfo() UserInfoRepoI
 	Session() SessionRepoI
@@ -112,6 +113,15 @@ type UserRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
 	GetByUsername(ctx context.Context, username string) (res *pb.User, err error)
+}
+
+type IntegrationRepoI interface {
+	GetListByPKs(ctx context.Context, pKeys *pb.IntegrationPrimaryKeyList) (res *pb.GetIntegrationListResponse, err error)
+	Create(ctx context.Context, entity *pb.CreateIntegrationRequest) (pKey *pb.IntegrationPrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetIntegrationListRequest) (res *pb.GetIntegrationListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.Integration, err error)
+	Update(ctx context.Context, entity *pb.UpdateIntegrationRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (rowsAffected int64, err error)
 }
 
 type UserRelationRepoI interface {
