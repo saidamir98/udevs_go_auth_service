@@ -1601,6 +1601,89 @@ const docTemplate = `{
                 }
             }
         },
+        "/integration-token": {
+            "post": {
+                "description": "GetIntegrationToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Session"
+                ],
+                "summary": "GetIntegrationToken",
+                "operationId": "get_integration_token",
+                "parameters": [
+                    {
+                        "description": "GetIntegrationTokenRequestBody",
+                        "name": "getIntegrationToken",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_service.GetIntegrationTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Integration Session Response",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.GetIntegrationTokenResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/integration/{Integration-id}": {
             "get": {
                 "description": "Get Integration By ID",
@@ -1783,7 +1866,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/auth_service.User"
+                                            "$ref": "#/definitions/auth_service.LoginResponse"
                                         }
                                     }
                                 }
@@ -5782,6 +5865,49 @@ const docTemplate = `{
                 }
             }
         },
+        "auth_service.GetIntegrationTokenRequest": {
+            "type": "object",
+            "properties": {
+                "integration_id": {
+                    "type": "string"
+                },
+                "secret_key": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth_service.GetIntegrationTokenResponse": {
+            "type": "object",
+            "properties": {
+                "client_platform": {
+                    "$ref": "#/definitions/auth_service.ClientPlatform"
+                },
+                "client_type": {
+                    "$ref": "#/definitions/auth_service.ClientType"
+                },
+                "integration": {
+                    "$ref": "#/definitions/auth_service.Integration"
+                },
+                "integration_found": {
+                    "type": "boolean"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Permission"
+                    }
+                },
+                "sessions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Session"
+                    }
+                },
+                "token": {
+                    "$ref": "#/definitions/auth_service.Token"
+                }
+            }
+        },
         "auth_service.GetPermissionByIDResponse": {
             "type": "object",
             "properties": {
@@ -5913,6 +6039,41 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "auth_service.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "client_platform": {
+                    "$ref": "#/definitions/auth_service.ClientPlatform"
+                },
+                "client_type": {
+                    "$ref": "#/definitions/auth_service.ClientType"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Permission"
+                    }
+                },
+                "role": {
+                    "$ref": "#/definitions/auth_service.Role"
+                },
+                "sessions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Session"
+                    }
+                },
+                "token": {
+                    "$ref": "#/definitions/auth_service.Token"
+                },
+                "user": {
+                    "$ref": "#/definitions/auth_service.User"
+                },
+                "user_found": {
+                    "type": "boolean"
                 }
             }
         },
@@ -6059,6 +6220,70 @@ const docTemplate = `{
                 },
                 "requests": {
                     "type": "integer"
+                }
+            }
+        },
+        "auth_service.Session": {
+            "type": "object",
+            "properties": {
+                "client_platform_id": {
+                    "type": "string"
+                },
+                "client_type_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "integration_id": {
+                    "type": "string"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth_service.Token": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "refresh_in_seconds": {
+                    "type": "integer"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },

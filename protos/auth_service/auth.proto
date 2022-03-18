@@ -138,6 +138,7 @@ message Session {
     string expires_at = 9;
     string created_at = 10;
     string updated_at = 11;
+    string integration_id = 12;
 }
 
 message Passcode {

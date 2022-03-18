@@ -275,6 +275,20 @@ func (r *sessionRepo) DeleteExpiredUserSessions(ctx context.Context, userID stri
 	return rowsAffected, err
 }
 
+func (r *sessionRepo) DeleteExpiredIntegrationSessions(ctx context.Context, integrationId string) (rowsAffected int64, err error) {
+	query := `DELETE FROM "session" WHERE integration_id = $1 AND expires_at < $2`
+
+	result, err := r.db.Exec(ctx, query, integrationId, time.Now().Format("2006-01-02 15:04:05"))
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected = result.RowsAffected()
+
+	return rowsAffected, err
+}
+
+
 func (r *sessionRepo) GetSessionListByUserID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error) {
 	res = &pb.GetSessionListResponse{}
 
@@ -308,6 +322,56 @@ func (r *sessionRepo) GetSessionListByUserID(ctx context.Context, userID string)
 			&obj.ClientPlatformId,
 			&obj.ClientTypeId,
 			&obj.UserId,
+			&obj.RoleId,
+			&obj.Ip,
+			&obj.Data,
+			&obj.ExpiresAt,
+			&obj.CreatedAt,
+			&obj.UpdatedAt,
+		)
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Sessions = append(res.Sessions, obj)
+	}
+
+	return res, nil
+}
+func (r *sessionRepo) GetSessionListByIntegrationID(ctx context.Context, integrationId string) (res *pb.GetSessionListResponse, err error) {
+	res = &pb.GetSessionListResponse{}
+
+	query := `SELECT
+		id,
+		project_id,
+		client_platform_id,
+		client_type_id,
+		integration_id,
+		role_id,
+		TEXT(ip) AS ip,
+		data,
+		TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+		TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+		TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
+	FROM
+		"session"
+	WHERE integration_id = $1`
+
+	rows, err := r.db.Query(ctx, query, integrationId)
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		obj := &pb.Session{}
+		err = rows.Scan(
+			&obj.Id,
+			&obj.ProjectId,
+			&obj.ClientPlatformId,
+			&obj.ClientTypeId,
+			&obj.IntegrationId,
 			&obj.RoleId,
 			&obj.Ip,
 			&obj.Data,

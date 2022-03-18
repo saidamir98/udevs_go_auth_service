@@ -142,5 +142,7 @@ type SessionRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateSessionRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error)
 	DeleteExpiredUserSessions(ctx context.Context, userID string) (rowsAffected int64, err error)
+	DeleteExpiredIntegrationSessions(ctx context.Context, userID string) (rowsAffected int64, err error)
 	GetSessionListByUserID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error)
+	GetSessionListByIntegrationID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error)
 }

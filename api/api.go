@@ -110,6 +110,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.POST("/upsert-user-info/:user-id", h.UpsertUserInfo)
 
 	r.POST("/login", h.Login)
+	r.POST("/integration-token", h.GetIntegrationToken)
 	r.DELETE("/logout", h.Logout)
 	r.PUT("/refresh", h.RefreshToken)
 	r.POST("/has-acess", h.HasAccess)
