@@ -40,6 +40,49 @@ func (r *rolePermissionRepo) Add(ctx context.Context, entity *pb.AddRolePermissi
 	return pKey, err
 }
 
+func (r *rolePermissionRepo) AddMultiple(ctx context.Context, entity *pb.AddRolePermissionsRequest) (rowsAffected int64, err error) {
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return rowsAffected, err
+	}
+
+	// call function to commit or rollback transaction at the end
+	defer func() {
+		if err != nil {
+			err = tx.Rollback(ctx)
+		} else {
+			err = tx.Commit(ctx)
+		}
+	}()
+	query := `DELETE FROM "role_permission" WHERE role_id = $1`
+	_, err = tx.Exec(ctx, query, entity.Permissions[0].RoleId)
+	if err != nil {
+		return rowsAffected, err
+	}
+
+	query = `INSERT INTO "role_permission" (
+		role_id,
+		permission_id
+	) VALUES (
+		$1,
+		$2
+	)`
+
+	for _, value := range entity.GetPermissions() {
+		result, err := tx.Exec(ctx, query,
+			value.RoleId,
+			value.PermissionId,
+		)
+		if err != nil {
+			return rowsAffected, err
+		}
+
+		rowsAffected += result.RowsAffected()
+	}
+
+	return rowsAffected, err
+}
+
 func (r *rolePermissionRepo) GetByPK(ctx context.Context, pKey *pb.RolePermissionPrimaryKey) (res *pb.RolePermission, err error) {
 	res = &pb.RolePermission{}
 	query := `SELECT

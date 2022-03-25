@@ -71,6 +71,8 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.DELETE("/user-info-field/:user-info-field-id", h.RemoveUserInfoField)
 
 	// PERMISSION SERVICE
+	r.GET("/role/:role-id", h.GetRoleByID)
+	r.GET("/role", h.GetRolesList)
 	r.POST("/role", h.AddRole)
 	r.PUT("/role", h.UpdateRole)
 	r.DELETE("/role/:role-id", h.RemoveRole)
@@ -87,6 +89,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.DELETE("/permission-scope", h.RemovePermissionScope)
 
 	r.POST("/role-permission", h.AddRolePermission)
+	r.POST("/role-permission/many", h.AddRolePermissions)
 	r.DELETE("/role-permission", h.RemoveRolePermission)
 
 	r.POST("/user", h.CreateUser)
@@ -95,12 +98,19 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.PUT("/user", h.UpdateUser)
 	r.DELETE("/user/:user-id", h.DeleteUser)
 
+	r.POST("/integration", h.CreateIntegration)
+	r.GET("/integration", h.GetIntegrationList)
+	r.GET("/integration/:Integration-id", h.GetIntegrationByID)
+	r.PUT("/integration", h.UpdateIntegration)
+	r.DELETE("/integration/:Integration-id", h.DeleteIntegration)
+
 	r.POST("/user-relation", h.AddUserRelation)
 	r.DELETE("/user-relation", h.RemoveUserRelation)
 
 	r.POST("/upsert-user-info/:user-id", h.UpsertUserInfo)
 
 	r.POST("/login", h.Login)
+	r.POST("/integration-token", h.GetIntegrationToken)
 	r.DELETE("/logout", h.Logout)
 	r.PUT("/refresh", h.RefreshToken)
 	r.POST("/has-acess", h.HasAccess)

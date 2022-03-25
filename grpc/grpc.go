@@ -21,6 +21,7 @@ func SetUpServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI, s
 	auth_service.RegisterPermissionServiceServer(grpcServer, service.NewPermissionService(cfg, log, strg, svcs))
 	auth_service.RegisterUserServiceServer(grpcServer, service.NewUserService(cfg, log, strg, svcs))
 	auth_service.RegisterSessionServiceServer(grpcServer, service.NewSessionService(cfg, log, strg, svcs))
+	auth_service.RegisterIntegrationServiceServer(grpcServer, service.NewIntegrationService(cfg, log, strg, svcs))
 
 	reflection.Register(grpcServer)
 	return

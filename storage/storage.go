@@ -22,6 +22,7 @@ type StorageI interface {
 	PermissionScope() PermissionScopeRepoI
 	RolePermission() RolePermissionRepoI
 	User() UserRepoI
+	Integration() IntegrationRepoI
 	UserRelation() UserRelationRepoI
 	UserInfo() UserInfoRepoI
 	Session() SessionRepoI
@@ -71,6 +72,8 @@ type UserInfoFieldRepoI interface {
 type RoleRepoI interface {
 	Add(ctx context.Context, entity *pb.AddRoleRequest) (pKey *pb.RolePrimaryKey, err error)
 	GetByPK(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.Role, err error)
+	GetList(ctx context.Context, entity *pb.GetRolesListRequest) (res *pb.GetRolesResponse, err error)
+	GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrimaryKey) (res *pb.GetRoleByIdResponse, err error)
 	Update(ctx context.Context, entity *pb.UpdateRoleRequest) (rowsAffected int64, err error)
 	Remove(ctx context.Context, entity *pb.RolePrimaryKey) (rowsAffected int64, err error)
 }
@@ -78,7 +81,7 @@ type RoleRepoI interface {
 type PermissionRepoI interface {
 	Create(ctx context.Context, entity *pb.CreatePermissionRequest) (pKey *pb.PermissionPrimaryKey, err error)
 	GetList(ctx context.Context, queryParam *pb.GetPermissionListRequest) (res *pb.GetPermissionListResponse, err error)
-	GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.Permission, err error)
+	GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.GetPermissionByIDResponse, err error)
 	Update(ctx context.Context, entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error)
 }
@@ -97,6 +100,7 @@ type PermissionScopeRepoI interface {
 
 type RolePermissionRepoI interface {
 	Add(ctx context.Context, entity *pb.AddRolePermissionRequest) (res *pb.RolePermissionPrimaryKey, err error)
+	AddMultiple(ctx context.Context, entity *pb.AddRolePermissionsRequest) (rowsAffected int64, err error)
 	Remove(ctx context.Context, entity *pb.RolePermissionPrimaryKey) (rowsAffected int64, err error)
 	GetByPK(ctx context.Context, pKey *pb.RolePermissionPrimaryKey) (res *pb.RolePermission, err error)
 }
@@ -109,6 +113,15 @@ type UserRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
 	GetByUsername(ctx context.Context, username string) (res *pb.User, err error)
+}
+
+type IntegrationRepoI interface {
+	GetListByPKs(ctx context.Context, pKeys *pb.IntegrationPrimaryKeyList) (res *pb.GetIntegrationListResponse, err error)
+	Create(ctx context.Context, entity *pb.CreateIntegrationRequest) (pKey *pb.IntegrationPrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetIntegrationListRequest) (res *pb.GetIntegrationListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.Integration, err error)
+	Update(ctx context.Context, entity *pb.UpdateIntegrationRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (rowsAffected int64, err error)
 }
 
 type UserRelationRepoI interface {
@@ -129,5 +142,7 @@ type SessionRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateSessionRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error)
 	DeleteExpiredUserSessions(ctx context.Context, userID string) (rowsAffected int64, err error)
+	DeleteExpiredIntegrationSessions(ctx context.Context, userID string) (rowsAffected int64, err error)
 	GetSessionListByUserID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error)
+	GetSessionListByIntegrationID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error)
 }

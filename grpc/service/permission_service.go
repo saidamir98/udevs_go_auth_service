@@ -43,6 +43,32 @@ func (s *permissionService) AddRole(ctx context.Context, req *pb.AddRoleRequest)
 	return s.strg.Role().GetByPK(ctx, pKey)
 }
 
+func (s *permissionService) GetRoleById(ctx context.Context, req *pb.RolePrimaryKey) (*pb.GetRoleByIdResponse, error) {
+	s.log.Info("---GetRoleById--->", logger.Any("req", req))
+
+	res, err := s.strg.Role().GetRoleByIdDetailed(ctx, req)
+
+	if err != nil {
+		s.log.Error("!!!GetRoleById--->", logger.Error(err))
+		return res, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return res, err
+}
+
+func (s *permissionService) GetRolesList(ctx context.Context, req *pb.GetRolesListRequest) (*pb.GetRolesResponse, error) {
+	s.log.Info("---GetRolesList--->", logger.Any("req", req))
+
+	res, err := s.strg.Role().GetList(ctx, req)
+
+	if err != nil {
+		s.log.Error("!!!GetRolesList--->", logger.Error(err))
+		return res, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return res, err
+}
+
 func (s *permissionService) UpdateRole(ctx context.Context, req *pb.UpdateRoleRequest) (*pb.Role, error) {
 	s.log.Info("---UpdateRole--->", logger.Any("req", req))
 
@@ -93,7 +119,7 @@ func (s *permissionService) RemoveRole(ctx context.Context, req *pb.RolePrimaryK
 	return res, nil
 }
 
-func (s *permissionService) CreatePermission(ctx context.Context, req *pb.CreatePermissionRequest) (*pb.Permission, error) {
+func (s *permissionService) CreatePermission(ctx context.Context, req *pb.CreatePermissionRequest) (*pb.GetPermissionByIDResponse, error) {
 	s.log.Info("---CreatePermission--->", logger.Any("req", req))
 
 	pKey, err := s.strg.Permission().Create(ctx, req)
@@ -106,7 +132,7 @@ func (s *permissionService) CreatePermission(ctx context.Context, req *pb.Create
 	return s.strg.Permission().GetByPK(ctx, pKey)
 }
 
-func (s *permissionService) GetPermissionByID(ctx context.Context, req *pb.PermissionPrimaryKey) (*pb.Permission, error) {
+func (s *permissionService) GetPermissionByID(ctx context.Context, req *pb.PermissionPrimaryKey) (*pb.GetPermissionByIDResponse, error) {
 	s.log.Info("---GetPermissionByID--->", logger.Any("req", req))
 
 	res, err := s.strg.Permission().GetByPK(ctx, req)
@@ -132,7 +158,7 @@ func (s *permissionService) GetPermissionList(ctx context.Context, req *pb.GetPe
 	return res, err
 }
 
-func (s *permissionService) UpdatePermission(ctx context.Context, req *pb.UpdatePermissionRequest) (*pb.Permission, error) {
+func (s *permissionService) UpdatePermission(ctx context.Context, req *pb.UpdatePermissionRequest) (*pb.GetPermissionByIDResponse, error) {
 	s.log.Info("---UpdatePermission--->", logger.Any("req", req))
 
 	rowsAffected, err := s.strg.Permission().Update(ctx, req)
@@ -233,6 +259,20 @@ func (s *permissionService) AddRolePermission(ctx context.Context, req *pb.AddRo
 	}
 
 	return s.strg.RolePermission().GetByPK(ctx, pKey)
+}
+
+func (s *permissionService) AddRolePermissions(ctx context.Context, req *pb.AddRolePermissionsRequest) (*pb.AddRolePermissionsResponse, error) {
+	s.log.Info("---AddRolePermissions--->", logger.Any("req", req))
+
+	rowsAffected, err := s.strg.RolePermission().AddMultiple(ctx, req)
+	if err != nil {
+		s.log.Error("!!!AddRolePermissions--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &pb.AddRolePermissionsResponse{
+		AddedRoles: rowsAffected,
+	}, err
 }
 
 func (s *permissionService) RemoveRolePermission(ctx context.Context, req *pb.RolePermissionPrimaryKey) (*pb.RolePermission, error) {
