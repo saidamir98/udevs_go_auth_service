@@ -4,7 +4,6 @@ go 1.16
 
 require (
 	github.com/bxcodec/faker/v3 v3.7.0
-	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-openapi/swag v0.21.1 // indirect

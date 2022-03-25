@@ -1,5 +1,5 @@
 syntax="proto3";
-
+// 
 package auth_service;
 option go_package="genproto/auth_service";
 
@@ -68,6 +68,8 @@ message Role {
     string id = 1;
     string client_type_id = 2;
     string name = 3;
+    string client_platform_id = 4;
+    string project_id = 5;
 }
 
 message Scope {
@@ -136,6 +138,7 @@ message Session {
     string expires_at = 9;
     string created_at = 10;
     string updated_at = 11;
+    string integration_id = 12;
 }
 
 message Passcode {
@@ -159,4 +162,19 @@ message Token {
     string updated_at = 4;
     string expires_at = 5;
     int32 refresh_in_seconds = 6;
+}
+
+message Integration {
+    string id = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string role_id = 5;
+    string secret_key = 6;
+    string ip_whitelist = 7;
+    int32 active = 8;
+    string expires_at = 9;
+    string created_at = 10;
+    string updated_at = 11;
+    string title = 12;
 }
