@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"regexp"
 	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/grpc/client"
@@ -34,12 +36,34 @@ func NewUserService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 func (s *userService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
 	s.log.Info("---CreateUser--->", logger.Any("req", req))
 
+	if len(req.Password) < 6 {
+		err := fmt.Errorf("password must not be less than 6 characters")
+		s.log.Error("!!!CreateUser--->", logger.Error(err))
+		return nil, err
+	}
+
 	hashedPassword, err := security.HashPassword(req.Password)
 	if err != nil {
 		s.log.Error("!!!CreateUser--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	req.Password = hashedPassword
+
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	email := emailRegex.MatchString(req.Email)
+	if !email {
+		err = fmt.Errorf("email is not valid")
+		s.log.Error("!!!CreateUser--->", logger.Error(err))
+		return nil, err
+	}
+
+	phoneRegex := regexp.MustCompile(`^[+]?(\d{1,2})?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$`)
+	phone := phoneRegex.MatchString(req.Phone)
+	if !phone {
+		err = fmt.Errorf("phone number is not valid")
+		s.log.Error("!!!CreateUser--->", logger.Error(err))
+		return nil, err
+	}
 
 	pKey, err := s.strg.User().Create(ctx, req)
 
