@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
@@ -53,6 +54,11 @@ func (r *IntegrationRepo) Create(ctx context.Context, entity *pb.CreateIntegrati
 		return pKey, err
 	}
 
+	jsonStruct, err := json.Marshal(entity.IpWhitelist)
+	if err != nil {
+		return nil, err
+	}
+
 	_, err = r.db.Exec(ctx, query,
 		uuid.String(),
 		entity.ProjectId,
@@ -61,7 +67,7 @@ func (r *IntegrationRepo) Create(ctx context.Context, entity *pb.CreateIntegrati
 		entity.RoleId,
 		entity.Title,
 		entity.SecretKey,
-		[]byte(entity.IpWhitelist),
+		jsonStruct,
 		entity.Active,
 		entity.ExpiresAt,
 	)
