@@ -322,10 +322,11 @@ func (r *IntegrationRepo) GetList(ctx context.Context, queryParam *pb.GetIntegra
 	for rows.Next() {
 		obj := &pb.Integration{}
 		var (
-			active    sql.NullInt32
-			expiresAt sql.NullString
-			createdAt sql.NullString
-			updatedAt sql.NullString
+			active      sql.NullInt32
+			expiresAt   sql.NullString
+			createdAt   sql.NullString
+			updatedAt   sql.NullString
+			ipWhiteList []byte
 		)
 
 		err = rows.Scan(
@@ -336,7 +337,7 @@ func (r *IntegrationRepo) GetList(ctx context.Context, queryParam *pb.GetIntegra
 			&obj.RoleId,
 			&obj.Title,
 			&obj.SecretKey,
-			&obj.IpWhitelist,
+			&ipWhiteList,
 			&active,
 			&expiresAt,
 			&createdAt,
@@ -362,6 +363,8 @@ func (r *IntegrationRepo) GetList(ctx context.Context, queryParam *pb.GetIntegra
 		if updatedAt.Valid {
 			obj.UpdatedAt = updatedAt.String
 		}
+
+		err = json.Unmarshal(ipWhiteList, &obj.IpWhitelist)
 
 		res.Integrations = append(res.Integrations, obj)
 	}
