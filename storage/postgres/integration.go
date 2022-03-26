@@ -383,6 +383,10 @@ func (r *IntegrationRepo) Update(ctx context.Context, entity *pb.UpdateIntegrati
 	WHERE
 		id = :id`
 
+	jsonStruct, err := json.Marshal(entity.IpWhitelist)
+	if err != nil {
+		return 0, err
+	}
 	params := map[string]interface{}{
 		"id":                 entity.Id,
 		"project_id":         entity.ProjectId,
@@ -390,7 +394,7 @@ func (r *IntegrationRepo) Update(ctx context.Context, entity *pb.UpdateIntegrati
 		"client_type_id":     entity.ClientTypeId,
 		"role_id":            entity.RoleId,
 		"title":              entity.Name,
-		"ip_whitelist":       entity.IpWhitelist,
+		"ip_whitelist":       jsonStruct,
 		"active":             entity.Active,
 		"expires_at":         entity.ExpiresAt,
 	}
