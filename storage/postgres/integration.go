@@ -376,7 +376,7 @@ func (r *IntegrationRepo) Update(ctx context.Context, entity *pb.UpdateIntegrati
 		client_type_id = :client_type_id,
 		role_id = :role_id,
 		title = :title,
-		ip_writelist = :ip_writelist,
+		ip_whitelist = :ip_whitelist,
 		active = :active,
 		expires_at = :expires_at,
 		updated_at = now()
@@ -390,7 +390,7 @@ func (r *IntegrationRepo) Update(ctx context.Context, entity *pb.UpdateIntegrati
 		"client_type_id":     entity.ClientTypeId,
 		"role_id":            entity.RoleId,
 		"title":              entity.Name,
-		"ip_writelist":       entity.IpWhitelist,
+		"ip_whitelist":       entity.IpWhitelist,
 		"active":             entity.Active,
 		"expires_at":         entity.ExpiresAt,
 	}
