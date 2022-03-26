@@ -127,6 +127,21 @@ func (s *userService) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 	if rowsAffected <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
 	}
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	email := emailRegex.MatchString(req.Email)
+	if !email {
+		err = fmt.Errorf("email is not valid")
+		s.log.Error("!!!UpdateUser--->", logger.Error(err))
+		return nil, err
+	}
+
+	phoneRegex := regexp.MustCompile(`^[+]?(\d{1,2})?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$`)
+	phone := phoneRegex.MatchString(req.Phone)
+	if !phone {
+		err = fmt.Errorf("phone number is not valid")
+		s.log.Error("!!!UpdateUser--->", logger.Error(err))
+		return nil, err
+	}
 
 	res, err := s.strg.User().GetByPK(ctx, &pb.UserPrimaryKey{Id: req.Id})
 	if err != nil {
