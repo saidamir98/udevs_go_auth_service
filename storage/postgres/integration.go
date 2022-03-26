@@ -393,7 +393,7 @@ func (r *IntegrationRepo) Update(ctx context.Context, entity *pb.UpdateIntegrati
 		"client_platform_id": entity.ClientPlatformId,
 		"client_type_id":     entity.ClientTypeId,
 		"role_id":            entity.RoleId,
-		"title":              entity.Name,
+		"title":              entity.Title,
 		"ip_whitelist":       jsonStruct,
 		"active":             entity.Active,
 		"expires_at":         entity.ExpiresAt,

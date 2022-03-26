@@ -59,7 +59,7 @@ message UpdateIntegrationRequest {
     string role_id = 5;
     int32 active = 6;
     string expires_at = 7;
-    string name = 8;
+    string title = 8;
     string ip_whitelist = 9;
 }
 
