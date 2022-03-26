@@ -259,7 +259,7 @@ func (r *IntegrationRepo) GetList(ctx context.Context, queryParam *pb.GetIntegra
 		role_id,
 		title,
 		secret_key,
-		ip_whitelist,
+		ip_whitelist::varchar,
 		active,
 		expires_at,
 		created_at,
