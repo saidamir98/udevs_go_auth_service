@@ -96,20 +96,48 @@ func (h *Handler) GetIntegrationList(c *gin.Context) {
 	h.handleResponse(c, http.OK, resp)
 }
 
+// GetIntegrationSessions godoc
+// @ID get_integration_sessions
+// @Router /integration/{integration-id}/sessions [GET]
+// @Summary Get Integration Sessions
+// @Description  Get Integration Sessions
+// @Tags Integration
+// @Accept json
+// @Produce json
+// @Param integration-id path string true "integration-id"
+// @Success 200 {object} http.Response{data=auth_service.GetIntegrationSessionsResponse} "GetIntegrationSessionsResponseBody"
+// @Response 400 {object} http.Response{data=string} "Invalid Argument"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetIntegrationSessions(c *gin.Context) {
+	resp, err := h.services.IntegrationService().GetIntegrationSessions(
+		c.Request.Context(),
+		&auth_service.IntegrationPrimaryKey{
+			Id: c.Param("integration-id"),
+		},
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, resp)
+}
+
 // GetIntegrationByID godoc
 // @ID get_Integration_by_id
-// @Router /integration/{Integration-id} [GET]
+// @Router /integration/{integration-id} [GET]
 // @Summary Get Integration By ID
 // @Description Get Integration By ID
 // @Tags Integration
 // @Accept json
 // @Produce json
-// @Param Integration-id path string true "Integration-id"
+// @Param integration-id path string true "integration-id"
 // @Success 200 {object} http.Response{data=auth_service.Integration} "IntegrationBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetIntegrationByID(c *gin.Context) {
-	IntegrationID := c.Param("Integration-id")
+	IntegrationID := c.Param("integration-id")
 
 	if !util.IsValidUUID(IntegrationID) {
 		h.handleResponse(c, http.InvalidArgument, "Integration id is an invalid uuid")
@@ -167,18 +195,18 @@ func (h *Handler) UpdateIntegration(c *gin.Context) {
 
 // DeleteIntegration godoc
 // @ID delete_Integration
-// @Router /integration/{Integration-id} [DELETE]
+// @Router /integration/{integration-id} [DELETE]
 // @Summary Delete Integration
 // @Description Get Integration
 // @Tags Integration
 // @Accept json
 // @Produce json
-// @Param Integration-id path string true "Integration-id"
+// @Param integration-id path string true "Integration-id"
 // @Success 204
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) DeleteIntegration(c *gin.Context) {
-	IntegrationID := c.Param("Integration-id")
+	IntegrationID := c.Param("integration-id")
 
 	if !util.IsValidUUID(IntegrationID) {
 		h.handleResponse(c, http.InvalidArgument, "Integration id is an invalid uuid")

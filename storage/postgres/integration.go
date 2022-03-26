@@ -116,6 +116,57 @@ func (r *IntegrationRepo) GetByPK(ctx context.Context, pKey *pb.IntegrationPrima
 	return res, nil
 }
 
+func (r *IntegrationRepo) GetIntegrationSessions(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.GetIntegrationSessionsResponse, err error) {
+	res = &pb.GetIntegrationSessionsResponse{}
+	query := `
+		SELECT 
+			id,
+			integration_id,
+			project_id,
+			client_type_id,
+			client_platform_id,
+			role_id,
+			ip,
+			data,
+			TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+			TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+			TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
+		FROM
+			"session"
+		WHERE integration_id = $1
+	`
+
+	rows, err := r.db.Query(ctx, query, pKey.GetId())
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		temp := new(pb.Session)
+		err = rows.Scan(
+			&temp.Id,
+			&temp.IntegrationId,
+			&temp.ProjectId,
+			&temp.ClientTypeId,
+			&temp.ClientPlatformId,
+			&temp.RoleId,
+			&temp.Ip,
+			&temp.Data,
+			&temp.ExpiresAt,
+			&temp.CreatedAt,
+			&temp.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		res.Sessions = append(res.Sessions, temp)
+	}
+
+	return res, nil
+}
+
 func (r *IntegrationRepo) GetListByPKs(ctx context.Context, pKeys *pb.IntegrationPrimaryKeyList) (res *pb.GetIntegrationListResponse, err error) {
 	res = &pb.GetIntegrationListResponse{}
 	query := `SELECT

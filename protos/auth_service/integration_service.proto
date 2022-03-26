@@ -14,6 +14,7 @@ service IntegrationService {
     rpc GetIntegrationList(GetIntegrationListRequest) returns (GetIntegrationListResponse) {}
     rpc UpdateIntegration(UpdateIntegrationRequest) returns (Integration) {}
     rpc DeleteIntegration(IntegrationPrimaryKey) returns (google.protobuf.Empty) {}
+    rpc GetIntegrationSessions(IntegrationPrimaryKey) returns (GetIntegrationSessionsResponse) {}
 }
 
 message CreateIntegrationRequest {
@@ -70,4 +71,8 @@ message AddIntegrationRelationRequest {
 message IntegrationRelationPrimaryKey {
     string integration_id = 1;
     string relation_id = 2;
+}
+
+message GetIntegrationSessionsResponse {
+    repeated Session sessions = 1;
 }

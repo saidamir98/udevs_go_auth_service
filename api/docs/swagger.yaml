@@ -279,6 +279,13 @@ definitions:
           $ref: '#/definitions/auth_service.Integration'
         type: array
     type: object
+  auth_service.GetIntegrationSessionsResponse:
+    properties:
+      sessions:
+        items:
+          $ref: '#/definitions/auth_service.Session'
+        type: array
+    type: object
   auth_service.GetIntegrationTokenRequest:
     properties:
       integration_id:
@@ -1855,7 +1862,7 @@ paths:
       summary: GetIntegrationToken
       tags:
       - Session
-  /integration/{Integration-id}:
+  /integration/{integration-id}:
     delete:
       consumes:
       - application/json
@@ -1864,7 +1871,7 @@ paths:
       parameters:
       - description: Integration-id
         in: path
-        name: Integration-id
+        name: integration-id
         required: true
         type: string
       produces:
@@ -1899,9 +1906,9 @@ paths:
       description: Get Integration By ID
       operationId: get_Integration_by_id
       parameters:
-      - description: Integration-id
+      - description: integration-id
         in: path
-        name: Integration-id
+        name: integration-id
         required: true
         type: string
       produces:
@@ -1935,6 +1942,51 @@ paths:
                   type: string
               type: object
       summary: Get Integration By ID
+      tags:
+      - Integration
+  /integration/{integration-id}/sessions:
+    get:
+      consumes:
+      - application/json
+      description: Get Integration Sessions
+      operationId: get_integration_sessions
+      parameters:
+      - description: integration-id
+        in: path
+        name: integration-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetIntegrationSessionsResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetIntegrationSessionsResponse'
+              type: object
+        "400":
+          description: Invalid Argument
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Integration Sessions
       tags:
       - Integration
   /login:

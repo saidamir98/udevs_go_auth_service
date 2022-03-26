@@ -56,6 +56,18 @@ func (s *integrationService) GetIntegrationByID(ctx context.Context, req *pb.Int
 	return res, nil
 }
 
+func (s *integrationService) GetIntegrationSessions(ctx context.Context, req *pb.IntegrationPrimaryKey) (*pb.GetIntegrationSessionsResponse, error) {
+	s.log.Info("---GetIntegrationByUserId--->", logger.Any("req", req))
+
+	res, err := s.strg.Integration().GetIntegrationSessions(ctx, req)
+	if err != nil {
+		s.log.Error("---GetIntegrationByUserId--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return res, nil
+}
+
 func (s *integrationService) GetIntegrationListByIDs(ctx context.Context, req *pb.IntegrationPrimaryKeyList) (*pb.GetIntegrationListResponse, error) {
 	s.log.Info("---GetUserListByIDs--->", logger.Any("req", req))
 

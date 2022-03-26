@@ -1684,7 +1684,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/integration/{Integration-id}": {
+        "/integration/{integration-id}": {
             "get": {
                 "description": "Get Integration By ID",
                 "consumes": [
@@ -1701,8 +1701,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Integration-id",
-                        "name": "Integration-id",
+                        "description": "integration-id",
+                        "name": "integration-id",
                         "in": "path",
                         "required": true
                     }
@@ -1781,7 +1781,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Integration-id",
-                        "name": "Integration-id",
+                        "name": "integration-id",
                         "in": "path",
                         "required": true
                     }
@@ -1789,6 +1789,87 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": ""
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/integration/{integration-id}/sessions": {
+            "get": {
+                "description": "Get Integration Sessions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integration"
+                ],
+                "summary": "Get Integration Sessions",
+                "operationId": "get_integration_sessions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "integration-id",
+                        "name": "integration-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "GetIntegrationSessionsResponseBody",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.GetIntegrationSessionsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
                     },
                     "400": {
                         "description": "Invalid Argument",
@@ -5861,6 +5942,17 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/auth_service.Integration"
+                    }
+                }
+            }
+        },
+        "auth_service.GetIntegrationSessionsResponse": {
+            "type": "object",
+            "properties": {
+                "sessions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Session"
                     }
                 }
             }
