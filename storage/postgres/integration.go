@@ -99,6 +99,7 @@ func (r *IntegrationRepo) GetByPK(ctx context.Context, pKey *pb.IntegrationPrima
 	WHERE
 		id = $1`
 
+	var ipWhiteList []byte
 	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
 		&res.Id,
 		&res.ProjectId,
@@ -107,7 +108,7 @@ func (r *IntegrationRepo) GetByPK(ctx context.Context, pKey *pb.IntegrationPrima
 		&res.RoleId,
 		&res.Title,
 		&res.SecretKey,
-		&res.IpWhitelist,
+		&ipWhiteList,
 		&res.Active,
 		&res.ExpiresAt,
 		&res.CreatedAt,
@@ -115,6 +116,11 @@ func (r *IntegrationRepo) GetByPK(ctx context.Context, pKey *pb.IntegrationPrima
 	)
 	if err != nil {
 		return res, err
+	}
+
+	err = json.Unmarshal(ipWhiteList, &res.IpWhitelist)
+	if err != nil {
+		return nil, err
 	}
 
 	return res, nil
@@ -199,10 +205,11 @@ func (r *IntegrationRepo) GetListByPKs(ctx context.Context, pKeys *pb.Integratio
 
 	for rows.Next() {
 		var (
-			active    sql.NullInt32
-			expiresAt sql.NullString
-			createdAt sql.NullString
-			updatedAt sql.NullString
+			active      sql.NullInt32
+			expiresAt   sql.NullString
+			createdAt   sql.NullString
+			updatedAt   sql.NullString
+			ipWhiteList []byte
 		)
 
 		integration := &pb.Integration{}
@@ -214,7 +221,7 @@ func (r *IntegrationRepo) GetListByPKs(ctx context.Context, pKeys *pb.Integratio
 			&integration.RoleId,
 			&integration.Title,
 			&integration.SecretKey,
-			&integration.IpWhitelist,
+			&ipWhiteList,
 			&active,
 			&expiresAt,
 			&createdAt,
@@ -239,6 +246,11 @@ func (r *IntegrationRepo) GetListByPKs(ctx context.Context, pKeys *pb.Integratio
 
 		if updatedAt.Valid {
 			integration.UpdatedAt = updatedAt.String
+		}
+
+		err = json.Unmarshal(ipWhiteList, &integration.IpWhitelist)
+		if err != nil {
+			return nil, err
 		}
 
 		res.Integrations = append(res.Integrations, integration)
@@ -365,6 +377,9 @@ func (r *IntegrationRepo) GetList(ctx context.Context, queryParam *pb.GetIntegra
 		}
 
 		err = json.Unmarshal(ipWhiteList, &obj.IpWhitelist)
+		if err != nil {
+			return nil, err
+		}
 
 		res.Integrations = append(res.Integrations, obj)
 	}
