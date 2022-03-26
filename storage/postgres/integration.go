@@ -61,7 +61,7 @@ func (r *IntegrationRepo) Create(ctx context.Context, entity *pb.CreateIntegrati
 		entity.RoleId,
 		entity.Title,
 		entity.SecretKey,
-		entity.IpWhitelist,
+		[]byte(entity.IpWhitelist),
 		entity.Active,
 		entity.ExpiresAt,
 	)
