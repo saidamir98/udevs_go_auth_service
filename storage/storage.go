@@ -113,6 +113,7 @@ type UserRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
 	GetByUsername(ctx context.Context, username string) (res *pb.User, err error)
+	ResetPassword(ctx context.Context, user *pb.ResetPasswordRequest) (rowsAffected int64, err error)
 }
 
 type IntegrationRepoI interface {

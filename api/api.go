@@ -97,6 +97,8 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.GET("/user/:user-id", h.GetUserByID)
 	r.PUT("/user", h.UpdateUser)
 	r.DELETE("/user/:user-id", h.DeleteUser)
+	r.PUT("/user/reset-password", h.ResetPassword)
+	r.POST("/user/send-message", h.SendMessageToUserEmail)
 
 	r.POST("/integration", h.CreateIntegration)
 	r.GET("/integration", h.GetIntegrationList)

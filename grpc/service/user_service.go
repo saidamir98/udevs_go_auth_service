@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"time"
 	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/grpc/client"
+	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/pkg/logger"
 	"upm/udevs_go_auth_service/pkg/security"
 	"upm/udevs_go_auth_service/storage"
@@ -218,4 +220,66 @@ func (s *userService) UpsertUserInfo(ctx context.Context, req *pb.UpsertUserInfo
 	}
 
 	return s.strg.UserInfo().GetByPK(ctx, pKey)
+}
+
+func (s *userService) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*pb.User, error) {
+	s.log.Info("---ResetPassword--->", logger.Any("req", req))
+
+	if len(req.Password) < 6 {
+		err := fmt.Errorf("password must not be less than 6 characters")
+		s.log.Error("!!!ResetPassword--->", logger.Error(err))
+		return nil, err
+	}
+
+	hashedPassword, err := security.HashPassword(req.Password)
+	if err != nil {
+		s.log.Error("!!!ResetPassword--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	tokenInfo, err := security.ParseClaims(req.Token, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!ResetPassword--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	req.Password = hashedPassword
+	req.UserId = tokenInfo.ID
+
+	rowsAffected, err := s.strg.User().ResetPassword(ctx, req)
+	if err != nil {
+		s.log.Error("!!!ResetPassword--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if rowsAffected <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
+	}
+
+	return s.strg.User().GetByPK(ctx, &pb.UserPrimaryKey{Id: req.UserId})
+}
+
+func (s *userService) SendMessageToEmail(ctx context.Context, req *pb.SendMessageToEmailRequest) (*emptypb.Empty, error) {
+	user, err := s.strg.User().GetByUsername(context.Background(), req.GetEmail())
+	if err != nil {
+		s.log.Error("error while getting user by email", logger.Error(err), logger.Any("req", req))
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	m := map[string]interface{}{
+		"id": user.Id,
+	}
+
+	token, err := security.GenerateJWT(m, time.Hour*2, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("error while getting generating token", logger.Error(err), logger.Any("req", req))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	err = helper.SendEmail("Update Password", req.GetEmail(), req.GetBaseUrl(), token)
+	if err != nil {
+		s.log.Error("!!!SendUpdatePasswordUrlToEmail--->", logger.Error(err), logger.Any("req", req))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return &emptypb.Empty{}, nil
 }

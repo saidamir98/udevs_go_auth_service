@@ -450,3 +450,26 @@ func (r *userRepo) GetByUsername(ctx context.Context, username string) (res *pb.
 
 	return res, nil
 }
+
+func (r *userRepo) ResetPassword(ctx context.Context, user *pb.ResetPasswordRequest) (rowsAffected int64, err error) {
+	query := `UPDATE "user" SET
+		password = :password,
+		updated_at = now()
+	WHERE
+		id = :id`
+
+	params := map[string]interface{}{
+		"id":       user.UserId,
+		"password": user.Password,
+	}
+
+	q, arr := helper.ReplaceQueryParams(query, params)
+	result, err := r.db.Exec(ctx, q, arr...)
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected = result.RowsAffected()
+
+	return rowsAffected, err
+}

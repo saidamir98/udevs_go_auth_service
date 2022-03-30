@@ -311,3 +311,71 @@ func (h *Handler) UpsertUserInfo(c *gin.Context) {
 
 	h.handleResponse(c, http.Created, resp)
 }
+
+// UpdateUser godoc
+// @ID reset_password
+// @Router /user/reset-password [PUT]
+// @Summary Update User
+// @Description Reset Password
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param reset_password body auth_service.ResetPasswordRequest true "ResetPasswordRequestBody"
+// @Success 200 {object} http.Response{data=auth_service.User} "User data"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) ResetPassword(c *gin.Context) {
+	var user auth_service.ResetPasswordRequest
+
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		h.handleResponse(c, http.BadRequest, err.Error())
+		return
+	}
+
+	resp, err := h.services.UserService().ResetPassword(
+		c.Request.Context(),
+		&user,
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, resp)
+}
+
+// UpdateUser godoc
+// @ID send_message_to_user_email
+// @Router /user/send-message [POST]
+// @Summary Send Message To User
+// @Description Send Message to User Email
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param send_message body auth_service.SendMessageToEmailRequest true "SendMessageToEmailRequestBody"
+// @Success 204
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) SendMessageToUserEmail(c *gin.Context) {
+	var customerMessage auth_service.SendMessageToEmailRequest
+
+	err := c.ShouldBindJSON(&customerMessage)
+	if err != nil {
+		h.handleResponse(c, http.BadRequest, err.Error())
+		return
+	}
+
+	resp, err := h.services.UserService().SendMessageToEmail(
+		c.Request.Context(),
+		&customerMessage,
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.NoContent, resp)
+}
