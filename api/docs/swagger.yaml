@@ -3456,7 +3456,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/auth_service.User'
+                  $ref: '#/definitions/auth_service.LoginResponse'
               type: object
         "500":
           description: Server Error

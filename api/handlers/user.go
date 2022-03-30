@@ -321,7 +321,7 @@ func (h *Handler) UpsertUserInfo(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param reset_password body auth_service.ResetPasswordRequest true "ResetPasswordRequestBody"
-// @Success 200 {object} http.Response{data=auth_service.User} "User data"
+// @Success 200 {object} http.Response{data=auth_service.LoginResponse} "User data"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) ResetPassword(c *gin.Context) {
@@ -337,13 +337,24 @@ func (h *Handler) ResetPassword(c *gin.Context) {
 		c.Request.Context(),
 		&user,
 	)
-
 	if err != nil {
 		h.handleResponse(c, http.GRPCError, err.Error())
 		return
 	}
 
-	h.handleResponse(c, http.OK, resp)
+	login, err := h.services.SessionService().Login(
+		c.Request.Context(),
+		&auth_service.LoginRequest{
+			Username: resp.GetLogin(),
+			Password: user.GetPassword(),
+		},
+	)
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, login)
 }
 
 // UpdateUser godoc

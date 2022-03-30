@@ -4225,7 +4225,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/auth_service.User"
+                                            "$ref": "#/definitions/auth_service.LoginResponse"
                                         }
                                     }
                                 }
