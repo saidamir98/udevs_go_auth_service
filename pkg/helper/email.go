@@ -20,7 +20,7 @@ func SendEmail(subject, to, link, token string) error {
 	message := `
 		You can update your password using the following url
    
-	   ` + link + "/User/reset-password?token=" + token
+	   ` + link + "?token=" + token
 
 	auth := smtp.PlainAuth("", from, password, host)
 
