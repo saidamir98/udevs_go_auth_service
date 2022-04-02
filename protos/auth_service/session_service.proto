@@ -11,6 +11,7 @@ service SessionService {
     rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {}
     rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
     rpc HasAccess(HasAccessRequest) returns (HasAccessResponse) {}
+    rpc GetIntegrationToken(GetIntegrationTokenRequest)  returns (GetIntegrationTokenResponse) {}
 }
 
 message LoginRequest {
@@ -72,6 +73,7 @@ message CreateSessionRequest {
     string ip = 7;
     string data = 8;
     string expires_at = 9;
+    string integration_id = 10;
 }
 
 message UpdateSessionRequest {
@@ -99,4 +101,19 @@ message GetSessionListRequest {
 message GetSessionListResponse {
     int32 count = 1;
     repeated Session sessions = 2;
+}
+
+message GetIntegrationTokenRequest {
+    string integration_id = 1;
+    string secret_key = 2;
+}
+
+message GetIntegrationTokenResponse {
+    bool integration_found = 1;
+    ClientPlatform client_platform = 2;
+    ClientType client_type = 3;
+    Integration integration = 4;
+    Token token = 6;
+    repeated Permission permissions = 7;
+    repeated Session sessions = 8;
 }

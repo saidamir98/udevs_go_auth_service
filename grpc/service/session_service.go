@@ -51,6 +51,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 
 	user, err := s.strg.User().GetByUsername(ctx, req.Username)
 	if err != nil {
+		err := errors.New("Invalid username or password")
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -180,6 +181,166 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 		"client_platform_id": session.ClientPlatformId,
 		"client_type_id":     session.ClientTypeId,
 		"user_id":            session.UserId,
+		"role_id":            session.RoleId,
+		"ip":                 session.Data,
+		"data":               session.Data,
+	}
+
+	accessToken, err := security.GenerateJWT(m, config.AccessTokenExpiresInTime, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	refreshToken, err := security.GenerateJWT(m, config.RefreshTokenExpiresInTime, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	res.Token = &pb.Token{
+		AccessToken:      accessToken,
+		RefreshToken:     refreshToken,
+		CreatedAt:        session.CreatedAt,
+		UpdatedAt:        session.UpdatedAt,
+		ExpiresAt:        session.ExpiresAt,
+		RefreshInSeconds: int32(config.AccessTokenExpiresInTime.Seconds()),
+	}
+
+	return res, nil
+}
+func (s *sessionService) GetIntegrationToken(ctx context.Context, req *pb.GetIntegrationTokenRequest) (*pb.GetIntegrationTokenResponse, error) {
+	res := &pb.GetIntegrationTokenResponse{}
+
+	if len(req.SecretKey) < 6 {
+		err := errors.New("invalid key")
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	integration, err := s.strg.Integration().GetByPK(ctx, &pb.IntegrationPrimaryKey{
+		Id: req.IntegrationId,
+	})
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	match := integration.SecretKey == req.SecretKey
+	if !match {
+		err := errors.New("password is wrong")
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if integration.Active < 0 {
+		err := errors.New("integration is not active")
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if integration.Active == 0 {
+		err := errors.New("integration hasn't been activated yet")
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	expiresAt, err := time.Parse(config.DatabaseTimeLayout, integration.ExpiresAt)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if expiresAt.Unix() < time.Now().Unix() {
+		err := errors.New("integration has been expired")
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	res.IntegrationFound = true
+	res.Integration = integration
+
+	clientType, err := s.strg.ClientType().GetByPK(ctx, &pb.ClientTypePrimaryKey{
+		Id: integration.ClientTypeId,
+	})
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	res.ClientType = clientType
+
+	clientPlatform, err := s.strg.ClientPlatform().GetByPK(ctx, &pb.ClientPlatformPrimaryKey{
+		Id: integration.ClientPlatformId,
+	})
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	res.ClientPlatform = clientPlatform
+
+	client, err := s.strg.Client().GetByPK(ctx, &pb.ClientPrimaryKey{
+		ClientPlatformId: integration.ClientPlatformId,
+		ClientTypeId:     integration.ClientTypeId,
+	})
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if client.LoginStrategy != pb.LoginStrategies_STANDARD {
+		err := errors.New("incorrect login strategy")
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	res.Integration.RoleId = integration.RoleId
+
+	// TODO - Delete all old sessions & refresh token has this function too
+	rowsAffected, err := s.strg.Session().DeleteExpiredIntegrationSessions(ctx, integration.Id)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	s.log.Info("Login--->DeleteExpiredIntegrationSessions", logger.Any("rowsAffected", rowsAffected))
+
+	integrationSessionList, err := s.strg.Session().GetSessionListByIntegrationID(ctx, integration.Id)
+
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	res.Sessions = integrationSessionList.Sessions
+
+	sessionPKey, err := s.strg.Session().Create(ctx, &pb.CreateSessionRequest{
+		ProjectId:        integration.ProjectId,
+		ClientPlatformId: integration.ClientPlatformId,
+		ClientTypeId:     integration.ClientTypeId,
+		IntegrationId:    integration.Id,
+		RoleId:           integration.RoleId,
+		Ip:               "0.0.0.0",
+		Data:             "additional json data",
+		ExpiresAt:        time.Now().Add(config.RefreshTokenExpiresInTime).Format(config.DatabaseTimeLayout),
+	})
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	session, err := s.strg.Session().GetByPK(ctx, sessionPKey)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// TODO - wrap in a function
+	m := map[string]interface{}{
+		"id":                 session.Id,
+		"project_id":         session.ProjectId,
+		"client_platform_id": session.ClientPlatformId,
+		"client_type_id":     session.ClientTypeId,
+		"Integration_id":     session.IntegrationId,
 		"role_id":            session.RoleId,
 		"ip":                 session.Data,
 		"data":               session.Data,
@@ -363,17 +524,19 @@ func (s *sessionService) HasAccess(ctx context.Context, req *pb.HasAccessRequest
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	hasAccess, err := s.strg.PermissionScope().HasAccess(ctx, user.RoleId, req.ClientPlatformId, req.Path, req.Method)
-	if err != nil {
-		s.log.Error("!!!HasAccess--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// DONT FORGET TO UNCOMMENT THIS!!!
 
-	if !hasAccess {
-		err = errors.New("access denied")
-		s.log.Error("!!!HasAccess--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// hasAccess, err := s.strg.PermissionScope().HasAccess(ctx, user.RoleId, req.ClientPlatformId, req.Path, req.Method)
+	// if err != nil {
+	// 	s.log.Error("!!!HasAccess--->", logger.Error(err))
+	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
+	// }
+
+	// if !hasAccess {
+	// 	err = errors.New("access denied")
+	// 	s.log.Error("!!!HasAccess--->", logger.Error(err))
+	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
+	// }
 
 	return &pb.HasAccessResponse{
 		Id:               session.Id,

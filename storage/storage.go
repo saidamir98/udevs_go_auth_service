@@ -22,6 +22,7 @@ type StorageI interface {
 	PermissionScope() PermissionScopeRepoI
 	RolePermission() RolePermissionRepoI
 	User() UserRepoI
+	Integration() IntegrationRepoI
 	UserRelation() UserRelationRepoI
 	UserInfo() UserInfoRepoI
 	Session() SessionRepoI
@@ -112,6 +113,17 @@ type UserRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateUserRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.UserPrimaryKey) (rowsAffected int64, err error)
 	GetByUsername(ctx context.Context, username string) (res *pb.User, err error)
+	ResetPassword(ctx context.Context, user *pb.ResetPasswordRequest) (rowsAffected int64, err error)
+}
+
+type IntegrationRepoI interface {
+	GetListByPKs(ctx context.Context, pKeys *pb.IntegrationPrimaryKeyList) (res *pb.GetIntegrationListResponse, err error)
+	Create(ctx context.Context, entity *pb.CreateIntegrationRequest) (pKey *pb.IntegrationPrimaryKey, err error)
+	GetList(ctx context.Context, queryParam *pb.GetIntegrationListRequest) (res *pb.GetIntegrationListResponse, err error)
+	GetByPK(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.Integration, err error)
+	Update(ctx context.Context, entity *pb.UpdateIntegrationRequest) (rowsAffected int64, err error)
+	Delete(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (rowsAffected int64, err error)
+	GetIntegrationSessions(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.GetIntegrationSessionsResponse, err error)
 }
 
 type UserRelationRepoI interface {
@@ -132,5 +144,7 @@ type SessionRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateSessionRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.SessionPrimaryKey) (rowsAffected int64, err error)
 	DeleteExpiredUserSessions(ctx context.Context, userID string) (rowsAffected int64, err error)
+	DeleteExpiredIntegrationSessions(ctx context.Context, userID string) (rowsAffected int64, err error)
 	GetSessionListByUserID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error)
+	GetSessionListByIntegrationID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error)
 }

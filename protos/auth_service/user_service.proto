@@ -14,6 +14,8 @@ service UserService {
     rpc GetUserList(GetUserListRequest) returns (GetUserListResponse) {}
     rpc UpdateUser(UpdateUserRequest) returns (User) {}
     rpc DeleteUser(UserPrimaryKey) returns (google.protobuf.Empty) {}
+    rpc ResetPassword(ResetPasswordRequest) returns (User) {}
+    rpc SendMessageToEmail(SendMessageToEmailRequest) returns (google.protobuf.Empty) {}
 
     rpc AddUserRelation(AddUserRelationRequest) returns (UserRelation) {}
     rpc RemoveUserRelation(UserRelationPrimaryKey) returns (UserRelation) {}
@@ -90,4 +92,16 @@ message UserRelationPrimaryKey {
 
 message UserInfoPrimaryKey {
     string user_id = 1;
+}
+
+message ResetPasswordRequest {
+    string token = 1;
+    string password = 2;
+    string user_id = 3;
+}
+
+message SendMessageToEmailRequest {
+    string email = 1;
+    string base_url = 2;
+    string token = 3;
 }

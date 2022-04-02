@@ -1,0 +1,78 @@
+syntax="proto3";
+
+package auth_service;
+option go_package="genproto/auth_service";
+
+import "auth.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+
+service IntegrationService {
+    rpc CreateIntegration(CreateIntegrationRequest) returns (Integration) {}
+    rpc GetIntegrationByID(IntegrationPrimaryKey) returns (Integration) {}
+    rpc GetIntegrationListByIDs(IntegrationPrimaryKeyList) returns (GetIntegrationListResponse) {}
+    rpc GetIntegrationList(GetIntegrationListRequest) returns (GetIntegrationListResponse) {}
+    rpc UpdateIntegration(UpdateIntegrationRequest) returns (Integration) {}
+    rpc DeleteIntegration(IntegrationPrimaryKey) returns (google.protobuf.Empty) {}
+    rpc GetIntegrationSessions(IntegrationPrimaryKey) returns (GetIntegrationSessionsResponse) {}
+}
+
+message CreateIntegrationRequest {
+    string project_id = 1;
+    string client_platform_id = 2;
+    string client_type_id = 3;
+    string role_id = 4;
+    string secret_key = 5;
+    int32 active = 6;
+    string expires_at = 7;
+    string title = 8;
+    string ip_whitelist = 9;
+}
+
+message IntegrationPrimaryKey {
+    string id = 1;
+}
+
+message IntegrationPrimaryKeyList {
+    repeated string ids = 1;
+}
+
+message GetIntegrationListRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    string search = 3;
+    string client_platform_id = 4;
+    string client_type_id = 5;
+    string project_id = 6;
+}
+
+message GetIntegrationListResponse {
+    int32 count = 1;
+    repeated Integration integrations = 2;
+}
+
+message UpdateIntegrationRequest {
+    string id = 1;
+    string project_id = 2;
+    string client_platform_id = 3;
+    string client_type_id = 4;
+    string role_id = 5;
+    int32 active = 6;
+    string expires_at = 7;
+    string title = 8;
+    string ip_whitelist = 9;
+}
+
+message AddIntegrationRelationRequest {
+    string integration_id = 1;
+    string relation_id = 2;
+}
+
+message IntegrationRelationPrimaryKey {
+    string integration_id = 1;
+    string relation_id = 2;
+}
+
+message GetIntegrationSessionsResponse {
+    repeated Session sessions = 1;
+}

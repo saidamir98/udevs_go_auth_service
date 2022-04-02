@@ -22,6 +22,7 @@ type Store struct {
 	permissionScope storage.PermissionScopeRepoI
 	rolePermission  storage.RolePermissionRepoI
 	user            storage.UserRepoI
+	integration     storage.IntegrationRepoI
 	userRelation    storage.UserRelationRepoI
 	userInfo        storage.UserInfoRepoI
 	session         storage.SessionRepoI
@@ -166,4 +167,10 @@ func (s *Store) Session() storage.SessionRepoI {
 	}
 
 	return s.session
+}
+func (s *Store) Integration() storage.IntegrationRepoI {
+	if s.integration == nil {
+		s.integration = NewIntegrationRepo(s.db)
+	}
+	return s.integration
 }

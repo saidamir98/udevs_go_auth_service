@@ -97,6 +97,15 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.GET("/user/:user-id", h.GetUserByID)
 	r.PUT("/user", h.UpdateUser)
 	r.DELETE("/user/:user-id", h.DeleteUser)
+	r.PUT("/user/reset-password", h.ResetPassword)
+	r.POST("/user/send-message", h.SendMessageToUserEmail)
+
+	r.POST("/integration", h.CreateIntegration)
+	r.GET("/integration", h.GetIntegrationList)
+	r.GET("/integration/:integration-id", h.GetIntegrationByID)
+	r.PUT("/integration", h.UpdateIntegration)
+	r.DELETE("/integration/:integration-id", h.DeleteIntegration)
+	r.GET("/integration/:integration-id/sessions", h.GetIntegrationSessions)
 
 	r.POST("/user-relation", h.AddUserRelation)
 	r.DELETE("/user-relation", h.RemoveUserRelation)
@@ -104,6 +113,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) (r *gin.Engine) {
 	r.POST("/upsert-user-info/:user-id", h.UpsertUserInfo)
 
 	r.POST("/login", h.Login)
+	r.POST("/integration-token", h.GetIntegrationToken)
 	r.DELETE("/logout", h.Logout)
 	r.PUT("/refresh", h.RefreshToken)
 	r.POST("/has-acess", h.HasAccess)
