@@ -2,9 +2,7 @@ package handlers
 
 import (
 	"upm/udevs_go_auth_service/api/http"
-
 	"upm/udevs_go_auth_service/genproto/auth_service"
-
 	"upm/udevs_go_auth_service/pkg/util"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +33,6 @@ func (h *Handler) CreateIntegration(c *gin.Context) {
 		c.Request.Context(),
 		&Integration,
 	)
-
 	if err != nil {
 		h.handleResponse(c, http.GRPCError, err.Error())
 		return
@@ -46,7 +43,7 @@ func (h *Handler) CreateIntegration(c *gin.Context) {
 
 // GetIntegrationList godoc
 // @ID get_integration_list
-// @Router /integration [GET]
+// @Router /integration/{integration-id}/session [GET]
 // @Summary Get Integration List
 // @Description  Get Integration List
 // @Tags Integration
@@ -74,7 +71,6 @@ func (h *Handler) GetIntegrationList(c *gin.Context) {
 		return
 	}
 
-	println("a")
 	resp, err := h.services.IntegrationService().GetIntegrationList(
 		c.Request.Context(),
 		&auth_service.GetIntegrationListRequest{
@@ -86,19 +82,17 @@ func (h *Handler) GetIntegrationList(c *gin.Context) {
 			ProjectId:        c.Query("project-id"),
 		},
 	)
-
 	if err != nil {
 		h.handleResponse(c, http.GRPCError, err.Error())
 		return
 	}
-	println("b")
 
 	h.handleResponse(c, http.OK, resp)
 }
 
 // GetIntegrationSessions godoc
 // @ID get_integration_sessions
-// @Router /integration/{integration-id}/sessions [GET]
+// @Router /integration/{integration-id}/session [GET]
 // @Summary Get Integration Sessions
 // @Description  Get Integration Sessions
 // @Tags Integration
@@ -115,13 +109,46 @@ func (h *Handler) GetIntegrationSessions(c *gin.Context) {
 			Id: c.Param("integration-id"),
 		},
 	)
-
 	if err != nil {
 		h.handleResponse(c, http.GRPCError, err.Error())
 		return
 	}
 
 	h.handleResponse(c, http.OK, resp)
+}
+
+// GetIntegrationToken godoc
+// @ID get_integration_token
+// @Router /integration/{integration-id}/session [POST]
+// @Summary GetIntegrationToken
+// @Description GetIntegrationToken
+// @Tags Integration
+// @Accept json
+// @Produce json
+// @Param integration-id path string true "integration-id"
+// @Param getIntegrationToken body auth_service.GetIntegrationTokenRequest true "GetIntegrationTokenRequestBody"
+// @Success 201 {object} http.Response{data=auth_service.GetIntegrationTokenResponse} "Integration Session Response"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) AddSessionToIntegration(c *gin.Context) {
+	var login auth_service.AddSessionToIntegrationRequest
+
+	err := c.ShouldBindJSON(&login)
+	if err != nil {
+		h.handleResponse(c, http.BadRequest, err.Error())
+		return
+	}
+
+	resp, err := h.services.IntegrationService().AddSessionToIntegration(
+		c.Request.Context(),
+		&login,
+	)
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.Created, resp)
 }
 
 // GetIntegrationByID godoc
@@ -150,41 +177,6 @@ func (h *Handler) GetIntegrationByID(c *gin.Context) {
 			Id: IntegrationID,
 		},
 	)
-
-	if err != nil {
-		h.handleResponse(c, http.GRPCError, err.Error())
-		return
-	}
-
-	h.handleResponse(c, http.OK, resp)
-}
-
-// UpdateIntegration godoc
-// @ID update_Integration
-// @Router /integration [PUT]
-// @Summary Update Integration
-// @Description Update Integration
-// @Tags Integration
-// @Accept json
-// @Produce json
-// @Param Integration body auth_service.UpdateIntegrationRequest true "UpdateIntegrationRequestBody"
-// @Success 200 {object} http.Response{data=auth_service.Integration} "Integration data"
-// @Response 400 {object} http.Response{data=string} "Bad Request"
-// @Failure 500 {object} http.Response{data=string} "Server Error"
-func (h *Handler) UpdateIntegration(c *gin.Context) {
-	var Integration auth_service.UpdateIntegrationRequest
-
-	err := c.ShouldBindJSON(&Integration)
-	if err != nil {
-		h.handleResponse(c, http.BadRequest, err.Error())
-		return
-	}
-
-	resp, err := h.services.IntegrationService().UpdateIntegration(
-		c.Request.Context(),
-		&Integration,
-	)
-
 	if err != nil {
 		h.handleResponse(c, http.GRPCError, err.Error())
 		return
@@ -195,7 +187,7 @@ func (h *Handler) UpdateIntegration(c *gin.Context) {
 
 // DeleteIntegration godoc
 // @ID delete_Integration
-// @Router /integration/{integration-id} [DELETE]
+// @Router /integration/{integration-id}/session/{session-id} [DELETE]
 // @Summary Delete Integration
 // @Description Get Integration
 // @Tags Integration
@@ -219,11 +211,47 @@ func (h *Handler) DeleteIntegration(c *gin.Context) {
 			Id: IntegrationID,
 		},
 	)
-
 	if err != nil {
 		h.handleResponse(c, http.GRPCError, err.Error())
 		return
 	}
 
 	h.handleResponse(c, http.NoContent, resp)
+}
+
+// GetIntegrationByID godoc
+// @ID get_integration_token
+// @Router /integration/{integration-id}/session/{session-id} [GET]
+// @Summary Get Integration Token
+// @Description Get Integration Token
+// @Tags Integration
+// @Accept json
+// @Produce json
+// @Param integration-id path string true "integration-id"
+// @Param session-id path string true "session-id"
+// @Success 200 {object} http.Response{data=auth_service.Integration} "IntegrationBody"
+// @Response 400 {object} http.Response{data=string} "Invalid Argument"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetIntegrationToken(c *gin.Context) {
+	IntegrationID := c.Param("integration-id")
+	SessionID := c.Param("session_id")
+
+	if !util.IsValidUUID(IntegrationID) {
+		h.handleResponse(c, http.InvalidArgument, "Integration id is an invalid uuid")
+		return
+	}
+
+	resp, err := h.services.IntegrationService().GetIntegrationToken(
+		c.Request.Context(),
+		&auth_service.GetIntegrationTokenRequest{
+			IntegrationId: IntegrationID,
+			SessionId:     SessionID,
+		},
+	)
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, resp)
 }

@@ -42,40 +42,6 @@ func (h *Handler) Login(c *gin.Context) {
 	h.handleResponse(c, http.Created, resp)
 }
 
-// GetIntegrationToken godoc
-// @ID get_integration_token
-// @Router /integration-token [POST]
-// @Summary GetIntegrationToken
-// @Description GetIntegrationToken
-// @Tags Session
-// @Accept json
-// @Produce json
-// @Param getIntegrationToken body auth_service.GetIntegrationTokenRequest true "GetIntegrationTokenRequestBody"
-// @Success 201 {object} http.Response{data=auth_service.GetIntegrationTokenResponse} "Integration Session Response"
-// @Response 400 {object} http.Response{data=string} "Bad Request"
-// @Failure 500 {object} http.Response{data=string} "Server Error"
-func (h *Handler) GetIntegrationToken(c *gin.Context) {
-	var login auth_service.GetIntegrationTokenRequest
-
-	err := c.ShouldBindJSON(&login)
-	if err != nil {
-		h.handleResponse(c, http.BadRequest, err.Error())
-		return
-	}
-
-	resp, err := h.services.SessionService().GetIntegrationToken(
-		c.Request.Context(),
-		&login,
-	)
-
-	if err != nil {
-		h.handleResponse(c, http.GRPCError, err.Error())
-		return
-	}
-
-	h.handleResponse(c, http.Created, resp)
-}
-
 // Logout godoc
 // @ID logout
 // @Router /logout [DELETE]

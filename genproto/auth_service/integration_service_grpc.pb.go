@@ -30,6 +30,8 @@ type IntegrationServiceClient interface {
 	UpdateIntegration(ctx context.Context, in *UpdateIntegrationRequest, opts ...grpc.CallOption) (*Integration, error)
 	DeleteIntegration(ctx context.Context, in *IntegrationPrimaryKey, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetIntegrationSessions(ctx context.Context, in *IntegrationPrimaryKey, opts ...grpc.CallOption) (*GetIntegrationSessionsResponse, error)
+	AddSessionToIntegration(ctx context.Context, in *AddSessionToIntegrationRequest, opts ...grpc.CallOption) (*AddSessionToIntegrationResponse, error)
+	GetIntegrationToken(ctx context.Context, in *GetIntegrationTokenRequest, opts ...grpc.CallOption) (*Token, error)
 }
 
 type integrationServiceClient struct {
@@ -103,6 +105,24 @@ func (c *integrationServiceClient) GetIntegrationSessions(ctx context.Context, i
 	return out, nil
 }
 
+func (c *integrationServiceClient) AddSessionToIntegration(ctx context.Context, in *AddSessionToIntegrationRequest, opts ...grpc.CallOption) (*AddSessionToIntegrationResponse, error) {
+	out := new(AddSessionToIntegrationResponse)
+	err := c.cc.Invoke(ctx, "/auth_service.IntegrationService/AddSessionToIntegration", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *integrationServiceClient) GetIntegrationToken(ctx context.Context, in *GetIntegrationTokenRequest, opts ...grpc.CallOption) (*Token, error) {
+	out := new(Token)
+	err := c.cc.Invoke(ctx, "/auth_service.IntegrationService/GetIntegrationToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IntegrationServiceServer is the server API for IntegrationService service.
 // All implementations must embed UnimplementedIntegrationServiceServer
 // for forward compatibility
@@ -114,6 +134,8 @@ type IntegrationServiceServer interface {
 	UpdateIntegration(context.Context, *UpdateIntegrationRequest) (*Integration, error)
 	DeleteIntegration(context.Context, *IntegrationPrimaryKey) (*empty.Empty, error)
 	GetIntegrationSessions(context.Context, *IntegrationPrimaryKey) (*GetIntegrationSessionsResponse, error)
+	AddSessionToIntegration(context.Context, *AddSessionToIntegrationRequest) (*AddSessionToIntegrationResponse, error)
+	GetIntegrationToken(context.Context, *GetIntegrationTokenRequest) (*Token, error)
 	mustEmbedUnimplementedIntegrationServiceServer()
 }
 
@@ -141,6 +163,12 @@ func (UnimplementedIntegrationServiceServer) DeleteIntegration(context.Context, 
 }
 func (UnimplementedIntegrationServiceServer) GetIntegrationSessions(context.Context, *IntegrationPrimaryKey) (*GetIntegrationSessionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIntegrationSessions not implemented")
+}
+func (UnimplementedIntegrationServiceServer) AddSessionToIntegration(context.Context, *AddSessionToIntegrationRequest) (*AddSessionToIntegrationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSessionToIntegration not implemented")
+}
+func (UnimplementedIntegrationServiceServer) GetIntegrationToken(context.Context, *GetIntegrationTokenRequest) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIntegrationToken not implemented")
 }
 func (UnimplementedIntegrationServiceServer) mustEmbedUnimplementedIntegrationServiceServer() {}
 
@@ -281,6 +309,42 @@ func _IntegrationService_GetIntegrationSessions_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IntegrationService_AddSessionToIntegration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddSessionToIntegrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IntegrationServiceServer).AddSessionToIntegration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.IntegrationService/AddSessionToIntegration",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IntegrationServiceServer).AddSessionToIntegration(ctx, req.(*AddSessionToIntegrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IntegrationService_GetIntegrationToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIntegrationTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IntegrationServiceServer).GetIntegrationToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.IntegrationService/GetIntegrationToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IntegrationServiceServer).GetIntegrationToken(ctx, req.(*GetIntegrationTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IntegrationService_ServiceDesc is the grpc.ServiceDesc for IntegrationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -315,6 +379,14 @@ var IntegrationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetIntegrationSessions",
 			Handler:    _IntegrationService_GetIntegrationSessions_Handler,
+		},
+		{
+			MethodName: "AddSessionToIntegration",
+			Handler:    _IntegrationService_AddSessionToIntegration_Handler,
+		},
+		{
+			MethodName: "GetIntegrationToken",
+			Handler:    _IntegrationService_GetIntegrationToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

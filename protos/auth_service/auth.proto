@@ -177,4 +177,5 @@ message Integration {
     string created_at = 10;
     string updated_at = 11;
     string title = 12;
+    string data = 13;
 }

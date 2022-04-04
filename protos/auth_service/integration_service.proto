@@ -15,6 +15,8 @@ service IntegrationService {
     rpc UpdateIntegration(UpdateIntegrationRequest) returns (Integration) {}
     rpc DeleteIntegration(IntegrationPrimaryKey) returns (google.protobuf.Empty) {}
     rpc GetIntegrationSessions(IntegrationPrimaryKey) returns (GetIntegrationSessionsResponse) {}
+    rpc AddSessionToIntegration(AddSessionToIntegrationRequest)  returns (AddSessionToIntegrationResponse) {}
+    rpc GetIntegrationToken(GetIntegrationTokenRequest) returns (Token) {}
 }
 
 message CreateIntegrationRequest {
@@ -75,4 +77,24 @@ message IntegrationRelationPrimaryKey {
 
 message GetIntegrationSessionsResponse {
     repeated Session sessions = 1;
+}
+
+message AddSessionToIntegrationRequest {
+    string integration_id = 1;
+    string secret_key = 2;
+}
+
+message AddSessionToIntegrationResponse {
+    bool integration_found = 1;
+    ClientPlatform client_platform = 2;
+    ClientType client_type = 3;
+    Integration integration = 4;
+    Token token = 6;
+    repeated Permission permissions = 7;
+    Session session = 8;
+}
+
+message GetIntegrationTokenRequest {
+    string integration_id = 1;
+    string session_id = 2;
 }

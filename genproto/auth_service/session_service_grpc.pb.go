@@ -27,7 +27,6 @@ type SessionServiceClient interface {
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error)
 	HasAccess(ctx context.Context, in *HasAccessRequest, opts ...grpc.CallOption) (*HasAccessResponse, error)
-	GetIntegrationToken(ctx context.Context, in *GetIntegrationTokenRequest, opts ...grpc.CallOption) (*GetIntegrationTokenResponse, error)
 }
 
 type sessionServiceClient struct {
@@ -74,15 +73,6 @@ func (c *sessionServiceClient) HasAccess(ctx context.Context, in *HasAccessReque
 	return out, nil
 }
 
-func (c *sessionServiceClient) GetIntegrationToken(ctx context.Context, in *GetIntegrationTokenRequest, opts ...grpc.CallOption) (*GetIntegrationTokenResponse, error) {
-	out := new(GetIntegrationTokenResponse)
-	err := c.cc.Invoke(ctx, "/auth_service.SessionService/GetIntegrationToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // SessionServiceServer is the server API for SessionService service.
 // All implementations must embed UnimplementedSessionServiceServer
 // for forward compatibility
@@ -91,7 +81,6 @@ type SessionServiceServer interface {
 	Logout(context.Context, *LogoutRequest) (*empty.Empty, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenResponse, error)
 	HasAccess(context.Context, *HasAccessRequest) (*HasAccessResponse, error)
-	GetIntegrationToken(context.Context, *GetIntegrationTokenRequest) (*GetIntegrationTokenResponse, error)
 	mustEmbedUnimplementedSessionServiceServer()
 }
 
@@ -110,9 +99,6 @@ func (UnimplementedSessionServiceServer) RefreshToken(context.Context, *RefreshT
 }
 func (UnimplementedSessionServiceServer) HasAccess(context.Context, *HasAccessRequest) (*HasAccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasAccess not implemented")
-}
-func (UnimplementedSessionServiceServer) GetIntegrationToken(context.Context, *GetIntegrationTokenRequest) (*GetIntegrationTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetIntegrationToken not implemented")
 }
 func (UnimplementedSessionServiceServer) mustEmbedUnimplementedSessionServiceServer() {}
 
@@ -199,24 +185,6 @@ func _SessionService_HasAccess_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SessionService_GetIntegrationToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetIntegrationTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).GetIntegrationToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/auth_service.SessionService/GetIntegrationToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).GetIntegrationToken(ctx, req.(*GetIntegrationTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // SessionService_ServiceDesc is the grpc.ServiceDesc for SessionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -239,10 +207,6 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "HasAccess",
 			Handler:    _SessionService_HasAccess_Handler,
-		},
-		{
-			MethodName: "GetIntegrationToken",
-			Handler:    _SessionService_GetIntegrationToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
