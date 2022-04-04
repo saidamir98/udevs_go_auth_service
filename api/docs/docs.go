@@ -1051,159 +1051,6 @@ var doc = `{
             }
         },
         "/integration": {
-            "get": {
-                "description": "Get Integration List",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Integration"
-                ],
-                "summary": "Get Integration List",
-                "operationId": "get_integration_list",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "search",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "client-platform-id",
-                        "name": "client-platform-id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "client-type-id",
-                        "name": "client-type-id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "project-id",
-                        "name": "project-id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "GetIntegrationListResponseBody",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/auth_service.GetIntegrationListResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update Integration",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Integration"
-                ],
-                "summary": "Update Integration",
-                "operationId": "update_Integration",
-                "parameters": [
-                    {
-                        "description": "UpdateIntegrationRequestBody",
-                        "name": "Integration",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth_service.UpdateIntegrationRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Integration data",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/auth_service.Integration"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Create Integration",
                 "consumes": [
@@ -1241,71 +1088,6 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/auth_service.Integration"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/integration-token": {
-            "post": {
-                "description": "GetIntegrationToken",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Session"
-                ],
-                "summary": "GetIntegrationToken",
-                "operationId": "get_integration_token",
-                "parameters": [
-                    {
-                        "description": "GetIntegrationTokenRequestBody",
-                        "name": "getIntegrationToken",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth_service.GetIntegrationTokenRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Integration Session Response",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/auth_service.GetIntegrationTokenResponse"
                                         }
                                     }
                                 }
@@ -1394,55 +1176,9 @@ var doc = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "Get Integration",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Integration"
-                ],
-                "summary": "Delete Integration",
-                "operationId": "delete_Integration",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Integration-id",
-                        "name": "integration-id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": "Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
             }
         },
-        "/integration/{integration-id}/sessions": {
+        "/integration/{integration-id}/session": {
             "get": {
                 "description": "Get Integration Sessions",
                 "consumes": [
@@ -1483,6 +1219,192 @@ var doc = `{
                                 }
                             ]
                         }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add Session To Integration",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integration"
+                ],
+                "summary": "Add Session To Integration",
+                "operationId": "get_integration_token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "integration-id",
+                        "name": "integration-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "AddSessionToIntegrationRequestBody",
+                        "name": "addSessionToIntegration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_service.AddSessionToIntegrationResponse"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Integration Session Response",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.Session"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/integration/{integration-id}/session/{session-id}": {
+            "get": {
+                "description": "Get Integration Token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integration"
+                ],
+                "summary": "Get Integration Token",
+                "operationId": "get_integration_token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "integration-id",
+                        "name": "integration-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "session-id",
+                        "name": "session-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "IntegrationBody",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.Integration"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Get Integration",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integration"
+                ],
+                "summary": "Delete Integration",
+                "operationId": "delete_Integration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Integration-id",
+                        "name": "integration-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
                     },
                     "500": {
                         "description": "Server Error",
@@ -4509,6 +4431,40 @@ var doc = `{
                 }
             }
         },
+        "auth_service.AddSessionToIntegrationResponse": {
+            "type": "object",
+            "properties": {
+                "client_platform": {
+                    "type": "object",
+                    "$ref": "#/definitions/auth_service.ClientPlatform"
+                },
+                "client_type": {
+                    "type": "object",
+                    "$ref": "#/definitions/auth_service.ClientType"
+                },
+                "integration": {
+                    "type": "object",
+                    "$ref": "#/definitions/auth_service.Integration"
+                },
+                "integration_found": {
+                    "type": "boolean"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Permission"
+                    }
+                },
+                "session": {
+                    "type": "object",
+                    "$ref": "#/definitions/auth_service.Session"
+                },
+                "token": {
+                    "type": "object",
+                    "$ref": "#/definitions/auth_service.Token"
+                }
+            }
+        },
         "auth_service.AddUserInfoFieldRequest": {
             "type": "object",
             "properties": {
@@ -4858,53 +4814,6 @@ var doc = `{
                 }
             }
         },
-        "auth_service.GetIntegrationTokenRequest": {
-            "type": "object",
-            "properties": {
-                "integration_id": {
-                    "type": "string"
-                },
-                "secret_key": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth_service.GetIntegrationTokenResponse": {
-            "type": "object",
-            "properties": {
-                "client_platform": {
-                    "type": "object",
-                    "$ref": "#/definitions/auth_service.ClientPlatform"
-                },
-                "client_type": {
-                    "type": "object",
-                    "$ref": "#/definitions/auth_service.ClientType"
-                },
-                "integration": {
-                    "type": "object",
-                    "$ref": "#/definitions/auth_service.Integration"
-                },
-                "integration_found": {
-                    "type": "boolean"
-                },
-                "permissions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/auth_service.Permission"
-                    }
-                },
-                "sessions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/auth_service.Session"
-                    }
-                },
-                "token": {
-                    "type": "object",
-                    "$ref": "#/definitions/auth_service.Token"
-                }
-            }
-        },
         "auth_service.GetPermissionByIDResponse": {
             "type": "object",
             "properties": {
@@ -5000,6 +4909,9 @@ var doc = `{
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "data": {
                     "type": "string"
                 },
                 "expires_at": {
@@ -5362,38 +5274,6 @@ var doc = `{
                 },
                 "self_register": {
                     "type": "boolean"
-                }
-            }
-        },
-        "auth_service.UpdateIntegrationRequest": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "integer"
-                },
-                "client_platform_id": {
-                    "type": "string"
-                },
-                "client_type_id": {
-                    "type": "string"
-                },
-                "expires_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "ip_whitelist": {
-                    "type": "string"
-                },
-                "project_id": {
-                    "type": "string"
-                },
-                "role_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
                 }
             }
         },

@@ -120,14 +120,14 @@ func (h *Handler) GetIntegrationSessions(c *gin.Context) {
 // GetIntegrationToken godoc
 // @ID get_integration_token
 // @Router /integration/{integration-id}/session [POST]
-// @Summary GetIntegrationToken
-// @Description GetIntegrationToken
+// @Summary Add Session To Integration
+// @Description Add Session To Integration
 // @Tags Integration
 // @Accept json
 // @Produce json
 // @Param integration-id path string true "integration-id"
-// @Param getIntegrationToken body auth_service.GetIntegrationTokenRequest true "GetIntegrationTokenRequestBody"
-// @Success 201 {object} http.Response{data=auth_service.GetIntegrationTokenResponse} "Integration Session Response"
+// @Param addSessionToIntegration body auth_service.AddSessionToIntegrationResponse true "AddSessionToIntegrationRequestBody"
+// @Success 201 {object} http.Response{data=auth_service.Session} "Integration Session Response"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) AddSessionToIntegration(c *gin.Context) {

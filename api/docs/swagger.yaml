@@ -60,6 +60,30 @@ definitions:
       project_id:
         type: string
     type: object
+  auth_service.AddSessionToIntegrationResponse:
+    properties:
+      client_platform:
+        $ref: '#/definitions/auth_service.ClientPlatform'
+        type: object
+      client_type:
+        $ref: '#/definitions/auth_service.ClientType'
+        type: object
+      integration:
+        $ref: '#/definitions/auth_service.Integration'
+        type: object
+      integration_found:
+        type: boolean
+      permissions:
+        items:
+          $ref: '#/definitions/auth_service.Permission'
+        type: array
+      session:
+        $ref: '#/definitions/auth_service.Session'
+        type: object
+      token:
+        $ref: '#/definitions/auth_service.Token'
+        type: object
+    type: object
   auth_service.AddUserInfoFieldRequest:
     properties:
       client_type_id:
@@ -287,38 +311,6 @@ definitions:
           $ref: '#/definitions/auth_service.Session'
         type: array
     type: object
-  auth_service.GetIntegrationTokenRequest:
-    properties:
-      integration_id:
-        type: string
-      secret_key:
-        type: string
-    type: object
-  auth_service.GetIntegrationTokenResponse:
-    properties:
-      client_platform:
-        $ref: '#/definitions/auth_service.ClientPlatform'
-        type: object
-      client_type:
-        $ref: '#/definitions/auth_service.ClientType'
-        type: object
-      integration:
-        $ref: '#/definitions/auth_service.Integration'
-        type: object
-      integration_found:
-        type: boolean
-      permissions:
-        items:
-          $ref: '#/definitions/auth_service.Permission'
-        type: array
-      sessions:
-        items:
-          $ref: '#/definitions/auth_service.Session'
-        type: array
-      token:
-        $ref: '#/definitions/auth_service.Token'
-        type: object
-    type: object
   auth_service.GetPermissionByIDResponse:
     properties:
       client_platform_id:
@@ -381,6 +373,8 @@ definitions:
       client_type_id:
         type: string
       created_at:
+        type: string
+      data:
         type: string
       expires_at:
         type: string
@@ -618,27 +612,6 @@ definitions:
         type: boolean
       self_register:
         type: boolean
-    type: object
-  auth_service.UpdateIntegrationRequest:
-    properties:
-      active:
-        type: integer
-      client_platform_id:
-        type: string
-      client_type_id:
-        type: string
-      expires_at:
-        type: string
-      id:
-        type: string
-      ip_whitelist:
-        type: string
-      project_id:
-        type: string
-      role_id:
-        type: string
-      title:
-        type: string
     type: object
   auth_service.UpdatePermissionRequest:
     properties:
@@ -1549,60 +1522,6 @@ paths:
       tags:
       - Session
   /integration:
-    get:
-      consumes:
-      - application/json
-      description: Get Integration List
-      operationId: get_integration_list
-      parameters:
-      - description: offset
-        in: query
-        name: offset
-        type: integer
-      - description: limit
-        in: query
-        name: limit
-        type: integer
-      - description: search
-        in: query
-        name: search
-        type: string
-      - description: client-platform-id
-        in: query
-        name: client-platform-id
-        type: string
-      - description: client-type-id
-        in: query
-        name: client-type-id
-        type: string
-      - description: project-id
-        in: query
-        name: project-id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: GetIntegrationListResponseBody
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/auth_service.GetIntegrationListResponse'
-              type: object
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Get Integration List
-      tags:
-      - Integration
     post:
       consumes:
       - application/json
@@ -1639,108 +1558,7 @@ paths:
       summary: Create Integration
       tags:
       - Integration
-    put:
-      consumes:
-      - application/json
-      description: Update Integration
-      operationId: update_Integration
-      parameters:
-      - description: UpdateIntegrationRequestBody
-        in: body
-        name: Integration
-        required: true
-        schema:
-          $ref: '#/definitions/auth_service.UpdateIntegrationRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Integration data
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/auth_service.Integration'
-              type: object
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Update Integration
-      tags:
-      - Integration
-  /integration-token:
-    post:
-      consumes:
-      - application/json
-      description: GetIntegrationToken
-      operationId: get_integration_token
-      parameters:
-      - description: GetIntegrationTokenRequestBody
-        in: body
-        name: getIntegrationToken
-        required: true
-        schema:
-          $ref: '#/definitions/auth_service.GetIntegrationTokenRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Integration Session Response
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/auth_service.GetIntegrationTokenResponse'
-              type: object
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: GetIntegrationToken
-      tags:
-      - Session
   /integration/{integration-id}:
-    delete:
-      consumes:
-      - application/json
-      description: Get Integration
-      operationId: delete_Integration
-      parameters:
-      - description: Integration-id
-        in: path
-        name: integration-id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ""
-        "500":
-          description: Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/http.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Delete Integration
-      tags:
-      - Integration
     get:
       consumes:
       - application/json
@@ -1776,7 +1594,7 @@ paths:
       summary: Get Integration By ID
       tags:
       - Integration
-  /integration/{integration-id}/sessions:
+  /integration/{integration-id}/session:
     get:
       consumes:
       - application/json
@@ -1810,6 +1628,116 @@ paths:
                   type: string
               type: object
       summary: Get Integration Sessions
+      tags:
+      - Integration
+    post:
+      consumes:
+      - application/json
+      description: Add Session To Integration
+      operationId: get_integration_token
+      parameters:
+      - description: integration-id
+        in: path
+        name: integration-id
+        required: true
+        type: string
+      - description: AddSessionToIntegrationRequestBody
+        in: body
+        name: addSessionToIntegration
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.AddSessionToIntegrationResponse'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Integration Session Response
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Session'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Add Session To Integration
+      tags:
+      - Integration
+  /integration/{integration-id}/session/{session-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get Integration
+      operationId: delete_Integration
+      parameters:
+      - description: Integration-id
+        in: path
+        name: integration-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Integration
+      tags:
+      - Integration
+    get:
+      consumes:
+      - application/json
+      description: Get Integration Token
+      operationId: get_integration_token
+      parameters:
+      - description: integration-id
+        in: path
+        name: integration-id
+        required: true
+        type: string
+      - description: session-id
+        in: path
+        name: session-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: IntegrationBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.Integration'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Integration Token
       tags:
       - Integration
   /login:
