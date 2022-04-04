@@ -46,7 +46,7 @@ func (s *integrationService) CreateIntegration(ctx context.Context, req *pb.Crea
 	return s.strg.Integration().GetByPK(ctx, pKey)
 }
 
-func (s *sessionService) GetIntegrationToken(ctx context.Context, req *pb.AddSessionToIntegrationRequest) (*pb.AddSessionToIntegrationResponse, error) {
+func (s *sessionService) AddSessionToIntegration(ctx context.Context, req *pb.AddSessionToIntegrationRequest) (*pb.AddSessionToIntegrationResponse, error) {
 	res := &pb.AddSessionToIntegrationResponse{}
 
 	if len(req.SecretKey) < 6 {
@@ -172,7 +172,7 @@ func (s *sessionService) GetIntegrationToken(ctx context.Context, req *pb.AddSes
 		"client_type_id":     session.ClientTypeId,
 		"integration_id":     session.IntegrationId,
 		"role_id":            session.RoleId,
-		"ip":                 session.Data,
+		"ip":                 session.Ip,
 		"data":               session.Data,
 	}
 
@@ -201,12 +201,12 @@ func (s *sessionService) GetIntegrationToken(ctx context.Context, req *pb.AddSes
 }
 
 func (s *integrationService) GetIntegrationByID(ctx context.Context, req *pb.IntegrationPrimaryKey) (*pb.Integration, error) {
-	s.log.Info("---GetUserByID--->", logger.Any("req", req))
+	s.log.Info("---GetIntegrationByID--->", logger.Any("req", req))
 
 	res, err := s.strg.Integration().GetByPK(ctx, req)
 
 	if err != nil {
-		s.log.Error("!!!GetUserByID--->", logger.Error(err))
+		s.log.Error("!!!GetIntegrationByID--->", logger.Error(err))
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
@@ -218,11 +218,11 @@ func (s *integrationService) GetIntegrationToken(ctx context.Context, req *pb.Ge
 }
 
 func (s *integrationService) GetIntegrationSessions(ctx context.Context, req *pb.IntegrationPrimaryKey) (*pb.GetIntegrationSessionsResponse, error) {
-	s.log.Info("---GetIntegrationByUserId--->", logger.Any("req", req))
+	s.log.Info("---GetIntegrationSessions--->", logger.Any("req", req))
 
 	res, err := s.strg.Integration().GetIntegrationSessions(ctx, req)
 	if err != nil {
-		s.log.Error("---GetIntegrationByUserId--->", logger.Error(err))
+		s.log.Error("---GetIntegrationSessions--->", logger.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -230,11 +230,11 @@ func (s *integrationService) GetIntegrationSessions(ctx context.Context, req *pb
 }
 
 func (s *integrationService) GetIntegrationListByIDs(ctx context.Context, req *pb.IntegrationPrimaryKeyList) (*pb.GetIntegrationListResponse, error) {
-	s.log.Info("---GetUserListByIDs--->", logger.Any("req", req))
+	s.log.Info("---GetIntegrationListByIDs--->", logger.Any("req", req))
 
 	res, err := s.strg.Integration().GetListByPKs(ctx, req)
 	if err != nil {
-		s.log.Error("!!!GetUserListByIDs--->", logger.Error(err))
+		s.log.Error("!!!GetIntegrationListByIDs--->", logger.Error(err))
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
@@ -242,12 +242,12 @@ func (s *integrationService) GetIntegrationListByIDs(ctx context.Context, req *p
 }
 
 func (s *integrationService) GetIntegrationList(ctx context.Context, req *pb.GetIntegrationListRequest) (*pb.GetIntegrationListResponse, error) {
-	s.log.Info("---GetUserList--->", logger.Any("req", req))
+	s.log.Info("---GetIntegrationList--->", logger.Any("req", req))
 
 	res, err := s.strg.Integration().GetList(ctx, req)
 
 	if err != nil {
-		s.log.Error("!!!GetUserList--->", logger.Error(err))
+		s.log.Error("!!!GetIntegrationList--->", logger.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -255,7 +255,7 @@ func (s *integrationService) GetIntegrationList(ctx context.Context, req *pb.Get
 }
 
 func (s *integrationService) UpdateIntegration(ctx context.Context, req *pb.UpdateIntegrationRequest) (*pb.Integration, error) {
-	s.log.Info("---UpdateUser--->", logger.Any("req", req))
+	s.log.Info("---UpdateIntegration--->", logger.Any("req", req))
 
 	rowsAffected, err := s.strg.Integration().Update(ctx, req)
 
@@ -278,7 +278,7 @@ func (s *integrationService) UpdateIntegration(ctx context.Context, req *pb.Upda
 }
 
 func (s *integrationService) DeleteIntegration(ctx context.Context, req *pb.IntegrationPrimaryKey) (*emptypb.Empty, error) {
-	s.log.Info("---DeleteUser--->", logger.Any("req", req))
+	s.log.Info("---DeleteIntegration--->", logger.Any("req", req))
 
 	res := &emptypb.Empty{}
 
@@ -286,6 +286,25 @@ func (s *integrationService) DeleteIntegration(ctx context.Context, req *pb.Inte
 
 	if err != nil {
 		s.log.Error("!!!DeleteIntegration--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if rowsAffected <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "no rows were affected")
+	}
+
+	return res, nil
+}
+
+func (s *integrationService) DeleteSessionFromIntegration(ctx context.Context, req *pb.GetIntegrationTokenRequest) (*emptypb.Empty, error) {
+	s.log.Info("---DeleteSessionFromIntegration--->", logger.Any("req", req))
+
+	res := &emptypb.Empty{}
+
+	rowsAffected, err := s.strg.Integration().DeleteSession(ctx, req)
+
+	if err != nil {
+		s.log.Error("!!!DeleteSessionFromIntegration--->", logger.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

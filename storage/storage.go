@@ -124,6 +124,7 @@ type IntegrationRepoI interface {
 	Update(ctx context.Context, entity *pb.UpdateIntegrationRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (rowsAffected int64, err error)
 	GetIntegrationSessions(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.GetIntegrationSessionsResponse, err error)
+	DeleteSession(ctx context.Context, pKey *pb.GetIntegrationTokenRequest) (rowsAffected int64, err error)
 }
 
 type UserRelationRepoI interface {

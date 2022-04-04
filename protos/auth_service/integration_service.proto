@@ -17,6 +17,7 @@ service IntegrationService {
     rpc GetIntegrationSessions(IntegrationPrimaryKey) returns (GetIntegrationSessionsResponse) {}
     rpc AddSessionToIntegration(AddSessionToIntegrationRequest)  returns (AddSessionToIntegrationResponse) {}
     rpc GetIntegrationToken(GetIntegrationTokenRequest) returns (Token) {}
+    rpc DeleteSessionFromIntegration(GetIntegrationTokenRequest) returns (google.protobuf.Empty) {}
 }
 
 message CreateIntegrationRequest {

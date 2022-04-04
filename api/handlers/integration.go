@@ -187,9 +187,9 @@ func (h *Handler) GetIntegrationByID(c *gin.Context) {
 
 // DeleteIntegration godoc
 // @ID delete_Integration
-// @Router /integration/{integration-id}/session/{session-id} [DELETE]
+// @Router /integration/{integration-id} [DELETE]
 // @Summary Delete Integration
-// @Description Get Integration
+// @Description Delete Integration
 // @Tags Integration
 // @Accept json
 // @Produce json
@@ -229,7 +229,7 @@ func (h *Handler) DeleteIntegration(c *gin.Context) {
 // @Produce json
 // @Param integration-id path string true "integration-id"
 // @Param session-id path string true "session-id"
-// @Success 200 {object} http.Response{data=auth_service.Integration} "IntegrationBody"
+// @Success 200 {object} http.Response{data=auth_service.Token} "IntegrationBody"
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetIntegrationToken(c *gin.Context) {
@@ -254,4 +254,46 @@ func (h *Handler) GetIntegrationToken(c *gin.Context) {
 	}
 
 	h.handleResponse(c, http.OK, resp)
+}
+
+// DeleteIntegration godoc
+// @ID delete_session_from_integration
+// @Router /integration/{integration-id}/session/{session-id} [DELETE]
+// @Summary Delete Session From Integration
+// @Description Delete Session From Integration
+// @Tags Integration
+// @Accept json
+// @Produce json
+// @Param integration-id path string true "Integration-id"
+// @Param session-id path string true "session-id"
+// @Success 204
+// @Response 400 {object} http.Response{data=string} "Invalid Argument"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) RemoveSessionFromIntegration(c *gin.Context) {
+	integrationID := c.Param("integration-id")
+	sessionID := c.Param("session-id")
+
+	if !util.IsValidUUID(integrationID) {
+		h.handleResponse(c, http.InvalidArgument, "Integration id is an invalid uuid")
+		return
+	}
+
+	if !util.IsValidUUID(sessionID) {
+		h.handleResponse(c, http.InvalidArgument, "Session id is an invalid uuid")
+		return
+	}
+
+	resp, err := h.services.IntegrationService().DeleteSessionFromIntegration(
+		c.Request.Context(),
+		&auth_service.GetIntegrationTokenRequest{
+			IntegrationId: integrationID,
+			SessionId:     sessionID,
+		},
+	)
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.NoContent, resp)
 }

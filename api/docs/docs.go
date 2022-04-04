@@ -1176,6 +1176,52 @@ var doc = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete Integration",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integration"
+                ],
+                "summary": "Delete Integration",
+                "operationId": "delete_Integration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Integration-id",
+                        "name": "integration-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         },
         "/integration/{integration-id}/session": {
@@ -1353,7 +1399,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/auth_service.Integration"
+                                            "$ref": "#/definitions/auth_service.Token"
                                         }
                                     }
                                 }
@@ -1381,7 +1427,7 @@ var doc = `{
                 }
             },
             "delete": {
-                "description": "Get Integration",
+                "description": "Delete Session From Integration",
                 "consumes": [
                     "application/json"
                 ],
@@ -1391,13 +1437,20 @@ var doc = `{
                 "tags": [
                     "Integration"
                 ],
-                "summary": "Delete Integration",
-                "operationId": "delete_Integration",
+                "summary": "Delete Session From Integration",
+                "operationId": "delete_session_from_integration",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Integration-id",
                         "name": "integration-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "session-id",
+                        "name": "session-id",
                         "in": "path",
                         "required": true
                     }

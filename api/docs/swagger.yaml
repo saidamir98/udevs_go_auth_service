@@ -1559,6 +1559,34 @@ paths:
       tags:
       - Integration
   /integration/{integration-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Integration
+      operationId: delete_Integration
+      parameters:
+      - description: Integration-id
+        in: path
+        name: integration-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Integration
+      tags:
+      - Integration
     get:
       consumes:
       - application/json
@@ -1675,12 +1703,17 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Get Integration
-      operationId: delete_Integration
+      description: Delete Session From Integration
+      operationId: delete_session_from_integration
       parameters:
       - description: Integration-id
         in: path
         name: integration-id
+        required: true
+        type: string
+      - description: session-id
+        in: path
+        name: session-id
         required: true
         type: string
       produces:
@@ -1697,7 +1730,7 @@ paths:
                 data:
                   type: string
               type: object
-      summary: Delete Integration
+      summary: Delete Session From Integration
       tags:
       - Integration
     get:
@@ -1726,7 +1759,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/auth_service.Integration'
+                  $ref: '#/definitions/auth_service.Token'
               type: object
         "500":
           description: Server Error

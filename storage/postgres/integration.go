@@ -440,3 +440,16 @@ func (r *IntegrationRepo) Delete(ctx context.Context, pKey *pb.IntegrationPrimar
 
 	return rowsAffected, err
 }
+
+func (r *IntegrationRepo) DeleteSession(ctx context.Context, pKey *pb.GetIntegrationTokenRequest) (rowsAffected int64, err error) {
+	query := `DELETE FROM "session" WHERE id = $1 AND integration_id=$2`
+
+	result, err := r.db.Exec(ctx, query, pKey.SessionId, pKey.IntegrationId)
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected = result.RowsAffected()
+
+	return rowsAffected, err
+}
