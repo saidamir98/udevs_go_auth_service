@@ -60,6 +60,17 @@ definitions:
       project_id:
         type: string
     type: object
+  auth_service.AddSessionToIntegrationRequest:
+    properties:
+      expires_at:
+        type: string
+      integration_id:
+        type: string
+      secret_key:
+        type: string
+      user_id:
+        type: string
+    type: object
   auth_service.AddSessionToIntegrationResponse:
     properties:
       client_platform:
@@ -1674,18 +1685,18 @@ paths:
         name: addSessionToIntegration
         required: true
         schema:
-          $ref: '#/definitions/auth_service.AddSessionToIntegrationResponse'
+          $ref: '#/definitions/auth_service.AddSessionToIntegrationRequest'
       produces:
       - application/json
       responses:
         "201":
-          description: Integration Session Response
+          description: Add Session To Integration Response
           schema:
             allOf:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/auth_service.Session'
+                  $ref: '#/definitions/auth_service.AddSessionToIntegrationResponse'
               type: object
         "500":
           description: Server Error

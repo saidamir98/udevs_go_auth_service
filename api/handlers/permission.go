@@ -58,9 +58,7 @@ func (h *Handler) AddRole(c *gin.Context) {
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetRoleByID(c *gin.Context) {
 	roleId := c.Param("role-id")
-	println(roleId)
 	if !util.IsValidUUID(roleId) {
-		println("here")
 		h.handleResponse(c, http.InvalidArgument, "role id is an invalid uuid")
 		return
 	}

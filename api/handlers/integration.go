@@ -126,8 +126,8 @@ func (h *Handler) GetIntegrationSessions(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param integration-id path string true "integration-id"
-// @Param addSessionToIntegration body auth_service.AddSessionToIntegrationResponse true "AddSessionToIntegrationRequestBody"
-// @Success 201 {object} http.Response{data=auth_service.Session} "Integration Session Response"
+// @Param addSessionToIntegration body auth_service.AddSessionToIntegrationRequest true "AddSessionToIntegrationRequestBody"
+// @Success 201 {object} http.Response{data=auth_service.AddSessionToIntegrationResponse} "Add Session To Integration Response"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) AddSessionToIntegration(c *gin.Context) {
@@ -138,6 +138,13 @@ func (h *Handler) AddSessionToIntegration(c *gin.Context) {
 		h.handleResponse(c, http.BadRequest, err.Error())
 		return
 	}
+
+	integrationID := c.Param("integration-id")
+	if !util.IsValidUUID(integrationID) {
+		h.handleResponse(c, http.InvalidArgument, "integration id is an invalid uuid")
+		return
+	}
+	login.IntegrationId = integrationID
 
 	resp, err := h.services.IntegrationService().AddSessionToIntegration(
 		c.Request.Context(),

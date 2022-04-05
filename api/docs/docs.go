@@ -1313,13 +1313,13 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth_service.AddSessionToIntegrationResponse"
+                            "$ref": "#/definitions/auth_service.AddSessionToIntegrationRequest"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Integration Session Response",
+                        "description": "Add Session To Integration Response",
                         "schema": {
                             "allOf": [
                                 {
@@ -1329,7 +1329,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/auth_service.Session"
+                                            "$ref": "#/definitions/auth_service.AddSessionToIntegrationResponse"
                                         }
                                     }
                                 }
@@ -4480,6 +4480,23 @@ var doc = `{
                     "type": "string"
                 },
                 "project_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth_service.AddSessionToIntegrationRequest": {
+            "type": "object",
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "integration_id": {
+                    "type": "string"
+                },
+                "secret_key": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }

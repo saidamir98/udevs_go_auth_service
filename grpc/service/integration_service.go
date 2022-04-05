@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
@@ -46,9 +47,10 @@ func (s *integrationService) CreateIntegration(ctx context.Context, req *pb.Crea
 	return s.strg.Integration().GetByPK(ctx, pKey)
 }
 
-func (s *sessionService) AddSessionToIntegration(ctx context.Context, req *pb.AddSessionToIntegrationRequest) (*pb.AddSessionToIntegrationResponse, error) {
+func (s *integrationService) AddSessionToIntegration(ctx context.Context, req *pb.AddSessionToIntegrationRequest) (*pb.AddSessionToIntegrationResponse, error) {
 	res := &pb.AddSessionToIntegrationResponse{}
 
+	fmt.Println("REQ", req)
 	if len(req.SecretKey) < 6 {
 		err := errors.New("invalid key")
 		s.log.Error("!!!Login--->", logger.Error(err))
@@ -82,7 +84,7 @@ func (s *sessionService) AddSessionToIntegration(ctx context.Context, req *pb.Ad
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	expiresAt, err := time.Parse(config.DatabaseTimeLayout, integration.ExpiresAt)
+	expiresAt, err := time.Parse(config.DatabaseTimeLayout, req.ExpiresAt)
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
@@ -146,10 +148,11 @@ func (s *sessionService) AddSessionToIntegration(ctx context.Context, req *pb.Ad
 		ClientPlatformId: integration.ClientPlatformId,
 		ClientTypeId:     integration.ClientTypeId,
 		IntegrationId:    integration.Id,
+		UserId:           req.UserId,
 		RoleId:           integration.RoleId,
 		Ip:               "0.0.0.0",
 		Data:             integration.Data,
-		ExpiresAt:        time.Now().Add(config.RefreshTokenExpiresInTime).Format(config.DatabaseTimeLayout),
+		ExpiresAt:        expiresAt.Format(config.DatabaseTimeLayout),
 	})
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
