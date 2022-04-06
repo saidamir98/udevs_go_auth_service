@@ -1298,7 +1298,7 @@ var doc = `{
                     "Integration"
                 ],
                 "summary": "Add Session To Integration",
-                "operationId": "get_integration_token",
+                "operationId": "add_session_to_integration",
                 "parameters": [
                     {
                         "type": "string",
@@ -4587,9 +4587,6 @@ var doc = `{
                     "type": "string"
                 },
                 "secret_key": {
-                    "type": "string"
-                },
-                "user_id": {
                     "type": "string"
                 }
             }

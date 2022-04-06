@@ -117,8 +117,8 @@ func (h *Handler) GetIntegrationSessions(c *gin.Context) {
 	h.handleResponse(c, http.OK, resp)
 }
 
-// GetIntegrationToken godoc
-// @ID get_integration_token
+// AddSessionToIntegration godoc
+// @ID add_session_to_integration
 // @Router /integration/{integration-id}/session [POST]
 // @Summary Add Session To Integration
 // @Description Add Session To Integration
@@ -241,7 +241,7 @@ func (h *Handler) DeleteIntegration(c *gin.Context) {
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetIntegrationToken(c *gin.Context) {
 	integrationID := c.Param("integration-id")
-	sessionID := c.Param("session_id")
+	sessionID := c.Param("session-id")
 
 	if !util.IsValidUUID(integrationID) {
 		h.handleResponse(c, http.InvalidArgument, "Integration id is an invalid uuid")

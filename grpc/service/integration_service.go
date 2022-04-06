@@ -143,12 +143,11 @@ func (s *integrationService) AddSessionToIntegration(ctx context.Context, req *p
 	}
 	s.log.Info("Login--->DeleteExpiredIntegrationSessions", logger.Any("rowsAffected", rowsAffected))
 
-	sessionPKey, err := s.strg.Session().Create(ctx, &pb.CreateSessionRequest{
+	sessionPKey, err := s.strg.Integration().CreateSession(ctx, &pb.CreateSessionRequest{
 		ProjectId:        integration.ProjectId,
 		ClientPlatformId: integration.ClientPlatformId,
 		ClientTypeId:     integration.ClientTypeId,
 		IntegrationId:    integration.Id,
-		UserId:           req.UserId,
 		RoleId:           integration.RoleId,
 		Ip:               "0.0.0.0",
 		Data:             integration.Data,
@@ -232,7 +231,7 @@ func (s *integrationService) GetIntegrationToken(ctx context.Context, req *pb.Ge
 		"client_type_id":     session.ClientTypeId,
 		"user_id":            session.UserId,
 		"role_id":            session.RoleId,
-		"ip":                 session.Data,
+		"ip":                 session.Ip,
 		"data":               session.Data,
 	}
 

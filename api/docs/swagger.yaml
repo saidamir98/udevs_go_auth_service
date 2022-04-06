@@ -68,8 +68,6 @@ definitions:
         type: string
       secret_key:
         type: string
-      user_id:
-        type: string
     type: object
   auth_service.AddSessionToIntegrationResponse:
     properties:
@@ -1682,7 +1680,7 @@ paths:
       consumes:
       - application/json
       description: Add Session To Integration
-      operationId: get_integration_token
+      operationId: add_session_to_integration
       parameters:
       - description: integration-id
         in: path

@@ -93,6 +93,7 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 		expiresAt sql.NullString
 		createdAt sql.NullString
 		updatedAt sql.NullString
+		userID    sql.NullString
 	)
 
 	err = r.db.QueryRow(ctx, query, pKey.Id).Scan(
@@ -100,7 +101,7 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 		&res.ProjectId,
 		&res.ClientPlatformId,
 		&res.ClientTypeId,
-		&res.UserId,
+		&userID,
 		&res.RoleId,
 		&res.Ip,
 		&res.Data,
@@ -113,6 +114,10 @@ func (r *sessionRepo) GetByPK(ctx context.Context, pKey *pb.SessionPrimaryKey) (
 	)
 	if err != nil {
 		return res, err
+	}
+
+	if userID.Valid {
+		res.UserId = userID.String
 	}
 
 	if expiresAt.Valid {
@@ -287,7 +292,6 @@ func (r *sessionRepo) DeleteExpiredIntegrationSessions(ctx context.Context, inte
 
 	return rowsAffected, err
 }
-
 
 func (r *sessionRepo) GetSessionListByUserID(ctx context.Context, userID string) (res *pb.GetSessionListResponse, err error) {
 	res = &pb.GetSessionListResponse{}

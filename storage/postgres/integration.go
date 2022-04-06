@@ -177,6 +177,53 @@ func (r *IntegrationRepo) GetIntegrationSessions(ctx context.Context, pKey *pb.I
 	return res, nil
 }
 
+func (r *IntegrationRepo) CreateSession(ctx context.Context, entity *pb.CreateSessionRequest) (pKey *pb.SessionPrimaryKey, err error) {
+	query := `INSERT INTO "session" (
+		id,
+		project_id,
+		client_platform_id,
+		client_type_id,
+		integration_id,
+		role_id,
+		ip,
+		data,
+		expires_at
+	) VALUES (
+		$1,
+		$2,
+		$3,
+		$4,
+		$5,
+		$6,
+		$7,
+		$8,
+		$9
+	)`
+
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return pKey, err
+	}
+
+	_, err = r.db.Exec(ctx, query,
+		uuid.String(),
+		entity.ProjectId,
+		entity.ClientPlatformId,
+		entity.ClientTypeId,
+		entity.IntegrationId,
+		entity.RoleId,
+		entity.Ip,
+		entity.Data,
+		entity.ExpiresAt,
+	)
+
+	pKey = &pb.SessionPrimaryKey{
+		Id: uuid.String(),
+	}
+
+	return pKey, err
+}
+
 func (r *IntegrationRepo) GetListByPKs(ctx context.Context, pKeys *pb.IntegrationPrimaryKeyList) (res *pb.GetIntegrationListResponse, err error) {
 	res = &pb.GetIntegrationListResponse{}
 	query := `SELECT
@@ -461,7 +508,6 @@ func (r *IntegrationRepo) GetIntegrationSession(ctx context.Context, req *pb.Get
 		project_id,
 		client_platform_id,
 		client_type_id,
-		user_id,
 		role_id,
 		TEXT(ip) AS ip,
 		data,
@@ -484,7 +530,6 @@ func (r *IntegrationRepo) GetIntegrationSession(ctx context.Context, req *pb.Get
 		&res.ProjectId,
 		&res.ClientPlatformId,
 		&res.ClientTypeId,
-		&res.UserId,
 		&res.RoleId,
 		&res.Ip,
 		&res.Data,
