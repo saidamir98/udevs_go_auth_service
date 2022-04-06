@@ -240,19 +240,24 @@ func (h *Handler) DeleteIntegration(c *gin.Context) {
 // @Response 400 {object} http.Response{data=string} "Invalid Argument"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
 func (h *Handler) GetIntegrationToken(c *gin.Context) {
-	IntegrationID := c.Param("integration-id")
-	SessionID := c.Param("session_id")
+	integrationID := c.Param("integration-id")
+	sessionID := c.Param("session_id")
 
-	if !util.IsValidUUID(IntegrationID) {
+	if !util.IsValidUUID(integrationID) {
 		h.handleResponse(c, http.InvalidArgument, "Integration id is an invalid uuid")
+		return
+	}
+
+	if !util.IsValidUUID(sessionID) {
+		h.handleResponse(c, http.InvalidArgument, "Session id is an invalid uuid")
 		return
 	}
 
 	resp, err := h.services.IntegrationService().GetIntegrationToken(
 		c.Request.Context(),
 		&auth_service.GetIntegrationTokenRequest{
-			IntegrationId: IntegrationID,
-			SessionId:     SessionID,
+			IntegrationId: integrationID,
+			SessionId:     sessionID,
 		},
 	)
 	if err != nil {

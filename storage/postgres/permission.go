@@ -242,3 +242,47 @@ func (r *permissionRepo) Delete(ctx context.Context, pKey *pb.PermissionPrimaryK
 
 	return rowsAffected, err
 }
+
+// func InsertFareValue(fareID string, tx *sql.Tx) error {
+// 	values := []interface{}{}
+// 	query := `
+// 		INSERT INTO fare_value(
+// 			id,
+// 			fare_id,
+// 			from_price,
+// 			to_price,
+// 			delivery_price,
+// 			from_distance,
+// 			to_distance
+// 		) VALUES `
+
+// 		json.un
+// 	for _, v := range fare.FareValues {
+// 		query += "(?, ?, ?, ?, ?, ?, ?),"
+// 		id, _ := uuid.NewRandom()
+// 		values = append(values,
+// 			id.String(),
+// 			fareID,
+// 			v.FromPrice,
+// 			v.ToPrice,
+// 			v.DeliveryPrice,
+// 			v.FromDistance,
+// 			v.ToDistance,
+// 		)
+// 	}
+
+// 	query = strings.TrimSuffix(query, ",")
+// 	query = helper.ReplaceSQL(query, "?")
+
+// 	stmt, err := tx.Prepare(query)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	_, err = stmt.Exec(values...)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }

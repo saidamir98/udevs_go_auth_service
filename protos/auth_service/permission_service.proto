@@ -20,6 +20,7 @@ service PermissionService {
     rpc DeletePermission(PermissionPrimaryKey) returns (google.protobuf.Empty) {}
 
     rpc UpsertScope(UpsertScopeRequest) returns (Scope) {}
+    rpc GetScopeList(GetScopeListRequest) returns (GetScopesResponse) {}
 
     rpc AddPermissionScope(AddPermissionScopeRequest) returns (PermissionScope) {}
     rpc RemovePermissionScope(PermissionScopePrimaryKey) returns (PermissionScope) {}
@@ -145,4 +146,18 @@ message GetRolesListRequest {
 
 message GetRolesResponse {
     repeated Role roles = 1;
+}
+
+message GetScopeListRequest {
+    uint32 limit = 1;
+    uint32 offset = 2;
+    string search = 3;
+    string order_by = 4;
+    string order_type = 5;
+    string client_platform_id = 6;
+}
+
+message GetScopesResponse {
+    uint32 count = 1;
+    repeated Scope scopes = 2;
 }

@@ -453,3 +453,63 @@ func (r *IntegrationRepo) DeleteSession(ctx context.Context, pKey *pb.GetIntegra
 
 	return rowsAffected, err
 }
+
+func (r *IntegrationRepo) GetIntegrationSession(ctx context.Context, req *pb.GetIntegrationTokenRequest) (res *pb.Session, err error) {
+	res = &pb.Session{}
+	query := `SELECT
+		id,
+		project_id,
+		client_platform_id,
+		client_type_id,
+		user_id,
+		role_id,
+		TEXT(ip) AS ip,
+		data,
+		TO_CHAR(expires_at, ` + config.DatabaseQueryTimeLayout + `) AS expires_at,
+		TO_CHAR(created_at, ` + config.DatabaseQueryTimeLayout + `) AS created_at,
+		TO_CHAR(updated_at, ` + config.DatabaseQueryTimeLayout + `) AS updated_at
+	FROM
+		"session"
+	WHERE
+		id = $1 AND integration_id = $2`
+
+	var (
+		expiresAt sql.NullString
+		createdAt sql.NullString
+		updatedAt sql.NullString
+	)
+
+	err = r.db.QueryRow(ctx, query, req.GetSessionId(), req.GetIntegrationId()).Scan(
+		&res.Id,
+		&res.ProjectId,
+		&res.ClientPlatformId,
+		&res.ClientTypeId,
+		&res.UserId,
+		&res.RoleId,
+		&res.Ip,
+		&res.Data,
+		// &res.ExpiresAt,
+		&expiresAt,
+		// &res.CreatedAt,
+		&createdAt,
+		// &res.UpdatedAt,
+		&updatedAt,
+	)
+	if err != nil {
+		return res, err
+	}
+
+	if expiresAt.Valid {
+		res.ExpiresAt = expiresAt.String
+	}
+
+	if expiresAt.Valid {
+		res.CreatedAt = createdAt.String
+	}
+
+	if expiresAt.Valid {
+		res.UpdatedAt = updatedAt.String
+	}
+
+	return res, nil
+}

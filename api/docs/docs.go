@@ -3282,6 +3282,99 @@ var doc = `{
                 }
             }
         },
+        "/scope": {
+            "get": {
+                "description": "Get Scopes List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scope"
+                ],
+                "summary": "Get Scopes List",
+                "operationId": "get_scopes_list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "client-platform-id",
+                        "name": "client-platform-id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "search",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_type",
+                        "name": "order_type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "GetScopesListResponseBody",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.GetScopesResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/sphere": {
             "get": {
                 "description": "Get Sphere List",
@@ -3601,7 +3694,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "UpsertScope"
+                    "Scope"
                 ],
                 "summary": "Upsert Scope",
                 "operationId": "upsert_scope",
@@ -4928,6 +5021,20 @@ var doc = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/auth_service.Role"
+                    }
+                }
+            }
+        },
+        "auth_service.GetScopesResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "scopes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.Scope"
                     }
                 }
             }

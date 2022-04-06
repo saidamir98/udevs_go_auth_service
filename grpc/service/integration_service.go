@@ -217,7 +217,47 @@ func (s *integrationService) GetIntegrationByID(ctx context.Context, req *pb.Int
 }
 
 func (s *integrationService) GetIntegrationToken(ctx context.Context, req *pb.GetIntegrationTokenRequest) (*pb.Token, error) {
-	return nil, nil
+	s.log.Info("---GetIntegrationToken--->", logger.Any("req", req))
+
+	session, err := s.strg.Integration().GetIntegrationSession(ctx, req)
+	if err != nil {
+		s.log.Error("---GetIntegrationToken--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	m := map[string]interface{}{
+		"id":                 session.Id,
+		"project_id":         session.ProjectId,
+		"client_platform_id": session.ClientPlatformId,
+		"client_type_id":     session.ClientTypeId,
+		"user_id":            session.UserId,
+		"role_id":            session.RoleId,
+		"ip":                 session.Data,
+		"data":               session.Data,
+	}
+
+	accessToken, err := security.GenerateJWT(m, config.AccessTokenExpiresInTime, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	refreshToken, err := security.GenerateJWT(m, config.RefreshTokenExpiresInTime, s.cfg.SecretKey)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	token := &pb.Token{
+		AccessToken:      accessToken,
+		RefreshToken:     refreshToken,
+		CreatedAt:        session.CreatedAt,
+		UpdatedAt:        session.UpdatedAt,
+		ExpiresAt:        session.ExpiresAt,
+		RefreshInSeconds: int32(config.AccessTokenExpiresInTime.Seconds()),
+	}
+
+	return token, nil
 }
 
 func (s *integrationService) GetIntegrationSessions(ctx context.Context, req *pb.IntegrationPrimaryKey) (*pb.GetIntegrationSessionsResponse, error) {

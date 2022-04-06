@@ -89,6 +89,7 @@ type PermissionRepoI interface {
 type ScopeRepoI interface {
 	Upsert(ctx context.Context, entity *pb.UpsertScopeRequest) (res *pb.ScopePrimaryKey, err error)
 	GetByPK(ctx context.Context, pKey *pb.ScopePrimaryKey) (res *pb.Scope, err error)
+	GetList(ctx context.Context, queryParam *pb.GetScopeListRequest) (res *pb.GetScopesResponse, err error)
 }
 
 type PermissionScopeRepoI interface {
@@ -125,6 +126,7 @@ type IntegrationRepoI interface {
 	Delete(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (rowsAffected int64, err error)
 	GetIntegrationSessions(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.GetIntegrationSessionsResponse, err error)
 	DeleteSession(ctx context.Context, pKey *pb.GetIntegrationTokenRequest) (rowsAffected int64, err error)
+	GetIntegrationSession(ctx context.Context, req *pb.GetIntegrationTokenRequest) (res *pb.Session, err error)
 }
 
 type UserRelationRepoI interface {

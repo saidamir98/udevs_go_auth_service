@@ -34,6 +34,7 @@ type PermissionServiceClient interface {
 	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*GetPermissionByIDResponse, error)
 	DeletePermission(ctx context.Context, in *PermissionPrimaryKey, opts ...grpc.CallOption) (*empty.Empty, error)
 	UpsertScope(ctx context.Context, in *UpsertScopeRequest, opts ...grpc.CallOption) (*Scope, error)
+	GetScopeList(ctx context.Context, in *GetScopeListRequest, opts ...grpc.CallOption) (*GetScopesResponse, error)
 	AddPermissionScope(ctx context.Context, in *AddPermissionScopeRequest, opts ...grpc.CallOption) (*PermissionScope, error)
 	RemovePermissionScope(ctx context.Context, in *PermissionScopePrimaryKey, opts ...grpc.CallOption) (*PermissionScope, error)
 	AddRolePermission(ctx context.Context, in *AddRolePermissionRequest, opts ...grpc.CallOption) (*RolePermission, error)
@@ -148,6 +149,15 @@ func (c *permissionServiceClient) UpsertScope(ctx context.Context, in *UpsertSco
 	return out, nil
 }
 
+func (c *permissionServiceClient) GetScopeList(ctx context.Context, in *GetScopeListRequest, opts ...grpc.CallOption) (*GetScopesResponse, error) {
+	out := new(GetScopesResponse)
+	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/GetScopeList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *permissionServiceClient) AddPermissionScope(ctx context.Context, in *AddPermissionScopeRequest, opts ...grpc.CallOption) (*PermissionScope, error) {
 	out := new(PermissionScope)
 	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/AddPermissionScope", in, out, opts...)
@@ -208,6 +218,7 @@ type PermissionServiceServer interface {
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*GetPermissionByIDResponse, error)
 	DeletePermission(context.Context, *PermissionPrimaryKey) (*empty.Empty, error)
 	UpsertScope(context.Context, *UpsertScopeRequest) (*Scope, error)
+	GetScopeList(context.Context, *GetScopeListRequest) (*GetScopesResponse, error)
 	AddPermissionScope(context.Context, *AddPermissionScopeRequest) (*PermissionScope, error)
 	RemovePermissionScope(context.Context, *PermissionScopePrimaryKey) (*PermissionScope, error)
 	AddRolePermission(context.Context, *AddRolePermissionRequest) (*RolePermission, error)
@@ -252,6 +263,9 @@ func (UnimplementedPermissionServiceServer) DeletePermission(context.Context, *P
 }
 func (UnimplementedPermissionServiceServer) UpsertScope(context.Context, *UpsertScopeRequest) (*Scope, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertScope not implemented")
+}
+func (UnimplementedPermissionServiceServer) GetScopeList(context.Context, *GetScopeListRequest) (*GetScopesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetScopeList not implemented")
 }
 func (UnimplementedPermissionServiceServer) AddPermissionScope(context.Context, *AddPermissionScopeRequest) (*PermissionScope, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddPermissionScope not implemented")
@@ -479,6 +493,24 @@ func _PermissionService_UpsertScope_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PermissionService_GetScopeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetScopeListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServiceServer).GetScopeList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.PermissionService/GetScopeList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServiceServer).GetScopeList(ctx, req.(*GetScopeListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PermissionService_AddPermissionScope_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddPermissionScopeRequest)
 	if err := dec(in); err != nil {
@@ -619,6 +651,10 @@ var PermissionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpsertScope",
 			Handler:    _PermissionService_UpsertScope_Handler,
+		},
+		{
+			MethodName: "GetScopeList",
+			Handler:    _PermissionService_GetScopeList_Handler,
 		},
 		{
 			MethodName: "AddPermissionScope",

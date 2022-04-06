@@ -213,6 +213,19 @@ func (s *permissionService) UpsertScope(ctx context.Context, req *pb.UpsertScope
 	return s.strg.Scope().GetByPK(ctx, pKey)
 }
 
+func (s *permissionService) GetScopesList(ctx context.Context, req *pb.GetScopeListRequest) (*pb.GetScopesResponse, error) {
+	s.log.Info("---GetScopesList--->", logger.Any("req", req))
+
+	res, err := s.strg.Scope().GetList(ctx, req)
+
+	if err != nil {
+		s.log.Error("!!!GetScopesList--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return res, err
+}
+
 func (s *permissionService) AddPermissionScope(ctx context.Context, req *pb.AddPermissionScopeRequest) (*pb.PermissionScope, error) {
 	s.log.Info("---AddPermissionScope--->", logger.Any("req", req))
 

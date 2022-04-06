@@ -75,3 +75,41 @@ func (r *scopeRepo) GetByPK(ctx context.Context, pKey *pb.ScopePrimaryKey) (res 
 
 	return res, nil
 }
+
+func (r *scopeRepo) GetList(ctx context.Context, req *pb.GetScopeListRequest) (res *pb.GetScopesResponse, err error) {
+	res = &pb.GetScopesResponse{}
+	query := `SELECT
+			client_platform_id,
+			COALESCE(path, ''),
+			COALESCE(method, ''),
+			COALESCE(requests, 0) AS requests
+  		FROM
+			"scope"
+  		WHERE client_platform_id = $1`
+
+	if req.OrderBy == "" && req.OrderType == "" {
+		query += " ORDER BY " + req.OrderBy + " " + req.OrderType
+	}
+
+	rows, err := r.db.Query(ctx, query, req.ClientPlatformId)
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		scope := &pb.Scope{}
+		err = rows.Scan(
+			&scope.ClientPlatformId,
+			&scope.Path,
+			&scope.Method,
+			&scope.Requests,
+		)
+		if err != nil {
+			return res, err
+		}
+
+		res.Scopes = append(res.Scopes, scope)
+	}
+
+	return res, nil
+}

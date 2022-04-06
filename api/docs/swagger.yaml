@@ -353,6 +353,15 @@ definitions:
           $ref: '#/definitions/auth_service.Role'
         type: array
     type: object
+  auth_service.GetScopesResponse:
+    properties:
+      count:
+        type: integer
+      scopes:
+        items:
+          $ref: '#/definitions/auth_service.Scope'
+        type: array
+    type: object
   auth_service.GetUserListResponse:
     properties:
       count:
@@ -2830,6 +2839,62 @@ paths:
       summary: Get Role By ID
       tags:
       - Role
+  /scope:
+    get:
+      consumes:
+      - application/json
+      description: Get Scopes List
+      operationId: get_scopes_list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: client-platform-id
+        in: query
+        name: client-platform-id
+        required: true
+        type: string
+      - description: search
+        in: query
+        name: search
+        type: string
+      - description: order_by
+        in: query
+        name: order_by
+        type: string
+      - description: order_type
+        in: query
+        name: order_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetScopesListResponseBody
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.GetScopesResponse'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get Scopes List
+      tags:
+      - Scope
   /sphere:
     get:
       consumes:
@@ -3045,7 +3110,7 @@ paths:
               type: object
       summary: Upsert Scope
       tags:
-      - UpsertScope
+      - Scope
   /user:
     get:
       consumes:

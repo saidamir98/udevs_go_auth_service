@@ -377,7 +377,7 @@ func (h *Handler) DeletePermission(c *gin.Context) {
 // @Router /upsert-scope [POST]
 // @Summary Upsert Scope
 // @Description Upsert Scope
-// @Tags UpsertScope
+// @Tags Scope
 // @Accept json
 // @Produce json
 // @Param upsert-scope body auth_service.UpsertScopeRequest true "UpsertScopeRequestBody"
@@ -404,6 +404,62 @@ func (h *Handler) UpsertScope(c *gin.Context) {
 	}
 
 	h.handleResponse(c, http.Created, resp)
+}
+
+// GetScopesList godoc
+// @ID get_scopes_list
+// @Router /scope [GET]
+// @Summary Get Scopes List
+// @Description  Get Scopes List
+// @Tags Scope
+// @Accept json
+// @Produce json
+// @Param offset query integer false "offset"
+// @Param limit query integer false "limit"
+// @Param client-platform-id query string true "client-platform-id"
+// @Param search query string false "search"
+// @Param order_by query string false "order_by"
+// @Param order_type query string false "order_type"
+// @Success 200 {object} http.Response{data=auth_service.GetScopesResponse} "GetScopesListResponseBody"
+// @Response 400 {object} http.Response{data=string} "Invalid Argument"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetScopesList(c *gin.Context) {
+	clientPlatformID := c.Query("client-platform-id")
+	if !util.IsValidUUID(clientPlatformID) {
+		h.handleResponse(c, http.InvalidArgument, "Client platform id is an invalid uuid")
+		return
+	}
+
+	offset, err := h.getOffsetParam(c)
+	if err != nil {
+		h.handleResponse(c, http.InvalidArgument, err.Error())
+		return
+	}
+
+	limit, err := h.getLimitParam(c)
+	if err != nil {
+		h.handleResponse(c, http.InvalidArgument, err.Error())
+		return
+	}
+
+	resp, err := h.services.PermissionService().GetScopeList(
+		c.Request.Context(),
+		&auth_service.GetScopeListRequest{
+			Offset:           uint32(offset),
+			Limit:            uint32(limit),
+			Search:           c.Query("search"),
+			OrderBy:          c.Query("order_by"),
+			OrderType:        c.Query("order_type"),
+			ClientPlatformId: clientPlatformID,
+		},
+	)
+
+	if err != nil {
+		h.handleResponse(c, http.GRPCError, err.Error())
+		return
+	}
+
+	h.handleResponse(c, http.OK, resp)
 }
 
 // AddPermissionScope godoc
