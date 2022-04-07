@@ -4670,7 +4670,7 @@ var doc = `{
         "auth_service.AddSessionToIntegrationRequest": {
             "type": "object",
             "properties": {
-                "date": {
+                "data": {
                     "type": "string"
                 },
                 "expires_at": {

@@ -62,7 +62,7 @@ definitions:
     type: object
   auth_service.AddSessionToIntegrationRequest:
     properties:
-      date:
+      data:
         type: string
       expires_at:
         type: string
