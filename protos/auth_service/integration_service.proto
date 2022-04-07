@@ -84,7 +84,7 @@ message AddSessionToIntegrationRequest {
     string integration_id = 1;
     string secret_key = 2;
     string expires_at = 3;
-    string date = 4;
+    string data = 4;
 }
 
 message AddSessionToIntegrationResponse {
