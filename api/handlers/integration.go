@@ -43,7 +43,7 @@ func (h *Handler) CreateIntegration(c *gin.Context) {
 
 // GetIntegrationList godoc
 // @ID get_integration_list
-// @Router /integration/{integration-id}/session [GET]
+// @Router /integration [GET]
 // @Summary Get Integration List
 // @Description  Get Integration List
 // @Tags Integration

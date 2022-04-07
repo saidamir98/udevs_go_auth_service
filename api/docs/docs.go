@@ -1051,6 +1051,96 @@ var doc = `{
             }
         },
         "/integration": {
+            "get": {
+                "description": "Get Integration List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integration"
+                ],
+                "summary": "Get Integration List",
+                "operationId": "get_integration_list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "client-platform-id",
+                        "name": "client-platform-id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "client-type-id",
+                        "name": "client-type-id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "project-id",
+                        "name": "project-id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "GetIntegrationListResponseBody",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.GetIntegrationListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create Integration",
                 "consumes": [
@@ -4580,6 +4670,9 @@ var doc = `{
         "auth_service.AddSessionToIntegrationRequest": {
             "type": "object",
             "properties": {
+                "date": {
+                    "type": "string"
+                },
                 "expires_at": {
                     "type": "string"
                 },

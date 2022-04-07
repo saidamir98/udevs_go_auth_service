@@ -150,7 +150,7 @@ func (s *integrationService) AddSessionToIntegration(ctx context.Context, req *p
 		IntegrationId:    integration.Id,
 		RoleId:           integration.RoleId,
 		Ip:               "0.0.0.0",
-		Data:             integration.Data,
+		Data:             req.Data,
 		ExpiresAt:        expiresAt.Format(config.DatabaseTimeLayout),
 	})
 	if err != nil {

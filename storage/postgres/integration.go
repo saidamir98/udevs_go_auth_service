@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"upm/udevs_go_auth_service/config"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
@@ -128,6 +129,7 @@ func (r *IntegrationRepo) GetByPK(ctx context.Context, pKey *pb.IntegrationPrima
 
 func (r *IntegrationRepo) GetIntegrationSessions(ctx context.Context, pKey *pb.IntegrationPrimaryKey) (res *pb.GetIntegrationSessionsResponse, err error) {
 	res = &pb.GetIntegrationSessionsResponse{}
+	fmt.Println("PKEY: ", pKey)
 	query := `
 		SELECT 
 			id,
@@ -153,7 +155,10 @@ func (r *IntegrationRepo) GetIntegrationSessions(ctx context.Context, pKey *pb.I
 	defer rows.Close()
 
 	for rows.Next() {
-		temp := new(pb.Session)
+		var (
+			temp pb.Session
+			ip   sql.NullString
+		)
 		err = rows.Scan(
 			&temp.Id,
 			&temp.IntegrationId,
@@ -161,17 +166,22 @@ func (r *IntegrationRepo) GetIntegrationSessions(ctx context.Context, pKey *pb.I
 			&temp.ClientTypeId,
 			&temp.ClientPlatformId,
 			&temp.RoleId,
-			&temp.Ip,
+			&ip,
 			&temp.Data,
 			&temp.ExpiresAt,
 			&temp.CreatedAt,
 			&temp.UpdatedAt,
 		)
+
+		if ip.Valid {
+			temp.Ip = ip.String
+		}
 		if err != nil {
+			fmt.Println("ERROREREROSASKAS HERE")
 			return nil, err
 		}
 
-		res.Sessions = append(res.Sessions, temp)
+		res.Sessions = append(res.Sessions, &temp)
 	}
 
 	return res, nil
