@@ -28,6 +28,20 @@ service PermissionService {
     rpc AddRolePermission(AddRolePermissionRequest) returns (RolePermission) {}
     rpc AddRolePermissions(AddRolePermissionsRequest) returns (AddRolePermissionsResponse) {}
     rpc RemoveRolePermission(RolePermissionPrimaryKey) returns (RolePermission) {}
+    rpc PermissionList(PermissionGenerated) returns(google.protobuf.Empty) {}
+}
+
+message PermissionGenerated {
+    message Permission {
+        string permission = 1;
+        message Scope {
+            string url = 1;
+            string method = 2;
+        }
+        repeated Scope scopes = 2;
+        repeated Permission children = 3;
+    }
+    repeated Permission permissions = 1;
 }
 
 message GetPermissionByIDResponse {

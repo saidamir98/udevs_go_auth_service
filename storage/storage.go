@@ -84,6 +84,7 @@ type PermissionRepoI interface {
 	GetByPK(ctx context.Context, pKey *pb.PermissionPrimaryKey) (res *pb.GetPermissionByIDResponse, err error)
 	Update(ctx context.Context, entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error)
 	Delete(ctx context.Context, pKey *pb.PermissionPrimaryKey) (rowsAffected int64, err error)
+	GetListByClientPlatformId(ctx context.Context, clientPlatformID string) (res []*pb.Permission, err error)
 }
 
 type ScopeRepoI interface {

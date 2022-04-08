@@ -123,6 +123,14 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	permissions, err := s.strg.Permission().GetListByClientPlatformId(ctx, user.ClientPlatformId)
+	if err != nil {
+		s.log.Error("!!!Login--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	res.Permissions = permissions
+
 	if client.LoginStrategy != pb.LoginStrategies_STANDARD {
 		err := errors.New("incorrect login strategy")
 		s.log.Error("!!!Login--->", logger.Error(err))

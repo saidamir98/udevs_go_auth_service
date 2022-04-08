@@ -2,6 +2,9 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"strings"
+	"upm/udevs_go_auth_service/genproto/auth_service"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
 	"upm/udevs_go_auth_service/storage"
@@ -193,6 +196,54 @@ func (r *permissionRepo) GetList(ctx context.Context, queryParam *pb.GetPermissi
 	return res, nil
 }
 
+func (r *permissionRepo) GetListByClientPlatformId(ctx context.Context, clientPlatformID string) (res []*pb.Permission, err error) {
+	var (
+		permissionMap = make(map[string]*pb.Permission)
+	)
+	res = []*pb.Permission{}
+
+	query := `SELECT
+		id,
+		client_platform_id,
+		parent_id,
+		name
+	FROM
+		"permission"
+	ORDER BY created_at`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		permission := &pb.Permission{}
+		var parentID *string
+		err = rows.Scan(
+			&permission.Id,
+			&permission.ClientPlatformId,
+			&parentID,
+			&permission.Name,
+		)
+		if parentID != nil {
+			permission.ParentId = *parentID
+		}
+
+		if permission.ParentId != "" {
+			permission.Name = permissionMap[permission.GetParentId()].GetName() + "/" + permission.Name
+		}
+
+		permissionMap[permission.Id] = permission
+
+		if err != nil {
+			return res, err
+		}
+		res = append(res, permission)
+	}
+	return res, nil
+}
+
 func (r *permissionRepo) Update(ctx context.Context, entity *pb.UpdatePermissionRequest) (rowsAffected int64, err error) {
 	if entity.Id == entity.ParentId {
 		err = storage.ErrorTheSameId
@@ -243,46 +294,54 @@ func (r *permissionRepo) Delete(ctx context.Context, pKey *pb.PermissionPrimaryK
 	return rowsAffected, err
 }
 
-// func InsertFareValue(fareID string, tx *sql.Tx) error {
-// 	values := []interface{}{}
-// 	query := `
-// 		INSERT INTO fare_value(
-// 			id,
-// 			fare_id,
-// 			from_price,
-// 			to_price,
-// 			delivery_price,
-// 			from_distance,
-// 			to_distance
-// 		) VALUES `
+func (r *permissionRepo) GeneratePermission(ctx context.Context, req auth_service.PermissionGenerated) (res *auth_service.Permission, err error) {
 
-// 		json.un
-// 	for _, v := range fare.FareValues {
-// 		query += "(?, ?, ?, ?, ?, ?, ?),"
-// 		id, _ := uuid.NewRandom()
-// 		values = append(values,
-// 			id.String(),
-// 			fareID,
-// 			v.FromPrice,
-// 			v.ToPrice,
-// 			v.DeliveryPrice,
-// 			v.FromDistance,
-// 			v.ToDistance,
-// 		)
-// 	}
+	return nil, nil
+}
 
-// 	query = strings.TrimSuffix(query, ",")
-// 	query = helper.ReplaceSQL(query, "?")
+func MakePermissions(permissions *auth_service.PermissionGenerated_Permission) []*auth_service.Permission {
+	var (
+		res []*auth_service.Permission
+	)
+	if permissions.Children == nil {
+		return res
+	}
 
-// 	stmt, err := tx.Prepare(query)
-// 	if err != nil {
-// 		return err
-// 	}
+	return res
+}
 
-// 	_, err = stmt.Exec(values...)
-// 	if err != nil {
-// 		return err
-// 	}
+func InsertScopes(scopes []*auth_service.PermissionGenerated_Permission_Scope, permissionID, clientPlatformID string, tx *sql.Tx) error {
+	values := []interface{}{}
+	query := `
+		INSERT INTO "permission_scope" (
+		permission_id,
+		client_platform_id,
+		path,
+		method
+		) VALUES `
 
-// 	return nil
-// }
+	for _, v := range scopes {
+		query += "(?, ?, ?, ?),"
+		values = append(values,
+			permissionID,
+			clientPlatformID,
+			v.GetUrl(),
+			v.GetMethod(),
+		)
+	}
+
+	query = strings.TrimSuffix(query, ",")
+	query = helper.ReplaceSQL(query, "?")
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(values...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

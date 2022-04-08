@@ -40,6 +40,7 @@ type PermissionServiceClient interface {
 	AddRolePermission(ctx context.Context, in *AddRolePermissionRequest, opts ...grpc.CallOption) (*RolePermission, error)
 	AddRolePermissions(ctx context.Context, in *AddRolePermissionsRequest, opts ...grpc.CallOption) (*AddRolePermissionsResponse, error)
 	RemoveRolePermission(ctx context.Context, in *RolePermissionPrimaryKey, opts ...grpc.CallOption) (*RolePermission, error)
+	PermissionList(ctx context.Context, in *PermissionGenerated, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type permissionServiceClient struct {
@@ -203,6 +204,15 @@ func (c *permissionServiceClient) RemoveRolePermission(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *permissionServiceClient) PermissionList(ctx context.Context, in *PermissionGenerated, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/auth_service.PermissionService/PermissionList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PermissionServiceServer is the server API for PermissionService service.
 // All implementations must embed UnimplementedPermissionServiceServer
 // for forward compatibility
@@ -224,6 +234,7 @@ type PermissionServiceServer interface {
 	AddRolePermission(context.Context, *AddRolePermissionRequest) (*RolePermission, error)
 	AddRolePermissions(context.Context, *AddRolePermissionsRequest) (*AddRolePermissionsResponse, error)
 	RemoveRolePermission(context.Context, *RolePermissionPrimaryKey) (*RolePermission, error)
+	PermissionList(context.Context, *PermissionGenerated) (*empty.Empty, error)
 	mustEmbedUnimplementedPermissionServiceServer()
 }
 
@@ -281,6 +292,9 @@ func (UnimplementedPermissionServiceServer) AddRolePermissions(context.Context, 
 }
 func (UnimplementedPermissionServiceServer) RemoveRolePermission(context.Context, *RolePermissionPrimaryKey) (*RolePermission, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveRolePermission not implemented")
+}
+func (UnimplementedPermissionServiceServer) PermissionList(context.Context, *PermissionGenerated) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PermissionList not implemented")
 }
 func (UnimplementedPermissionServiceServer) mustEmbedUnimplementedPermissionServiceServer() {}
 
@@ -601,6 +615,24 @@ func _PermissionService_RemoveRolePermission_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PermissionService_PermissionList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionGenerated)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServiceServer).PermissionList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_service.PermissionService/PermissionList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServiceServer).PermissionList(ctx, req.(*PermissionGenerated))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PermissionService_ServiceDesc is the grpc.ServiceDesc for PermissionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -675,6 +707,10 @@ var PermissionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveRolePermission",
 			Handler:    _PermissionService_RemoveRolePermission_Handler,
+		},
+		{
+			MethodName: "PermissionList",
+			Handler:    _PermissionService_PermissionList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

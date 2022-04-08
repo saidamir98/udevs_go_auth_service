@@ -631,3 +631,19 @@ func (h *Handler) RemoveRolePermission(c *gin.Context) {
 
 	h.handleResponse(c, http.NoContent, resp)
 }
+
+// AddPermissionScope godoc
+// @ID permission_generated
+// @Router /permission_generated [POST]
+// @Summary Generate Permission
+// @Description Generate Permission
+// @Tags Permission
+// @Accept json
+// @Produce json
+// @Param permission-scope body auth_service.PermissionGenerated true "AddPermissionScopeRequestBody"
+// @Success 201 {object} http.Response{data=auth_service.PermissionScope} "PermissionScope data"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) PermissionGeneratedPermission(c *gin.Context) {
+
+}

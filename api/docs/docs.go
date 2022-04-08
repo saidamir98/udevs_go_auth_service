@@ -2107,6 +2107,71 @@ var doc = `{
                 }
             }
         },
+        "/permission_generated": {
+            "post": {
+                "description": "Generate Permission",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Generate Permission",
+                "operationId": "permission_generated",
+                "parameters": [
+                    {
+                        "description": "AddPermissionScopeRequestBody",
+                        "name": "permission-scope",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_service.PermissionGenerated"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "PermissionScope data",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/auth_service.PermissionScope"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/ping": {
             "get": {
                 "description": "this returns \"pong\" messsage to show service is working",
@@ -5279,6 +5344,48 @@ var doc = `{
                     "type": "string"
                 },
                 "parent_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth_service.PermissionGenerated": {
+            "type": "object",
+            "properties": {
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.PermissionGenerated_Permission"
+                    }
+                }
+            }
+        },
+        "auth_service.PermissionGenerated_Permission": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.PermissionGenerated_Permission"
+                    }
+                },
+                "permission": {
+                    "type": "string"
+                },
+                "scopes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/auth_service.PermissionGenerated_Permission_Scope"
+                    }
+                }
+            }
+        },
+        "auth_service.PermissionGenerated_Permission_Scope": {
+            "type": "object",
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }

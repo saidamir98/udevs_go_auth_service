@@ -464,6 +464,33 @@ definitions:
       parent_id:
         type: string
     type: object
+  auth_service.PermissionGenerated:
+    properties:
+      permissions:
+        items:
+          $ref: '#/definitions/auth_service.PermissionGenerated_Permission'
+        type: array
+    type: object
+  auth_service.PermissionGenerated_Permission:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/auth_service.PermissionGenerated_Permission'
+        type: array
+      permission:
+        type: string
+      scopes:
+        items:
+          $ref: '#/definitions/auth_service.PermissionGenerated_Permission_Scope'
+        type: array
+    type: object
+  auth_service.PermissionGenerated_Permission_Scope:
+    properties:
+      method:
+        type: string
+      url:
+        type: string
+    type: object
   auth_service.PermissionScope:
     properties:
       client_platform_id:
@@ -2157,6 +2184,43 @@ paths:
                   type: string
               type: object
       summary: Get Permission By ID
+      tags:
+      - Permission
+  /permission_generated:
+    post:
+      consumes:
+      - application/json
+      description: Generate Permission
+      operationId: permission_generated
+      parameters:
+      - description: AddPermissionScopeRequestBody
+        in: body
+        name: permission-scope
+        required: true
+        schema:
+          $ref: '#/definitions/auth_service.PermissionGenerated'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: PermissionScope data
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth_service.PermissionScope'
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Generate Permission
       tags:
       - Permission
   /ping:
