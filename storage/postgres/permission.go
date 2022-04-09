@@ -196,6 +196,63 @@ func (r *permissionRepo) GetList(ctx context.Context, queryParam *pb.GetPermissi
 	return res, nil
 }
 
+func (r *permissionRepo) GetListByRoleId(ctx context.Context, roleID string) (res []*pb.Permission, err error) {
+	var (
+		permissionMap = make(map[string]*pb.Permission)
+	)
+	res = []*pb.Permission{}
+
+	query := `SELECT
+		p.id,
+		p.name,
+		p.parent_id,
+		p.client_platform_id
+	FROM 
+		"role_permission"
+	AS
+		rp
+	INNER JOIN
+			"permission" 
+		AS 
+			p
+	ON
+		p.id = rp.permission_id
+	WHERE
+		rp.role_id = $1`
+
+	rows, err := r.db.Query(ctx, query, roleID)
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		permission := &pb.Permission{}
+		var parentID *string
+		err = rows.Scan(
+			&permission.Id,
+			&permission.ClientPlatformId,
+			&parentID,
+			&permission.Name,
+		)
+		if parentID != nil {
+			permission.ParentId = *parentID
+		}
+
+		if permission.ParentId != "" {
+			permission.Name = permissionMap[permission.GetParentId()].GetName() + "/" + permission.Name
+		}
+
+		permissionMap[permission.Id] = permission
+
+		if err != nil {
+			return res, err
+		}
+		res = append(res, permission)
+	}
+	return res, nil
+}
+
 func (r *permissionRepo) GetListByClientPlatformId(ctx context.Context, clientPlatformID string) (res []*pb.Permission, err error) {
 	var (
 		permissionMap = make(map[string]*pb.Permission)
@@ -209,9 +266,11 @@ func (r *permissionRepo) GetListByClientPlatformId(ctx context.Context, clientPl
 		name
 	FROM
 		"permission"
+	WHERE
+		client_platform_id = $1
 	ORDER BY created_at`
 
-	rows, err := r.db.Query(ctx, query)
+	rows, err := r.db.Query(ctx, query, clientPlatformID)
 	if err != nil {
 		return res, err
 	}

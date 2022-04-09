@@ -123,7 +123,7 @@ func (s *sessionService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	permissions, err := s.strg.Permission().GetListByClientPlatformId(ctx, user.ClientPlatformId)
+	permissions, err := s.strg.Permission().GetListByRoleId(ctx, user.RoleId)
 	if err != nil {
 		s.log.Error("!!!Login--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())

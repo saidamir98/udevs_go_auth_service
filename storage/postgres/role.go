@@ -130,7 +130,7 @@ func (r *roleRepo) GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrima
 	}
 
 	getPermissionQuery := `SELECT
-			rp.permission_id,
+			p.id,
 			p.name,
 			p.parent_id,
 			p.client_platform_id
@@ -145,7 +145,7 @@ func (r *roleRepo) GetRoleByIdDetailed(ctx context.Context, entity *pb.RolePrima
 		ON
 			p.id = rp.permission_id
 		WHERE
-			rp.role_id = $1 `
+			rp.role_id = $1`
 
 	rows, err := r.db.Query(ctx, getPermissionQuery, entity.GetId())
 	if err != nil {
