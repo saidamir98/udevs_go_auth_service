@@ -218,7 +218,8 @@ func (r *permissionRepo) GetListByRoleId(ctx context.Context, roleID string) (re
 	ON
 		p.id = rp.permission_id
 	WHERE
-		rp.role_id = $1`
+		rp.role_id = $1
+	ORDER BY p.created_at`
 
 	rows, err := r.db.Query(ctx, query, roleID)
 	if err != nil {
