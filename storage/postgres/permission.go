@@ -204,9 +204,9 @@ func (r *permissionRepo) GetListByRoleId(ctx context.Context, roleID string) (re
 
 	query := `SELECT
 		p.id,
-		p.name,
+		p.client_platform_id,
 		p.parent_id,
-		p.client_platform_id
+		p.name
 	FROM 
 		"role_permission"
 	AS
