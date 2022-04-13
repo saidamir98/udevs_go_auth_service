@@ -4,8 +4,9 @@ import (
 	"context"
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/pkg/helper"
-	"upm/udevs_go_auth_service/pkg/util"
 	"upm/udevs_go_auth_service/storage"
+
+	"github.com/saidamir98/udevs_pkg/util"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"

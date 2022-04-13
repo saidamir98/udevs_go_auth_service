@@ -6,9 +6,11 @@ import (
 	"time"
 	"upm/udevs_go_auth_service/config"
 	"upm/udevs_go_auth_service/grpc/client"
-	"upm/udevs_go_auth_service/pkg/logger"
-	"upm/udevs_go_auth_service/pkg/security"
 	"upm/udevs_go_auth_service/storage"
+
+	"github.com/saidamir98/udevs_pkg/security"
+
+	"github.com/saidamir98/udevs_pkg/logger"
 
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 
