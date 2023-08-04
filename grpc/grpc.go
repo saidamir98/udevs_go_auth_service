@@ -6,8 +6,9 @@ import (
 	"upm/udevs_go_auth_service/genproto/ping_service"
 	"upm/udevs_go_auth_service/grpc/client"
 	"upm/udevs_go_auth_service/grpc/service"
-	"upm/udevs_go_auth_service/pkg/logger"
 	"upm/udevs_go_auth_service/storage"
+
+	"github.com/saidamir98/udevs_pkg/logger"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

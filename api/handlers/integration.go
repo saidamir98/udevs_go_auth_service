@@ -3,7 +3,8 @@ package handlers
 import (
 	"upm/udevs_go_auth_service/api/http"
 	"upm/udevs_go_auth_service/genproto/auth_service"
-	"upm/udevs_go_auth_service/pkg/util"
+
+	"github.com/saidamir98/udevs_pkg/util"
 
 	"github.com/gin-gonic/gin"
 )

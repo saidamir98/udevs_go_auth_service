@@ -8,8 +8,9 @@ import (
 	"upm/udevs_go_auth_service/config"
 	"upm/udevs_go_auth_service/grpc"
 	"upm/udevs_go_auth_service/grpc/client"
-	"upm/udevs_go_auth_service/pkg/logger"
 	"upm/udevs_go_auth_service/storage/postgres"
+
+	"github.com/saidamir98/udevs_pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )

@@ -5,7 +5,8 @@ import (
 	"upm/udevs_go_auth_service/api/http"
 	"upm/udevs_go_auth_service/config"
 	"upm/udevs_go_auth_service/grpc/client"
-	"upm/udevs_go_auth_service/pkg/logger"
+
+	"github.com/saidamir98/udevs_pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )

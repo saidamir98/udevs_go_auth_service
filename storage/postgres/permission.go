@@ -204,9 +204,9 @@ func (r *permissionRepo) GetListByRoleId(ctx context.Context, roleID string) (re
 
 	query := `SELECT
 		p.id,
-		p.name,
+		p.client_platform_id,
 		p.parent_id,
-		p.client_platform_id
+		p.name
 	FROM 
 		"role_permission"
 	AS
@@ -218,7 +218,8 @@ func (r *permissionRepo) GetListByRoleId(ctx context.Context, roleID string) (re
 	ON
 		p.id = rp.permission_id
 	WHERE
-		rp.role_id = $1`
+		rp.role_id = $1
+	ORDER BY p.created_at`
 
 	rows, err := r.db.Query(ctx, query, roleID)
 	if err != nil {

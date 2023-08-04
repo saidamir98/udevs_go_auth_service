@@ -9,9 +9,11 @@ import (
 	pb "upm/udevs_go_auth_service/genproto/auth_service"
 	"upm/udevs_go_auth_service/grpc/client"
 	"upm/udevs_go_auth_service/pkg/helper"
-	"upm/udevs_go_auth_service/pkg/logger"
-	"upm/udevs_go_auth_service/pkg/security"
 	"upm/udevs_go_auth_service/storage"
+
+	"github.com/saidamir98/udevs_pkg/security"
+
+	"github.com/saidamir98/udevs_pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
