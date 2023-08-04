@@ -1,25 +1,39 @@
 package helper
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 )
+
+type queryParams struct {
+	Key string
+	Val interface{}
+}
 
 func ReplaceQueryParams(namedQuery string, params map[string]interface{}) (string, []interface{}) {
 	var (
 		i    int = 1
 		args []interface{}
+		arr  []queryParams
 	)
 
 	for k, v := range params {
-		if k != "" {
-			oldsize := len(namedQuery)
-			namedQuery = strings.ReplaceAll(namedQuery, ":"+k, "$"+strconv.Itoa(i))
+		arr = append(arr, queryParams{
+			Key: k,
+			Val: v,
+		})
+	}
 
-			if oldsize != len(namedQuery) {
-				args = append(args, v)
-				i++
-			}
+	sort.Slice(arr, func(i, j int) bool {
+		return len(arr[i].Key) > len(arr[j].Key)
+	})
+
+	for _, v := range arr {
+		if v.Key != "" && strings.Contains(namedQuery, ":"+v.Key) {
+			namedQuery = strings.ReplaceAll(namedQuery, ":"+v.Key, "$"+strconv.Itoa(i))
+			args = append(args, v.Val)
+			i++
 		}
 	}
 
